@@ -1,0 +1,243 @@
+@font-face {
+  font-family: "Neue Haas Unica Black";
+  src: url("Neue/Linotype - Neue Haas Unica Pro Black.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Unica Heavy";
+  src: url("Neue/Linotype - Neue Haas Unica Pro Heavy.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Unica Bold";
+  src: url("Neue/Linotype - Neue Haas Unica Pro Bold.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Unica Medium";
+  src: url("Neue/NeueHaasUnica-Medium.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Unica Regular";
+  src: url("Neue/NeueHaasUnica-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Unica Light";
+  src: url("Neue/Linotype - Neue Haas Unica Pro Light.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Input Mono";
+  src: url("InputMono/InputMono-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Input Mono Medium";
+  src: url("InputMono/InputMono-Medium.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #fff;
+  --text: #2a2527;
+  --pit: #c2bbc5;
+  --asterisk: #75908b;
+  --compose-num: #66807b;
+  --col-gap: 8px;
+  --pad: 12px;
+  --pad-x: 14px;
+  --topbar-h: calc(12px + 0.5px + 10px + 12px + var(--pad));
+  --hover-pink: #E63462;
+}
+
+html, body {
+  font-family: "Nimbus Sans L Regular Condensed", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Top hairline — outside topbar so hover blend changes don't affect it */
+body::before {
+  content: "";
+  position: fixed;
+  top: 12px;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  height: 0.5px;
+  background: #fff;
+  mix-blend-mode: difference;
+  z-index: 101;
+  pointer-events: none;
+}
+
+/* Shared topbar (matches index) */
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--col-gap);
+  padding: calc(12px + 0.5px + 9px) var(--pad-x) var(--pad);
+  font-family: "Input Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0;
+  line-height: 1;
+  pointer-events: none;
+  background: transparent;
+  mix-blend-mode: difference;
+}
+.topbar .name {
+  grid-column: 1;
+  color: #fff;
+  pointer-events: auto;
+}
+.topbar a {
+  pointer-events: auto;
+  color: #fff;
+  text-decoration: none;
+}
+.topbar-nav {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    row-gap: 0;
+  }
+  .topbar .name {
+    grid-column: 1;
+  }
+  .topbar-nav {
+    grid-column: 2;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: var(--pad);
+    width: 100%;
+  }
+}
+
+/* Word-trail transitions (color only applied on desktop) */
+.text-trail .trail-word {
+  color: inherit;
+  transition: color 6s ease;
+}
+
+/* Desktop: pink hover + word-trail (not on touch/mobile) */
+@media (min-width: 769px) and (hover: hover) {
+  :where(
+    a,
+    button,
+    p,
+    span,
+    h1,
+    h2,
+    h3,
+    h4,
+    li,
+    label,
+    .name,
+    .word,
+    .word__label,
+    .compose-btn,
+    .compose-meta,
+    .k,
+    .v,
+    .contact-row,
+    .page-title,
+    .title,
+    .body-copy,
+    .info-label,
+    .info-org,
+    .info-date,
+    .info-contact,
+    .info-item
+  ):hover {
+    color: var(--hover-pink) !important;
+  }
+
+  /* ABOUT label stays put */
+  .about-title,
+  .about-title:hover {
+    color: inherit !important;
+  }
+
+  /* Body copy with word-trail: don't flash the whole block / nested spans */
+  .text-trail:hover,
+  .text-trail span:hover {
+    color: inherit !important;
+  }
+  .text-trail .trail-word.is-lit,
+  .text-trail .trail-word.is-lit:hover {
+    color: var(--hover-pink) !important;
+    transition: color 0.05s linear;
+  }
+
+  .word,
+  .word__label {
+    transition: color 0.08s ease;
+  }
+  .word:hover .word__label,
+  .word.hot:hover .word__label,
+  .hero.is-previewing .word.hot .word__label {
+    color: var(--hover-pink) !important;
+  }
+
+  /* Difference blend hides true pink — drop it on text only; hairlines stay separate */
+  .topbar:has(.name:hover),
+  .topbar:has(a:hover) {
+    mix-blend-mode: normal;
+  }
+  .topbar:has(.name:hover) .name,
+  .topbar:has(.name:hover) a,
+  .topbar:has(a:hover) .name,
+  .topbar:has(a:hover) a {
+    color: var(--text);
+  }
+  .topbar .name:hover,
+  .topbar a:hover {
+    color: var(--hover-pink) !important;
+  }
+
+  /* Instant pink — no word-trail fade */
+  a.link-instant,
+  a.link-instant:hover {
+    transition: none !important;
+  }
+  a.link-instant:hover {
+    color: var(--hover-pink) !important;
+  }
+}

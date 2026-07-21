@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../fonts.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeannie Han</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    min-height:100%;
+    background:#fff;
+    color:#000;
+    font-family:"Input Mono", monospace;
+  }
+
+  a { color:inherit; text-decoration:none; }
+
+  /*
+    Top structure (matches index chrome):
+      12px → line → 9px → nav text → 9px → line → 9px → ABOUT
+    Bottom rule is outside .topbar so nav hover blend never affects it.
+  */
+  .topbar {
+    padding-bottom:9px;
+  }
+
+  .chrome-rule--below-nav {
+    position:fixed;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    height:0.5px;
+    background:#fff;
+    mix-blend-mode:difference;
+    z-index:101;
+    pointer-events:none;
+  }
+
+  /* Matches landing compose-btn bottom hairline */
+  .chrome-rule--bottom {
+    position:fixed;
+    bottom:12px;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    height:0.5px;
+    background:#000;
+    z-index:101;
+    pointer-events:none;
+  }
+
+  .wrap {
+    /* top line + gaps + nav + gap + bottom line box + gap → ABOUT */
+    padding:calc(12px + 0.5px + 9px + 9px + 9px + 9px) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
+  }
+
+  .about-title {
+    font-size:12px;
+    font-weight:700;
+    line-height:1;
+    text-transform:uppercase;
+    color:#000;
+  }
+
+  .about-body {
+    margin-top:1.2em;
+    max-width:152ch;
+    font-size:10px;
+    line-height:1.45;
+  }
+
+  .about-body .bio {
+    margin:0;
+  }
+
+  .about-body .cv {
+    display:block;
+    margin-top:1.45em;
+    line-height:1.45;
+    font-family:"Input Mono Medium", "Input Mono", monospace;
+  }
+
+  .experience {
+    margin-top:1.45em;
+    font-size:10px;
+    line-height:1.45;
+  }
+  .experience-label {
+    margin:0;
+    font-weight:400;
+  }
+  .experience-org {
+    margin:0;
+    padding-left:4ch;
+  }
+  .experience-date {
+    margin:0;
+    padding-left:8ch;
+  }
+
+  .education {
+    margin-top:1.45em; /* one line gap under Experience */
+    font-size:10px;
+    line-height:1.45;
+  }
+  .education-label {
+    margin:0;
+    font-weight:400;
+  }
+  .education-school {
+    margin:0;
+    padding-left:4ch;
+  }
+  .education-date {
+    margin:0;
+    padding-left:6ch;
+  }
+
+  .contact-block {
+    margin-top:1.45em; /* one line gap under Education */
+    font-size:10px;
+    line-height:1.45;
+  }
+  .contact-label {
+    margin:0;
+    font-weight:400;
+  }
+  .contact-line {
+    margin:0;
+    padding-left:4ch;
+  }
+
+  @media (max-width:768px) {
+    /* name | stacked nav side-by-side, then 9px to line, 9px to ABOUT */
+    .wrap {
+      padding-top:calc(12px + 0.5px + 9px + 9px + (12px + 9px) * 2 + 9px + 9px);
+    }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="name" href="../index.html">Jeannie Han</a>
+    <nav class="topbar-nav">
+      <a href="../archive.html">Work</a>
+      <a href="about.html">Information</a>
+      <a href="mailto:jeanniehan10@gmail.com">Let's Connect!</a>
+    </nav>
+  </header>
+  <div class="chrome-rule chrome-rule--below-nav" aria-hidden="true"></div>
+  <div class="chrome-rule chrome-rule--bottom" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <h1 class="about-title">ABOUT</h1>
+    <div class="about-body">
+      <p class="bio text-trail">
+        Jeannie Han is a graphic designer based in New York/New Jersey.<br>
+        She imagines design to be one of many ways to implement simplistic thinking into creating systems for complex/abstract ideas. The intersection of art and systems produces what is, to her, deemed functional and successful work. Her keen interests in art created through typography supports her ideas conceptually, while her passion for form–making creates multi–dimensional networks of interpretation.
+      </p>
+      <p class="cv text-trail">(CV AVAILABLE UPON REQUEST :) )</p>
+    </div>
+
+    <section class="experience">
+      <p class="experience-label text-trail">Experience</p>
+      <p class="experience-org text-trail">The Vera List Center for Art and Politics</p>
+      <p class="experience-date text-trail">October 2024–May 2026.</p>
+      <p class="experience-org text-trail">HvA Design</p>
+      <p class="experience-date text-trail">January–April 2024.</p>
+      <p class="experience-org text-trail">Lines New York</p>
+      <p class="experience-date text-trail">October–December 2023.</p>
+    </section>
+
+    <section class="education">
+      <p class="education-label text-trail">Education</p>
+      <p class="education-school text-trail">Parsons School of Design, BFA Communication Design</p>
+      <p class="education-date text-trail">2022–2026</p>
+    </section>
+
+    <section class="contact-block">
+      <p class="contact-label text-trail">Contact</p>
+      <p class="contact-line text-trail">
+        IG: (work) <a href="https://instagram.com/jeandotworks" target="_blank" rel="noopener">jeandotworks</a> , (personal) <a href="https://instagram.com/jeanniehan_" target="_blank" rel="noopener">jeanniehan_</a>
+      </p>
+      <p class="contact-line text-trail">
+        Email: <a href="mailto:jeanniehan10@gmail.com">jeanniehan10@gmail.com</a>
+      </p>
+      <p class="contact-line text-trail">
+        LinkedIn: <a href="https://www.linkedin.com/in/jeanniehan/" target="_blank" rel="noopener">https://www.linkedin.com/in/jeanniehan/</a>
+      </p>
+    </section>
+  </main>
+
+<script src="../text-trail.js"></script>
+<script>
+  (function () {
+    const topbar = document.querySelector('.topbar');
+    const rule = document.querySelector('.chrome-rule--below-nav');
+    if (!topbar || !rule) return;
+
+    function placeRule() {
+      const bottom = topbar.getBoundingClientRect().bottom;
+      rule.style.top = `${Math.round(bottom) - 0.5}px`;
+    }
+
+    placeRule();
+    window.addEventListener('resize', placeRule);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', placeRule);
+    }
+  })();
+</script>
+</body>
+</html>

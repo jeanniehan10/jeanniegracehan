@@ -1,0 +1,16 @@
+.DS_Store
+.qodo/
+*.bak.jpg
+*.bak
+.vscode/
+.idea/
+indieground-freebies-textures-photocopynoise/*.zip
+indieground-freebies-textures-photocopynoise/Indieground-Free-PhotocopyNoise-Textures-01.jpg
+indieground-freebies-textures-photocopynoise/Indieground-Free-PhotocopyNoise-Textures-02.jpg
+indieground-freebies-textures-photocopynoise/Indieground-Free-PhotocopyNoise-Textures-04.jpg
+indieground-freebies-textures-photocopynoise/Indieground-Free-PhotocopyNoise-Textures-05.jpg
+indieground-freebies-textures-photocopynoise/photocopy-noise.png
+indieground-freebies-textures-photocopynoise/Readme-Indieground-Free-PhotocopyNoise-Textures.txt
+projects/CLUTTER/CLUTTER_BLACK_1-1.jpg
+projects/CLUTTER/CLUTTER_BLACK-1.jpg
+PORTFOLIO_BACKGROUND_DESKTOP.svg

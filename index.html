@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="fonts.css">
+<script src="matter.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeannie Han</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    background:#fff;
+    color:var(--text);
+    height:100%;
+    overflow:hidden;
+    cursor:default;
+    --bg:#fff;
+    --word-size:42px;
+    --word-leading-composed:0.72;
+  }
+
+  @media (max-width: 768px) {
+    :root { --word-size:clamp(16px, 5vw, 26px); }
+  }
+
+  /* ---- screen 1: the word jumble, contained to one viewport ---- */
+  .hero {
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+    background:#fff;
+    touch-action:none;
+  }
+  /* Always-on portfolio mark / SVG-or-PNG background */
+  .page-bg {
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .page-bg picture,
+  .page-bg img {
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  .page-bg img {
+    object-fit:cover;
+    object-position:center;
+  }
+  .hero-bg {
+    position:absolute;
+    inset:0;
+    z-index:0;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hero-bg.is-visible { opacity:1; }
+  .hero-bg img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  #words { position:absolute; inset:0; z-index:1; pointer-events:none; }
+  .compose-meta {
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .compose-meta__row {
+    position:absolute;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    top:0;
+  }
+  .compose-meta__line {
+    display:block;
+    width:100%;
+    height:1px;
+    background:#c5c1c1;
+    /* Half-CSS-pixel hairline; paired with integer row snaps below */
+    transform:scaleY(0.5);
+    transform-origin:top left;
+  }
+  .compose-meta__label {
+    margin-top:4px;
+    font-family:"Input Mono", monospace;
+    font-size:9px;
+    line-height:1;
+    letter-spacing:0;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .word {
+    position:absolute;
+    top:0;
+    left:0;
+    display:grid;
+    white-space:nowrap;
+    font-family:"Neue Haas Unica Bold", sans-serif;
+    font-size:var(--word-size);
+    letter-spacing:-0.08em;
+    line-height:1.15;
+    padding:0 2px;
+    color:var(--text);
+    user-select:none;
+    -webkit-touch-callout:none;
+    pointer-events:auto;
+    will-change:transform, opacity;
+    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .word__blur,
+  .word__label {
+    grid-area:1 / 1;
+    margin:0;
+    padding:0;
+    white-space:inherit;
+    font:inherit;
+    letter-spacing:inherit;
+    line-height:inherit;
+    color:inherit;
+  }
+  .word__blur {
+    z-index:0;
+   
+    opacity:0.8;
+    pointer-events:none;
+    user-select:none;
+  }
+  .word__label {
+    position:relative;
+    z-index:1;
+    transition:color 0.1s ease;
+  }
+  .word.hot .word__label { color:var(--text); }
+  .hero.is-previewing .word:not(.hot) { opacity:0; pointer-events:none; }
+  /* Mobile hold (and desktop preview): active title goes pink */
+  .hero.is-previewing .word.hot .word__label { color:var(--hover-pink); }
+
+  /* Wrap only when fully settled — not during flight (prevents click shift) */
+  .hero.is-composed .word {
+    line-height:var(--word-leading-composed);
+    padding-left:0;
+    padding-right:0;
+    white-space:normal;
+  }
+
+  .compose-btn {
+    position:fixed;
+    bottom:calc(12px + 0.5px + 9px);
+    left:var(--pad-x);
+    z-index:101;
+    font-size:9px;
+    letter-spacing:0;
+    line-height:1;
+    padding:0;
+    border:none;
+    background:none;
+    color:var(--text);
+    cursor:pointer;
+    font-family:"Input Mono", monospace;
+    pointer-events:auto;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .compose-btn::after {
+    content:"";
+    position:fixed;
+    bottom:12px;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    height:0.5px;
+    background:var(--text);
+    pointer-events:none;
+  }
+
+  /* photocopy grain — texture only */
+  .print-overlay {
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    pointer-events:none;
+    background-image:url("indieground-freebies-textures-photocopynoise/Indieground-Free-PhotocopyNoise-Textures-03.jpg");
+    background-repeat:no-repeat;
+    background-size:cover;
+    background-position:center;
+    opacity:0.42;
+    mix-blend-mode:overlay;
+  }
+
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <span class="name">Jeannie Han</span>
+    <nav class="topbar-nav">
+      <a href="archive.html">Work</a>
+      <a href="projects/about.html">Information</a>
+      <a href="mailto:jeanniehan10@gmail.com">Let's Connect!</a>
+    </nav>
+  </header>
+
+  <!-- screen 1: falling / draggable word jumble -->
+  <section class="hero">
+    <div class="page-bg" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 768px)" srcset="BG_SVG/BACKGROUND_PORT_MOBILE.svg">
+        <img src="BG_SVG/PORTFOLIO_BACKGROUND_DESKTOP.svg" alt="">
+      </picture>
+    </div>
+    <div class="hero-bg" id="heroBg" aria-hidden="true">
+      <img id="heroBgImg" alt="">
+    </div>
+    <div class="compose-meta" id="composeMeta" aria-hidden="true"></div>
+    <div id="words"></div>
+    <button class="compose-btn" id="composeBtn" type="button">Revert.</button>
+  </section>
+
+  <div class="print-overlay" aria-hidden="true"></div>
+
+<script>
+  const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
+  const TOUCH_MQ = window.matchMedia('(hover: none) and (pointer: coarse)');
+
+  const PROJECTS = [
+    {
+      name: 'CLUTTER: [A T( )L for Messy Pedagogy]',
+      url: 'projects/CLUTTER/clutter.html',
+      img: 'projects/CLUTTER/CLUTTER_4.jpg',
+      imgMobile: 'projects/CLUTTER/CLUTTER_4(MOBILE).jpg',
+      fontFamily: '"Neue Haas Unica Black", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Thesis',
+      subToWord: 17,
+    },
+    {
+      name: 'New School New Books 2025',
+      url: 'projects/NSNB/new-school-new-books.html',
+      img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
+      imgMobile: 'projects/NSNB/NSNB_EXHIBIT.jpg',
+      fontFamily: '"Neue Haas Unica Heavy", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Broadsheet Publication',
+      subToWord: 17,
+    },
+    {
+      name: 'The C*lour of Pomegranates',
+      url: 'projects/COP/pomegranates.html',
+      img: 'projects/COP/COP_Editorial_2.jpg',
+      imgMobile: 'projects/COP/COP_Editorial_2(MOBILE).jpg',
+      fontFamily: '"Neue Haas Unica Bold", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Editorial Book Design',
+      subToWord: 17,
+    },
+    {
+      name: 'The Gestalt Series',
+      url: 'projects/GESTALT/gestalt.html',
+      img: 'projects/GESTALT/GESTALT_EDITED.jpg',
+      imgMobile: 'projects/GESTALT/GESTALT_EDITED(MOBILE).jpg',
+      fontFamily: '"Neue Haas Unica Medium", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Trading Card Identity',
+      subToWord: 22,
+    },
+    {
+      name: 'Business Card Design',
+      url: 'projects/BUSINESSCARD/business-card.html',
+      img: 'projects/BUSINESSCARD/business-card.gif',
+      fontFamily: '"Neue Haas Unica Regular", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Business Card',
+      subToWord: 22,
+    },
+    {
+      name: 'FORCE! An Opera of Three Acts',
+      url: 'projects/FORCE!/force.html',
+      img: 'projects/FORCE!/FORCE!_.jpg',
+      imgMobile: 'projects/FORCE!/FORCE!_(MOBILE).jpg',
+      fontFamily: '"Neue Haas Unica Light", sans-serif',
+      fontStyle: 'normal',
+      subhead: 'Libretto Design',
+      subToWord: 20,
+    },
+  ];
+
+  const WORD_FONT_LOADS = [
+    'normal 12px "Neue Haas Unica Black"',
+    'normal 12px "Neue Haas Unica Heavy"',
+    'normal 12px "Neue Haas Unica Bold"',
+    'normal 12px "Neue Haas Unica Medium"',
+    'normal 12px "Neue Haas Unica Regular"',
+    'normal 12px "Neue Haas Unica Light"',
+    'normal 9px "Input Mono"',
+  ];
+
+  function projectImg(project) {
+    if (MOBILE_MQ.matches && project.imgMobile) return project.imgMobile;
+    return project.img;
+  }
+
+  /* =========================================================
+     SCREEN 1 — word jumble (Matter.js): the project titles fall
+     in, pile up, and can be dragged / flung. A click (no drag)
+     opens that project. Everything is confined to the .hero box,
+     so scrolling leaves it behind.
+     ========================================================= */
+  (function initWords() {
+    if (!window.Matter) return;
+
+    const { Engine, Runner, Bodies, Body, Composite, Mouse, Sleeping } = Matter;
+
+    const hero = document.querySelector('.hero');
+    const layer = document.getElementById('words');
+    const composeMeta = document.getElementById('composeMeta');
+    const heroBg = document.getElementById('heroBg');
+    const heroBgImg = document.getElementById('heroBgImg');
+    const composeBtn = document.getElementById('composeBtn');
+    const touchPreview = TOUCH_MQ.matches;
+
+    const COMPOSE_MS = 2000;
+    const SCATTER_PAUSE_MS = 50;
+    let mode = 'jumble';
+    let scatterTimer = null;
+    let composeStart = 0;
+    let runner = null;
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    let W = 0;
+    let H = 0;
+
+    function measureHero() {
+      W = hero.clientWidth;
+      H = hero.clientHeight;
+      return W > 0 && H > 0;
+    }
+
+    function heroPoint(clientX, clientY) {
+      const rect = hero.getBoundingClientRect();
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function pointOverWordGlyphs(wordEl, clientX, clientY) {
+      const label = wordEl.querySelector('.word__label');
+      if (!label) return false;
+      // Prefer caret hit-testing so empty box space (full-width wrap column) doesn't count
+      if (typeof document.caretRangeFromPoint === 'function') {
+        const range = document.caretRangeFromPoint(clientX, clientY);
+        return !!(range && label.contains(range.startContainer));
+      }
+      if (typeof document.caretPositionFromPoint === 'function') {
+        const pos = document.caretPositionFromPoint(clientX, clientY);
+        return !!(pos && label.contains(pos.offsetNode));
+      }
+      return true;
+    }
+
+    function hitWord(point) {
+      const rect = hero.getBoundingClientRect();
+      const px = rect.left + point.x;
+      const py = rect.top + point.y;
+      const stack = document.elementsFromPoint(px, py);
+      const glyphOnly = mode === 'composed' || mode === 'composing';
+      for (const el of stack) {
+        const wordEl = el.closest?.('.word');
+        if (!wordEl || !layer.contains(wordEl)) continue;
+        if (glyphOnly && !pointOverWordGlyphs(wordEl, px, py)) continue;
+        return bodies.find((b) => b.el === wordEl) || null;
+      }
+      return null;
+    }
+
+    let settleWideAfterScatter = false;
+
+    function wordLabel(el) {
+      return el.querySelector('.word__label')?.textContent || el.textContent || '';
+    }
+
+    function applyWordFont(el, project) {
+      if (!project) return;
+      if (project.fontFamily) el.style.fontFamily = project.fontFamily;
+      if (project.fontStyle) el.style.fontStyle = project.fontStyle;
+    }
+
+    function createWordElement(project) {
+      const name = typeof project === 'string' ? project : project.name;
+      const el = document.createElement('div');
+      el.className = 'word';
+      if (typeof project === 'object') applyWordFont(el, project);
+
+      const blur = document.createElement('span');
+      blur.className = 'word__blur';
+      blur.setAttribute('aria-hidden', 'true');
+      blur.textContent = name;
+
+      const label = document.createElement('span');
+      label.className = 'word__label';
+      label.textContent = name;
+
+      el.appendChild(blur);
+      el.appendChild(label);
+      return el;
+    }
+
+    function isClutterWord(b) {
+      const name = b.project?.name || wordLabel(b.el) || '';
+      return name.startsWith('CLUTTER');
+    }
+
+    function wakeBodyForDrag(b) {
+      Sleeping.set(b, false);
+      b._clutterStabilized = false;
+      b._settleCount = 0;
+      if (isClutterWord(b) && b._clutterInertia != null) {
+        Body.setInertia(b, b._clutterInertia);
+      }
+    }
+
+    function stabilizeClutterWord(b) {
+      if (!isClutterWord(b)) return;
+      if (b._clutterInertia == null) b._clutterInertia = b.inertia;
+      Body.setInertia(b, Infinity);
+      Body.setAngularVelocity(b, 0);
+    }
+
+    const WORD_GAP = 10;
+    const COMPOSE_META = {
+      lineH: 0.25,
+      lineToSub: 4, // .compose-meta__label margin-top
+      subH: 9,      // .compose-meta__label font-size
+      subToWord: 20,
+      wordToNext: 16,
+    };
+    let lastComposeRows = [];
+
+    function composedLineHeight() {
+      return getComputedStyle(document.documentElement).getPropertyValue('--word-leading-composed').trim() || '0.72';
+    }
+
+    function composePadX() {
+      return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad-x')) || 14;
+    }
+
+    function composeContentWidth() {
+      return Math.max(120, W - composePadX() * 2);
+    }
+
+    function composeHeaderHeight() {
+      return COMPOSE_META.lineH + COMPOSE_META.lineToSub + COMPOSE_META.subH + COMPOSE_META.subToWord;
+    }
+
+    function composeBottomReserve() {
+      const heroRect = hero.getBoundingClientRect();
+      const btnRect = composeBtn.getBoundingClientRect();
+      return Math.max(48, heroRect.bottom - btnRect.top + 16);
+    }
+
+    function bodyDims(el) {
+      const elW = el.offsetWidth;
+      const elH = el.offsetHeight;
+      return { w: elW + WORD_GAP, h: elH + WORD_GAP, elW, elH };
+    }
+
+    function spreadWordXs(items, getEl) {
+      const pad = 14;
+      const slots = items.map((_, i) => (i + 0.5) / items.length);
+      for (let i = slots.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [slots[i], slots[j]] = [slots[j], slots[i]];
+      }
+      return items.map((item, i) => {
+        const elW = getEl(item).offsetWidth;
+        const usable = Math.max(0, W - pad * 2 - elW);
+        const x = pad + elW / 2 + slots[i] * usable + (Math.random() - 0.5) * 50;
+        return Math.max(elW / 2 + pad, Math.min(W - elW / 2 - pad, x));
+      });
+    }
+
+    function spreadScatterPositions(launches) {
+      const xs = spreadWordXs(launches, (launch) => launch.el);
+      return launches.map((launch, i) => ({ ...launch, x: xs[i] }));
+    }
+
+    function syncBodyToElement(b) {
+      const { w, h, elW, elH } = bodyDims(b.el);
+      if (elW < 1 || elH < 1) return;
+      if (b._lastBw === w && b._lastBh === h) return;
+
+      const { x, y } = b.position;
+      const angle = b.angle;
+      const fresh = Bodies.rectangle(x, y, w, h, { isStatic: b.isStatic });
+      Body.setVertices(b, fresh.vertices);
+      Body.setAngle(b, angle);
+      Body.setPosition(b, { x, y });
+      b._lastBw = w;
+      b._lastBh = h;
+    }
+
+    function syncAllBodies() {
+      bodies.forEach(syncBodyToElement);
+    }
+
+    function setPreview(body) {
+      if (body && body === previewBody) return;
+      if (body) {
+        previewBody = body;
+        heroBgImg.src = body.previewImg;
+        heroBgImg.alt = wordLabel(body.el);
+        heroBg.classList.add('is-visible');
+        heroBg.setAttribute('aria-hidden', 'false');
+        hero.classList.add('is-previewing');
+      } else {
+        previewBody = null;
+        heroBg.classList.remove('is-visible');
+        heroBg.setAttribute('aria-hidden', 'true');
+        hero.classList.remove('is-previewing');
+      }
+    }
+
+    const engine = Engine.create({
+      enableSleeping: true,
+      positionIterations: 10,
+      velocityIterations: 8,
+    });
+    engine.gravity.y = 1;
+    const world = engine.world;
+
+    const wallOpts = { isStatic: true };
+    let walls = [];
+    let btnWall = null;
+
+    function buttonExclusionRect() {
+      const heroRect = hero.getBoundingClientRect();
+      const btnRect = composeBtn.getBoundingClientRect();
+      const pad = 10;
+      return {
+        w: btnRect.width + pad * 2,
+        h: btnRect.height + pad * 2,
+        x: (btnRect.left - heroRect.left) + btnRect.width / 2,
+        y: (btnRect.top - heroRect.top) + btnRect.height / 2,
+      };
+    }
+
+    function buildWalls() {
+      if (!measureHero()) return;
+      walls.forEach((w) => Composite.remove(world, w));
+      if (btnWall) Composite.remove(world, btnWall);
+      const t = 400;
+      const FLOOR_GAP = 6;
+      walls = [
+        Bodies.rectangle(W / 2, (H - FLOOR_GAP) + t / 2, W * 3, t, wallOpts),
+        Bodies.rectangle(-t / 2, H / 2, t, H * 4, wallOpts),
+        Bodies.rectangle(W + t / 2, H / 2, t, H * 4, wallOpts),
+        Bodies.rectangle(W / 2, -H - t, W * 3, t, wallOpts),
+      ];
+      walls.forEach((w) => Composite.add(world, w));
+
+      const zone = buttonExclusionRect();
+      btnWall = Bodies.rectangle(
+        zone.x + zone.w / 2 + 6,
+        zone.y - zone.h * 0.25,
+        14,
+        zone.h * 1.6,
+        wallOpts,
+      );
+      Composite.add(world, btnWall);
+    }
+
+    const bodies = [];
+    const metaRows = [];
+
+    function uniformWordSize(els) {
+      const maxW = W * (MOBILE_MQ.matches ? 0.88 : 0.92);
+      const baseSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-size')) || 24;
+
+      els.forEach((el) => {
+        el.style.whiteSpace = 'nowrap';
+        el.style.width = '';
+        el.style.maxWidth = '';
+        el.style.fontSize = baseSize + 'px';
+      });
+
+      let widest = 0;
+      els.forEach((el) => { widest = Math.max(widest, el.offsetWidth); });
+
+      if (widest > maxW) {
+        const size = Math.max(14, baseSize * (maxW / widest));
+        els.forEach((el) => { el.style.fontSize = size + 'px'; });
+      }
+    }
+
+    function dropPositionY(i) {
+      return -80 - i * (MOBILE_MQ.matches ? 90 : 120) - Math.random() * 160;
+    }
+
+    function prepareComposeWordStyles(el, fontSize) {
+      const width = composeContentWidth();
+      el.style.lineHeight = composedLineHeight();
+      el.style.paddingLeft = '0';
+      el.style.paddingRight = '0';
+      el.style.whiteSpace = 'normal';
+      // Shrink-wrap to the title (not full column) so empty space doesn't preview
+      el.style.width = 'fit-content';
+      el.style.maxWidth = width + 'px';
+      if (fontSize != null) el.style.fontSize = fontSize + 'px';
+    }
+
+    function measureComposeMetrics(el) {
+      return {
+        height: el.offsetHeight,
+        width: el.offsetWidth,
+      };
+    }
+
+    function totalComposeHeight(els) {
+      let total = 0;
+      els.forEach((el, i) => {
+        total += composeHeaderHeight() + measureComposeMetrics(el).height;
+        if (i < els.length - 1) total += COMPOSE_META.wordToNext;
+      });
+      return total;
+    }
+
+    function fitComposeFontSize(els) {
+      // Keep the CSS word size — do not shrink type to fit the stack
+      const size = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-size')) || 24;
+      els.forEach((el) => prepareComposeWordStyles(el, size));
+      return size;
+    }
+
+    function buildComposeRows() {
+      const { top: composeTop, left: composeLeft } = composedLayoutOrigin();
+      const n = bodies.length;
+      // Matches .compose-meta__line + label margin + label size
+      const afterSubH = COMPOSE_META.lineH + COMPOSE_META.lineToSub + COMPOSE_META.subH;
+
+      const measured = bodies.map((b) => ({
+        ...measureComposeMetrics(b.el),
+        // Per-project gap under subhead (set subToWord on PROJECTS one at a time)
+        subToWord: b.project?.subToWord != null ? b.project.subToWord : COMPOSE_META.subToWord,
+      }));
+      const slotH = measured.reduce((max, m) => Math.max(max, m.height), 0);
+
+      let y = composeTop;
+      return measured.map((m, i) => {
+        const bh = m.height;
+        const bw = m.width;
+        const afterSub = y + afterSubH;
+        const wordTop = afterSub + m.subToWord;
+        const cy = wordTop + bh / 2;
+        const row = {
+          y,
+          headerH: afterSubH,
+          wordTop,
+          bh,
+          bw,
+          cy,
+          composeLeft,
+          wordLeft: composeLeft,
+        };
+        y = afterSub + m.subToWord + slotH + (i < n - 1 ? COMPOSE_META.wordToNext : 0);
+        return row;
+      });
+    }
+
+    function placeComposeMetaRows(rows) {
+      const dpr = window.devicePixelRatio || 1;
+      rows.forEach((row, i) => {
+        if (!metaRows[i]) return;
+        // Snap to device pixels so hairlines don't thicken on some rows
+        const y = Math.round(row.y * dpr) / dpr;
+        metaRows[i].style.transform = `translate3d(0, ${y}px, 0)`;
+      });
+    }
+
+    function layoutComposeMeta() {
+      if (!metaRows.length || !bodies.length) return;
+      const els = bodies.map((b) => b.el);
+
+      // Lines/subheads always visible — measure wrap slots, then restore jumble if needed
+      fitComposeFontSize(els);
+      lastComposeRows = buildComposeRows();
+      placeComposeMetaRows(lastComposeRows);
+
+      if (mode !== 'composed') {
+        clearComposeWordStyles();
+        uniformWordSize(els);
+      }
+    }
+
+    function spawnWords() {
+      if (bodies.length) return true;
+      if (!measureHero()) return false;
+      buildWalls();
+
+      const els = PROJECTS.map((p) => {
+        const el = createWordElement(p);
+        layer.appendChild(el);
+
+        const meta = document.createElement('div');
+        meta.className = 'compose-meta__row';
+        meta.innerHTML =
+          '<span class="compose-meta__line" aria-hidden="true"></span>' +
+          `<span class="compose-meta__label"></span>`;
+        meta.querySelector('.compose-meta__label').textContent = p.subhead || '';
+        composeMeta.appendChild(meta);
+        metaRows.push(meta);
+
+        return el;
+      });
+
+      uniformWordSize(els);
+
+      const spawnXs = spreadWordXs(els, (el) => el);
+
+      PROJECTS.forEach((p, i) => {
+        const el = els[i];
+        const { w, h } = bodyDims(el);
+
+        const body = Bodies.rectangle(spawnXs[i], dropPositionY(i), w, h, wordPhysicsOpts());
+        Body.setAngle(body, (Math.random() - 0.5) * 0.7);
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        body.el = el;
+        body.url = p.url;
+        body.previewImg = projectImg(p);
+        body.project = p;
+        bodies.push(body);
+        Composite.add(world, body);
+      });
+
+      layoutComposeMeta();
+      return true;
+    }
+
+    function boot() {
+      if (spawnWords()) return;
+      requestAnimationFrame(boot);
+    }
+
+    const fontReady = (document.fonts && document.fonts.load)
+      ? Promise.all(WORD_FONT_LOADS.map((spec) => document.fonts.load(spec)))
+          .then(() => document.fonts.ready)
+      : Promise.resolve();
+
+    fontReady.then(boot);
+
+    const mouse = Mouse.create(hero);
+    mouse.element.removeEventListener('wheel', mouse.mousewheel);
+    mouse.element.removeEventListener('mousewheel', mouse.mousewheel);
+    mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+
+    function wordPhysicsOpts() {
+      return {
+        restitution: 0.08,
+        friction: 0.62,
+        frictionStatic: 0.75,
+        frictionAir: 0.04,
+        density: 0.002,
+        sleepThreshold: 30,
+      };
+    }
+
+    function setJumblePhysics(on) {
+      if (on) {
+        engine.gravity.y = 1;
+        bodies.forEach((b) => {
+          Body.setStatic(b, false);
+          Sleeping.set(b, false);
+          b._lastBw = null;
+          b._lastBh = null;
+        });
+        syncAllBodies();
+      } else {
+        engine.gravity.y = 0;
+        drag = null;
+        bodies.forEach((b) => {
+          Body.setStatic(b, true);
+          Body.setVelocity(b, { x: 0, y: 0 });
+          Body.setAngularVelocity(b, 0);
+        });
+      }
+    }
+
+    function clearComposeWordStyles() {
+      bodies.forEach((b) => {
+        b.el.style.whiteSpace = '';
+        b.el.style.width = '';
+        b.el.style.maxWidth = '';
+        b.el.style.lineHeight = '';
+        b.el.style.paddingLeft = '';
+        b.el.style.paddingRight = '';
+      });
+    }
+
+    function composedLayoutOrigin() {
+      const heroRect = hero.getBoundingClientRect();
+      const topbar = document.querySelector('.topbar');
+      const top = (topbar ? topbar.getBoundingClientRect().bottom - heroRect.top : 36) + 15;
+      const left = composePadX();
+      return { top, left };
+    }
+
+    function buildComposedTargets(rows) {
+      const list = rows || (lastComposeRows.length ? lastComposeRows : buildComposeRows());
+      return list.map((row) => ({
+        x: row.wordLeft + row.bw / 2,
+        y: row.cy,
+        angle: 0,
+      }));
+    }
+
+    async function startCompose() {
+      if (mode !== 'jumble' || !bodies.length) return;
+
+      // Capture poses before any style change — no wrap yet, so nothing jumps on click
+      const fromStates = bodies.map((b) => ({
+        x: b.position.x,
+        y: b.position.y,
+        angle: b.angle,
+      }));
+
+      setPreview(null);
+      previewBody = null;
+      setJumblePhysics(false);
+
+      if (document.fonts && document.fonts.load) {
+        await Promise.all(WORD_FONT_LOADS.map((spec) => document.fonts.load(spec)));
+      }
+
+      const els = bodies.map((b) => b.el);
+
+      // Measure final slots with wrap, then put jumble styles back for the flight
+      fitComposeFontSize(els);
+      lastComposeRows = buildComposeRows();
+      placeComposeMetaRows(lastComposeRows);
+      const settled = buildComposedTargets(lastComposeRows);
+
+      clearComposeWordStyles();
+      uniformWordSize(els);
+
+      // Fly as nowrap to the final slot center Y (no land nudge); X keeps left edge at pad
+      const targets = settled.map((slot, i) => ({
+        x: lastComposeRows[i].wordLeft + els[i].offsetWidth / 2,
+        y: slot.y,
+        angle: 0,
+      }));
+
+      mode = 'composing';
+      hero.classList.add('is-composing');
+      hero.classList.remove('is-composed');
+      composeBtn.textContent = 'Revert';
+      composeStart = performance.now();
+
+      bodies.forEach((b, i) => {
+        b.composeFrom = fromStates[i];
+        b.composeTo = targets[i];
+        b.composeSettled = settled[i];
+        Body.setPosition(b, { x: fromStates[i].x, y: fromStates[i].y });
+        Body.setAngle(b, fromStates[i].angle);
+      });
+    }
+
+    function startScatter() {
+      if (mode !== 'composed' || !bodies.length) return;
+      clearTimeout(scatterTimer);
+      setPreview(null);
+      previewBody = null;
+      drag = null;
+      mode = 'scattering';
+      composeBtn.textContent = 'Revert';
+      engine.gravity.y = 0;
+
+      const snapshots = bodies.map((b) => {
+        const dir = Math.random() * Math.PI * 2;
+        const speed = 30 + Math.random() * 30;
+        return {
+          x: b.position.x,
+          y: b.position.y,
+          el: b.el,
+          url: b.url,
+          previewImg: b.previewImg,
+          project: b.project,
+          throw: {
+            angle: (Math.random() - 0.5) * 0.7,
+            velocity: {
+              x: Math.cos(dir) * speed + (Math.random() - 0.5) * 12,
+              y: Math.sin(dir) * speed * 0.5 - (2 + Math.random() * 4),
+            },
+            angularVelocity: (Math.random() - 0.5) * 0.06,
+          },
+        };
+      });
+
+      scatterTimer = setTimeout(() => {
+        scatterTimer = null;
+        if (mode !== 'scattering') return;
+        hero.classList.remove('is-composed', 'is-composing');
+        clearComposeWordStyles();
+        uniformWordSize(snapshots.map((s) => s.el));
+
+        snapshots.forEach((snap, i) => {
+          Composite.remove(world, bodies[i]);
+          const { w, h } = bodyDims(snap.el);
+          const body = Bodies.rectangle(snap.x, snap.y, w, h, wordPhysicsOpts());
+          Body.setAngle(body, snap.throw.angle);
+          Body.setVelocity(body, snap.throw.velocity);
+          Body.setAngularVelocity(body, snap.throw.angularVelocity);
+          body.el = snap.el;
+          body.url = snap.url;
+          body.previewImg = snap.previewImg;
+          body.project = snap.project;
+          bodies[i] = body;
+          Composite.add(world, body);
+        });
+
+        mode = 'jumble';
+        settleWideAfterScatter = true;
+        engine.gravity.y = 1;
+      }, SCATTER_PAUSE_MS);
+    }
+
+    composeBtn.addEventListener('click', () => {
+      if (mode === 'composing' || mode === 'scattering') return;
+      if (mode === 'jumble') startCompose();
+      else if (mode === 'composed') startScatter();
+    });
+
+    hero.addEventListener('click', (e) => {
+      if (mode !== 'composed') return;
+      const el = e.target.closest('.word');
+      if (!el) return;
+      const body = bodies.find((b) => b.el === el);
+      if (body) window.location.href = body.url;
+    });
+
+    let down = null;
+    let drag = null;
+    let previewBody = null;
+    let holdTimer = null;
+    let touchState = null;
+
+    function canDrag() {
+      return mode === 'jumble';
+    }
+
+    function allowsPreview() {
+      return mode === 'jumble' || mode === 'composed';
+    }
+
+    function beginDrag(hit, pos) {
+      wakeBodyForDrag(hit);
+      const wasSensor = hit.isSensor;
+      Body.set(hit, { isSensor: true });
+      drag = {
+        body: hit,
+        wasSensor,
+        ox: hit.position.x - pos.x,
+        oy: hit.position.y - pos.y,
+        lastX: pos.x,
+        lastY: pos.y,
+        lastT: performance.now(),
+        vx: 0,
+        vy: 0,
+      };
+      layer.appendChild(hit.el);
+    }
+
+    function moveDrag(pos) {
+      if (!drag || !canDrag()) return;
+      const now = performance.now();
+      const dt = Math.max(8, now - drag.lastT);
+      drag.vx = ((pos.x - drag.lastX) / dt) * 16;
+      drag.vy = ((pos.y - drag.lastY) / dt) * 16;
+      drag.lastX = pos.x;
+      drag.lastY = pos.y;
+      drag.lastT = now;
+      Body.setPosition(drag.body, { x: pos.x + drag.ox, y: pos.y + drag.oy });
+      Body.setVelocity(drag.body, { x: 0, y: 0 });
+      Body.setAngularVelocity(drag.body, 0);
+    }
+
+    function endDrag() {
+      if (!drag) return;
+      Body.set(drag.body, { isSensor: drag.wasSensor });
+      if (canDrag()) {
+        Body.setVelocity(drag.body, { x: drag.vx, y: drag.vy });
+        Body.setAngularVelocity(
+          drag.body,
+          drag.vx * 0.004 + (Math.random() - 0.5) * 0.04,
+        );
+        const moved = down ? Math.hypot(drag.lastX - down.x, drag.lastY - down.y) : 999;
+        if (down?.body === drag.body && moved < 6 && Date.now() - down.t < 400) {
+          window.location.href = drag.body.url;
+        }
+      }
+      drag = null;
+      down = null;
+    }
+
+    mouse.element.removeEventListener('touchmove', mouse.mousemove);
+    mouse.element.removeEventListener('touchstart', mouse.mousedown);
+    mouse.element.removeEventListener('touchend', mouse.mouseup);
+
+    hero.addEventListener('mousedown', (e) => {
+      if (!canDrag() || e.button !== 0) return;
+      const pos = heroPoint(e.clientX, e.clientY);
+      mouse.position.x = pos.x;
+      mouse.position.y = pos.y;
+      const hit = hitWord(pos);
+      down = { body: hit, x: pos.x, y: pos.y, t: Date.now() };
+      if (!hit) return;
+      beginDrag(hit, pos);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const pos = heroPoint(e.clientX, e.clientY);
+      mouse.position.x = pos.x;
+      mouse.position.y = pos.y;
+      moveDrag(pos);
+    });
+
+    window.addEventListener('mouseup', endDrag);
+
+    hero.addEventListener('touchstart', (e) => {
+      if (!allowsPreview() && !canDrag()) return;
+      if (e.touches.length !== 1) return;
+      const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
+      const hit = hitWord(pos);
+      touchState = { x: pos.x, y: pos.y, hit, holding: false, moved: false, dragging: false };
+      down = { body: hit, x: pos.x, y: pos.y, t: Date.now() };
+      clearTimeout(holdTimer);
+      if (hit && allowsPreview() && touchPreview) {
+        holdTimer = setTimeout(() => {
+          if (!touchState || touchState.moved || touchState.dragging) return;
+          touchState.holding = true;
+          previewBody = hit;
+          setPreview(hit);
+        }, 280);
+      }
+    }, { passive: true });
+
+    hero.addEventListener('touchmove', (e) => {
+      if (!touchState || e.touches.length !== 1) return;
+      const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 10) {
+        touchState.moved = true;
+        clearTimeout(holdTimer);
+        if (touchState.holding) {
+          touchState.holding = false;
+          previewBody = null;
+          setPreview(null);
+        }
+        if (canDrag() && touchState.hit && !touchState.dragging) {
+          touchState.dragging = true;
+          beginDrag(touchState.hit, pos);
+        }
+      }
+      if (touchState.dragging) moveDrag(pos);
+    }, { passive: true });
+
+    hero.addEventListener('touchend', () => {
+      clearTimeout(holdTimer);
+      if (touchState?.dragging) {
+        endDrag();
+      } else if (touchState?.holding) {
+        previewBody = null;
+        setPreview(null);
+      } else if (touchState?.hit && !touchState.moved && (canDrag() || mode === 'composed')) {
+        window.location.href = touchState.hit.url;
+      }
+      touchState = null;
+    }, { passive: true });
+
+    runner = Runner.create();
+    Runner.run(runner, engine);
+    let lastHovered = null;
+    let hoverEnabled = false;
+    hero.addEventListener('mouseenter', () => { hoverEnabled = true; });
+    hero.addEventListener('mouseleave', () => {
+      hoverEnabled = false;
+      setPreview(null);
+      lastHovered = null;
+    });
+
+    function updateWordDepth() {
+      if (mode === 'composed' || mode === 'composing') {
+        bodies.forEach((b, i) => {
+          b.el.style.zIndex = String(i);
+        });
+      } else {
+        const sorted = [...bodies].sort((a, b) => {
+          if (b.position.y !== a.position.y) return b.position.y - a.position.y;
+          return a.position.x - b.position.x;
+        });
+        sorted.forEach((b, i) => {
+          b.el.style.zIndex = String(i);
+        });
+      }
+      if (drag?.body) {
+        drag.body.el.style.zIndex = String(bodies.length);
+        layer.appendChild(drag.body.el);
+      }
+    }
+
+    (function sync() {
+      if (mode === 'composing') {
+        const t = Math.min(1, (performance.now() - composeStart) / COMPOSE_MS);
+        const e = easeInOutCubic(t);
+        bodies.forEach((b) => {
+          const from = b.composeFrom;
+          const to = b.composeTo;
+          const x = from.x + (to.x - from.x) * e;
+          const y = from.y + (to.y - from.y) * e;
+          const angle = from.angle + (to.angle - from.angle) * e;
+          Body.setPosition(b, { x, y });
+          Body.setAngle(b, angle);
+        });
+        if (t >= 1) {
+          // Flight words have 2px side padding; compose drops it — keep glyph left edge fixed
+          const lands = bodies.map((b) => ({
+            left: b.position.x - b.el.offsetWidth / 2 + 2,
+            y: b.composeSettled.y,
+          }));
+          const els = bodies.map((b) => b.el);
+          fitComposeFontSize(els);
+          bodies.forEach((b, i) => {
+            Body.setPosition(b, {
+              x: lands[i].left + b.el.offsetWidth / 2,
+              y: lands[i].y,
+            });
+            Body.setAngle(b, 0);
+            b._lastBw = null;
+            b._lastBh = null;
+          });
+          syncAllBodies();
+
+          mode = 'composed';
+          hero.classList.remove('is-composing');
+          hero.classList.add('is-composed');
+          composeBtn.textContent = 'Disrupt!';
+        }
+      } else if (mode === 'jumble' && settleWideAfterScatter) {
+        let clutterSettled = true;
+        for (const b of bodies) {
+          if (!isClutterWord(b) || drag?.body === b) continue;
+          const speed = Math.hypot(b.velocity.x, b.velocity.y);
+          if (speed > 0.12) {
+            clutterSettled = false;
+            b._settleCount = 0;
+            continue;
+          }
+          if (speed < 0.06) {
+            b._settleCount = (b._settleCount || 0) + 1;
+            if (b._settleCount > 12 && !b._clutterStabilized) {
+              b._clutterStabilized = true;
+              stabilizeClutterWord(b);
+              Body.setVelocity(b, { x: 0, y: 0 });
+              Sleeping.set(b, true);
+            } else if (!b._clutterStabilized) {
+              clutterSettled = false;
+            }
+          } else {
+            clutterSettled = false;
+          }
+        }
+        if (clutterSettled) settleWideAfterScatter = false;
+      }
+
+      const hovered = allowsPreview()
+        ? (touchPreview ? previewBody : hitWord(mouse.position))
+        : null;
+      for (const b of bodies) {
+        b.el.classList.toggle('hot', b === hovered);
+        b.el.style.transform =
+          `translate3d(${b.position.x}px, ${b.position.y}px, 0) translate(-50%, -50%) rotate(${b.angle}rad)`;
+      }
+      updateWordDepth();
+
+      if (!touchPreview && allowsPreview() && hoverEnabled) {
+        if (hovered !== lastHovered) {
+          setPreview(hovered || null);
+          lastHovered = hovered;
+        }
+      } else if (!allowsPreview()) {
+        if (previewBody) setPreview(null);
+        lastHovered = null;
+      }
+
+      if (!touchPreview && mode === 'jumble') {
+        if (drag) hero.style.cursor = 'grabbing';
+        else if (hovered) hero.style.cursor = 'pointer';
+        else if (hitWord(mouse.position)) hero.style.cursor = 'grab';
+        else hero.style.cursor = 'default';
+      } else if (!touchPreview && allowsPreview() && hovered) {
+        hero.style.cursor = 'pointer';
+      } else {
+        hero.style.cursor = 'default';
+      }
+      requestAnimationFrame(sync);
+    })();
+
+    MOBILE_MQ.addEventListener('change', () => {
+      bodies.forEach((b) => {
+        b.previewImg = projectImg(b.project);
+      });
+      if (bodies.length) {
+        if (mode === 'composed' || mode === 'composing') {
+          snapComposedLayout();
+        } else {
+          layoutComposeMeta();
+          bodies.forEach((b) => {
+            b._lastBw = null;
+            b._lastBh = null;
+          });
+          syncAllBodies();
+        }
+      }
+    });
+
+    function snapComposedLayout() {
+      const els = bodies.map((b) => b.el);
+      fitComposeFontSize(els);
+      lastComposeRows = buildComposeRows();
+      placeComposeMetaRows(lastComposeRows);
+      const targets = buildComposedTargets(lastComposeRows);
+      bodies.forEach((b, i) => {
+        Body.setPosition(b, { x: targets[i].x, y: targets[i].y });
+        Body.setAngle(b, 0);
+        b.composeSettled = targets[i];
+        if (mode === 'composing' && b.composeTo) {
+          const w = b.el.offsetWidth;
+          const h = b.el.offsetHeight;
+          b.composeTo = {
+            x: lastComposeRows[i].wordLeft + w / 2,
+            y: lastComposeRows[i].wordTop + h / 2,
+            angle: 0,
+          };
+        }
+        b._lastBw = null;
+        b._lastBh = null;
+      });
+      if (mode !== 'composed') {
+        clearComposeWordStyles();
+        uniformWordSize(els);
+      }
+      syncAllBodies();
+    }
+
+    window.addEventListener('resize', () => {
+      buildWalls();
+      if (mode === 'composed' || mode === 'composing') {
+        snapComposedLayout();
+      } else if (bodies.length) {
+        layoutComposeMeta();
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="fonts.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeannie Han</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    height:100%;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    --bottom-gap:40px;
+    --slide-top-gap:5px;
+    --slide-gap:10px;
+    --mobile-scale:1;
+  }
+  a { color:inherit; text-decoration:none; }
+
+  @media (max-width:768px) {
+    html, body {
+      --mobile-scale:0.62;
+      --slide-gap:calc(10px * var(--mobile-scale));
+      --slide-top-gap:calc(5px * var(--mobile-scale));
+    }
+  }
+
+  /* Same always-on mark as landing */
+  .page-bg {
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .page-bg picture,
+  .page-bg img {
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  .page-bg img {
+    object-fit:cover;
+    object-position:center;
+  }
+
+  .slideshow {
+    position:fixed;
+    top:calc(var(--topbar-h) + var(--slide-top-gap));
+    left:0;
+    right:0;
+    bottom:var(--bottom-gap);
+    z-index:1;
+    overflow:hidden;
+    touch-action:none;
+    cursor:default;
+    opacity:0;
+    transition:opacity 0.25s ease;
+  }
+  .slideshow.is-ready { opacity:1; }
+  .slideshow.is-dragging { cursor:grabbing; }
+
+  .slideshow-track {
+    display:flex;
+    flex-direction:row;
+    align-items:flex-start;
+    gap:var(--slide-gap);
+    height:100%;
+    will-change:transform;
+  }
+
+  @media (max-width:768px) {
+    .slideshow-track { align-items:flex-end; }
+  }
+
+  .slide {
+    display:block;
+    flex-shrink:0;
+    line-height:0;
+    cursor:default;
+  }
+  .slide img {
+    display:block;
+    width:auto;
+    height:auto;
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+  }
+
+  /* Matches landing / Information bottom hairline */
+  .chrome-rule--bottom {
+    position:fixed;
+    bottom:12px;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    height:0.5px;
+    background:var(--text);
+    z-index:101;
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="name" href="index.html">Jeannie Han</a>
+    <nav class="topbar-nav">
+      <a href="archive.html">Work</a>
+      <a href="projects/about.html">Information</a>
+      <a href="mailto:jeanniehan10@gmail.com">Let's Connect!</a>
+    </nav>
+  </header>
+
+  <div class="chrome-rule chrome-rule--bottom" aria-hidden="true"></div>
+
+  <div class="page-bg" aria-hidden="true">
+    <picture>
+      <source media="(max-width: 768px)" srcset="BG_SVG/BACKGROUND_PORT_MOBILE.svg">
+      <img src="BG_SVG/PORTFOLIO_BACKGROUND_DESKTOP.svg" alt="">
+    </picture>
+  </div>
+
+  <div class="slideshow" id="slideshow">
+    <div class="slideshow-track" id="track"></div>
+  </div>
+
+<script>
+  const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
+
+  const PROJECTS = [
+    { name: 'CLUTTER: [A T( )L for Messy Pedagogy]', url: 'projects/CLUTTER/clutter.html', img: 'projects/CLUTTER/CLUTTER_4.jpg', imgMobile: 'projects/CLUTTER/CLUTTER_4(MOBILE).jpg', sizeScale: 1 },
+    {
+      name: 'New School New Books 2025',
+      url: 'projects/NSNB/new-school-new-books.html',
+      img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
+      displayImg: 'projects/NSNB/L1050102.jpg',
+      displayImgMobile: 'projects/NSNB/L1050102(MOBILE).jpg',
+      sizeScale: 0.78,
+    },
+    { name: 'The C*lour of Pomegranates', url: 'projects/COP/pomegranates.html', img: 'projects/COP/COP_Editorial_2.jpg', imgMobile: 'projects/COP/COP_Editorial_2(MOBILE).jpg', sizeScale: 0.62 },
+    { name: 'The Gestalt Series', url: 'projects/GESTALT/gestalt.html', img: 'projects/GESTALT/GESTALT_EDITED.jpg', imgMobile: 'projects/GESTALT/GESTALT_EDITED(MOBILE).jpg', sizeScale: 0.88 },
+    { name: 'Business Card Design', url: 'projects/BUSINESSCARD/business-card.html', img: 'projects/BUSINESSCARD/business-card.gif', sizeScale: 0.5 },
+    { name: 'FORCE! An Opera of Three Acts', url: 'projects/FORCE!/force.html', img: 'projects/FORCE!/FORCE!_.jpg', imgMobile: 'projects/FORCE!/FORCE!_(MOBILE).jpg', sizeScale: 0.7 },
+  ];
+
+  /* NSNB left of CLUTTER so refresh can show both with CLUTTER bottom-right */
+  const TRACK_PROJECTS = [PROJECTS[1], PROJECTS[0], ...PROJECTS.slice(2)];
+
+  function projectImg(project) {
+    if (MOBILE_MQ.matches && project.displayImgMobile) return project.displayImgMobile;
+    if (project.displayImg) return project.displayImg;
+    if (MOBILE_MQ.matches && project.imgMobile) return project.imgMobile;
+    return project.img;
+  }
+
+  function layoutScale() {
+    if (!MOBILE_MQ.matches) return 1;
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mobile-scale'));
+    return v > 0 ? v : 0.72;
+  }
+
+  (function initSlideshow() {
+    const strip = document.getElementById('slideshow');
+    const track = document.getElementById('track');
+
+    const AUTO_SPEED = -0.4;
+    const FRICTION = 0.93;
+    const AUTO_BLEND = 0.035;
+    const MAX_THROW = 18;
+
+    let offset = 0;
+    let velocity = AUTO_SPEED;
+    let loopWidth = 0;
+    let pointerDown = false;
+    let dragging = false;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let lastPointerX = 0;
+    let activeSlide = null;
+    let recentDx = [];
+    let raf = 0;
+    let ready = false;
+
+    function fitNatural(img, sizeScale) {
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      if (!w || !h) return;
+      const maxH = strip.clientHeight;
+      const scale = Math.min(1, maxH / h) * (sizeScale || 1) * layoutScale();
+      img.style.width = Math.round(w * scale) + 'px';
+      img.style.height = Math.round(h * scale) + 'px';
+    }
+
+    function buildItems() {
+      TRACK_PROJECTS.forEach((p) => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        slide.dataset.url = p.url;
+        slide.dataset.scale = String(p.sizeScale || 1);
+        if (p.img === 'CLUTTER_4.jpg') slide.dataset.project = 'clutter';
+
+        const img = document.createElement('img');
+        img.src = projectImg(p);
+        img.alt = p.name;
+        img.decoding = 'async';
+        img.draggable = false;
+        const scale = p.sizeScale || 1;
+        img.addEventListener('load', () => fitNatural(img, scale), { once: true });
+        slide.appendChild(img);
+        track.appendChild(slide);
+      });
+    }
+
+    function refitAll() {
+      track.querySelectorAll('.slide').forEach((slide) => {
+        const img = slide.querySelector('img');
+        if (img) fitNatural(img, parseFloat(slide.dataset.scale) || 1);
+      });
+    }
+
+    function waitImages() {
+      return Promise.all([...track.querySelectorAll('img')].map((img) => new Promise((resolve) => {
+        const slide = img.closest('.slide');
+        const scale = parseFloat(slide?.dataset.scale) || 1;
+        const done = () => { fitNatural(img, scale); resolve(); };
+        if (img.complete) done();
+        else {
+          img.addEventListener('load', done, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+        }
+      })));
+    }
+
+    function measureLoop() {
+      const half = track.children.length / 2;
+      if (!half) return;
+      loopWidth = track.children[half].offsetLeft - track.children[0].offsetLeft;
+      if (!loopWidth) {
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        let w = 0;
+        for (let i = 0; i < half; i++) {
+          w += track.children[i].offsetWidth;
+          if (i < half - 1) w += gap;
+        }
+        loopWidth = w + gap;
+      }
+    }
+
+    function setInitialOffset() {
+      const clutter = track.querySelector('[data-project="clutter"]')
+        || track.children[1];
+      if (!clutter) return;
+      offset = strip.clientWidth - (clutter.offsetLeft + clutter.offsetWidth);
+      wrapOffset();
+    }
+
+    function wrapOffset() {
+      if (!loopWidth) return;
+      while (offset <= -loopWidth) offset += loopWidth;
+      while (offset > 0) offset -= loopWidth;
+    }
+
+    function render() {
+      track.style.transform = `translate3d(${offset}px, 0, 0)`;
+    }
+
+    function tick() {
+      if (!ready) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      if (!pointerDown) {
+        offset += velocity;
+        if (Math.abs(velocity - AUTO_SPEED) > 0.04) {
+          velocity *= FRICTION;
+          velocity += (AUTO_SPEED - velocity) * AUTO_BLEND;
+        } else {
+          velocity = AUTO_SPEED;
+        }
+      }
+      wrapOffset();
+      render();
+      raf = requestAnimationFrame(tick);
+    }
+
+    function onPointerDown(e) {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      e.preventDefault();
+      pointerDown = true;
+      dragging = false;
+      recentDx = [];
+      activeSlide = e.target.closest('.slide');
+      pointerStartX = e.clientX;
+      pointerStartY = e.clientY;
+      lastPointerX = e.clientX;
+      strip.setPointerCapture(e.pointerId);
+    }
+
+    function onPointerMove(e) {
+      if (!pointerDown) return;
+
+      const dx = e.clientX - lastPointerX;
+      lastPointerX = e.clientX;
+
+      if (!dragging && Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY) > 8) {
+        dragging = true;
+        strip.classList.add('is-dragging');
+      }
+      if (!dragging) return;
+
+      e.preventDefault();
+      offset += dx;
+      recentDx.push(dx);
+      if (recentDx.length > 5) recentDx.shift();
+      wrapOffset();
+      render();
+    }
+
+    function onPointerUp(e) {
+      if (!pointerDown) return;
+      const wasDragging = dragging;
+      pointerDown = false;
+      dragging = false;
+      strip.classList.remove('is-dragging');
+      try { strip.releasePointerCapture(e.pointerId); } catch (_) {}
+
+      if (wasDragging && recentDx.length) {
+        const throwSpeed = recentDx.reduce((a, b) => a + b, 0) / recentDx.length;
+        velocity = Math.max(-MAX_THROW, Math.min(MAX_THROW, throwSpeed));
+      }
+
+      if (!wasDragging && activeSlide && Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY) < 8) {
+        window.location.href = activeSlide.dataset.url;
+      }
+      activeSlide = null;
+      recentDx = [];
+    }
+
+    async function setup() {
+      ready = false;
+      strip.classList.remove('is-ready');
+      cancelAnimationFrame(raf);
+      track.innerHTML = '';
+      buildItems();
+      await waitImages();
+      buildItems();
+      await waitImages();
+      measureLoop();
+      setInitialOffset();
+      velocity = AUTO_SPEED;
+      render();
+      ready = true;
+      strip.classList.add('is-ready');
+      raf = requestAnimationFrame(tick);
+    }
+
+    strip.addEventListener('pointerdown', onPointerDown);
+    strip.addEventListener('pointermove', onPointerMove);
+    strip.addEventListener('pointerup', onPointerUp);
+    strip.addEventListener('pointercancel', onPointerUp);
+
+    MOBILE_MQ.addEventListener('change', setup);
+    window.addEventListener('resize', () => {
+      refitAll();
+      measureLoop();
+      wrapOffset();
+      render();
+    });
+
+    setup();
+  })();
+</script>
+</body>
+</html>
