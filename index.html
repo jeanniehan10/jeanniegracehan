@@ -20,9 +20,6 @@
     --word-leading-composed:0.72;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
-    -webkit-user-select:none;
-    user-select:none;
-    -webkit-touch-callout:none;
   }
 
   @media (max-width: 768px) {
@@ -161,10 +158,12 @@
     z-index:1;
     transition:color 0.1s ease;
   }
-  .word.hot .word__label { color:var(--text); }
+  .word.hot .word__label,
+  .word.hot .word__label::before { color:var(--text); }
   .hero.is-previewing .word:not(.hot) { opacity:0; pointer-events:none; }
   /* Mobile hold (and desktop preview): active title goes pink */
-  .hero.is-previewing .word.hot .word__label { color:var(--hover-pink); }
+  .hero.is-previewing .word.hot .word__label,
+  .hero.is-previewing .word.hot .word__label::before { color:var(--hover-pink); }
 
   /* Wrap only when fully settled — not during flight (prevents click shift) */
   .hero.is-composed .word {
@@ -248,7 +247,7 @@
     <div id="words"></div>
   </section>
 
-  <button class="compose-btn" id="composeBtn" type="button">Revert.</button>
+  <button class="compose-btn" id="composeBtn" type="button" tabindex="0">Revert.</button>
 
   <div class="print-overlay" aria-hidden="true"></div>
 
@@ -401,8 +400,19 @@
       const rect = hero.getBoundingClientRect();
       const px = rect.left + point.x;
       const py = rect.top + point.y;
-      const stack = document.elementsFromPoint(px, py);
       const glyphOnly = mode === 'composed' || mode === 'composing';
+
+      // Safari: while previewing, other titles get pointer-events:none and
+      // elementsFromPoint can stay stuck on the hot word — use painted rects
+      if (!usingTouch && hero.classList.contains('is-previewing')) {
+        for (let i = bodies.length - 1; i >= 0; i--) {
+          const b = bodies[i];
+          if (pointOverWordGlyphs(b.el, px, py)) return b;
+        }
+        return null;
+      }
+
+      const stack = document.elementsFromPoint(px, py);
       for (const el of stack) {
         const wordEl = el.closest?.('.word');
         if (!wordEl || !layer.contains(wordEl)) continue;
@@ -1053,16 +1063,26 @@
       else if (mode === 'composed') startScatter();
     }
 
+    // Safari often fires touchend AND click — guard so Revert only toggles once
+    let composeIgnoreClick = false;
     composeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (composeIgnoreClick) {
+        e.preventDefault();
+        return;
+      }
       toggleCompose();
     });
-    // Dedicated touch path — hero preventDefault used to swallow the synthetic click
     composeBtn.addEventListener('touchend', (e) => {
       e.preventDefault();
       e.stopPropagation();
       toggleCompose();
+      composeIgnoreClick = true;
+      setTimeout(() => { composeIgnoreClick = false; }, 500);
     }, { passive: false });
+    composeBtn.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
 
     hero.addEventListener('click', (e) => {
       if (mode !== 'composed') return;
@@ -1158,6 +1178,8 @@
       const pos = heroPoint(e.clientX, e.clientY);
       mouse.position.x = pos.x;
       mouse.position.y = pos.y;
+      // Safari may never fire mouseenter if the cursor starts over the hero
+      if (pos.x >= 0 && pos.y >= 0 && pos.x <= W && pos.y <= H) hoverEnabled = true;
       moveDrag(pos);
     });
 
@@ -1364,10 +1386,13 @@
       }
       updateWordDepth();
 
-      if (!usingTouch && allowsPreview() && hoverEnabled) {
-        if (hovered !== lastHovered) {
-          setPreview(hovered || null);
-          lastHovered = hovered;
+      if (!usingTouch && allowsPreview()) {
+        // Clear as soon as the cursor leaves a title (Safari can miss mouseleave quirks)
+        if (hoverEnabled || hovered || lastHovered) {
+          if (hovered !== lastHovered) {
+            setPreview(hovered || null);
+            lastHovered = hovered;
+          }
         }
       } else if (!allowsPreview()) {
         if (previewBody) setPreview(null);
