@@ -182,7 +182,8 @@
     font-size:9px;
     letter-spacing:0;
     line-height:1;
-    padding:0;
+    padding:12px 16px 12px 0;
+    margin:0;
     border:none;
     background:none;
     color:var(--text);
@@ -191,6 +192,8 @@
     pointer-events:auto;
     touch-action:manipulation;
     -webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;
+    user-select:none;
   }
   .compose-btn::after {
     content:"";
@@ -243,14 +246,14 @@
     </div>
     <div class="compose-meta" id="composeMeta" aria-hidden="true"></div>
     <div id="words"></div>
-    <button class="compose-btn" id="composeBtn" type="button">Revert.</button>
   </section>
+
+  <button class="compose-btn" id="composeBtn" type="button">Revert.</button>
 
   <div class="print-overlay" aria-hidden="true"></div>
 
 <script>
   const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
-  const TOUCH_MQ = window.matchMedia('(hover: none) and (pointer: coarse)');
 
   const PROJECTS = [
     {
@@ -351,7 +354,9 @@
     const heroBg = document.getElementById('heroBg');
     const heroBgImg = document.getElementById('heroBgImg');
     const composeBtn = document.getElementById('composeBtn');
-    const touchPreview = TOUCH_MQ.matches;
+    // Live input mode — don't freeze touch vs mouse at page load (breaks DevTools)
+    let usingTouch = false;
+    let lastTouchAt = 0;
 
     const COMPOSE_MS = 2000;
     const SCATTER_PAUSE_MS = 50;
@@ -1042,15 +1047,26 @@
       }, SCATTER_PAUSE_MS);
     }
 
-    composeBtn.addEventListener('click', () => {
+    function toggleCompose() {
       if (mode === 'composing' || mode === 'scattering') return;
       if (mode === 'jumble') startCompose();
       else if (mode === 'composed') startScatter();
+    }
+
+    composeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCompose();
     });
+    // Dedicated touch path — hero preventDefault used to swallow the synthetic click
+    composeBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleCompose();
+    }, { passive: false });
 
     hero.addEventListener('click', (e) => {
       if (mode !== 'composed') return;
-      const el = e.target.closest('.word');
+      const el = e.target.closest?.('.word') || e.target.parentElement?.closest?.('.word');
       if (!el) return;
       const body = bodies.find((b) => b.el === el);
       if (body) window.location.href = body.url;
@@ -1136,6 +1152,9 @@
     });
 
     window.addEventListener('mousemove', (e) => {
+      // Ignore iOS ghost mouse events right after a touch
+      if (Date.now() - lastTouchAt < 600) return;
+      usingTouch = false;
       const pos = heroPoint(e.clientX, e.clientY);
       mouse.position.x = pos.x;
       mouse.position.y = pos.y;
@@ -1144,11 +1163,18 @@
 
     window.addEventListener('mouseup', endDrag);
 
+    function eventElement(target) {
+      if (!target) return null;
+      return target.nodeType === 1 ? target : target.parentElement;
+    }
+
     function isComposeControl(target) {
-      return !!target?.closest?.('.compose-btn, .topbar, .topbar-nav, a');
+      return !!eventElement(target)?.closest?.('#composeBtn, .compose-btn, .topbar, .topbar-nav, a');
     }
 
     hero.addEventListener('touchstart', (e) => {
+      lastTouchAt = Date.now();
+      usingTouch = true;
       // Let Revert / nav receive normal taps — don't steal the gesture
       if (isComposeControl(e.target)) return;
       if (!allowsPreview() && !canDrag()) return;
@@ -1173,6 +1199,7 @@
 
     hero.addEventListener('touchmove', (e) => {
       if (!touchState || e.touches.length !== 1) return;
+      lastTouchAt = Date.now();
       e.preventDefault();
       const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
       if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 16) {
@@ -1191,6 +1218,7 @@
     }, { passive: false });
 
     function endTouch(e) {
+      lastTouchAt = Date.now();
       if (isComposeControl(e?.target)) {
         clearTimeout(holdTimer);
         touchState = null;
@@ -1215,7 +1243,7 @@
 
     document.addEventListener('selectstart', (e) => {
       if (isComposeControl(e.target)) return;
-      if (e.target.closest?.('.hero, .word')) e.preventDefault();
+      if (eventElement(e.target)?.closest?.('.hero, .word')) e.preventDefault();
     });
     document.addEventListener('selectionchange', () => {
       if (!touchState) return;
@@ -1223,7 +1251,7 @@
     });
     document.addEventListener('contextmenu', (e) => {
       if (isComposeControl(e.target)) return;
-      if (e.target.closest?.('.hero, .word')) e.preventDefault();
+      if (eventElement(e.target)?.closest?.('.hero, .word')) e.preventDefault();
     });
 
     runner = Runner.create();
@@ -1325,9 +1353,9 @@
         if (clutterSettled) settleWideAfterScatter = false;
       }
 
-      // Desktop: follow the cursor. Touch: only the active hold (previewBody).
+      // Mouse follows cursor; touch only shows the active hold
       const hovered = allowsPreview()
-        ? (touchPreview ? previewBody : hitWord(mouse.position))
+        ? (usingTouch ? previewBody : hitWord(mouse.position))
         : null;
       for (const b of bodies) {
         b.el.classList.toggle('hot', b === hovered);
@@ -1336,7 +1364,7 @@
       }
       updateWordDepth();
 
-      if (!touchPreview && allowsPreview() && hoverEnabled) {
+      if (!usingTouch && allowsPreview() && hoverEnabled) {
         if (hovered !== lastHovered) {
           setPreview(hovered || null);
           lastHovered = hovered;
@@ -1346,12 +1374,12 @@
         lastHovered = null;
       }
 
-      if (!touchPreview && mode === 'jumble') {
+      if (!usingTouch && mode === 'jumble') {
         if (drag) hero.style.cursor = 'grabbing';
         else if (hovered) hero.style.cursor = 'pointer';
         else if (hitWord(mouse.position)) hero.style.cursor = 'grab';
         else hero.style.cursor = 'default';
-      } else if (!touchPreview && allowsPreview() && hovered) {
+      } else if (!usingTouch && allowsPreview() && hovered) {
         hero.style.cursor = 'pointer';
       } else {
         hero.style.cursor = 'default';
