@@ -20,6 +20,9 @@
     --word-leading-composed:0.72;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
   }
 
   @media (max-width: 768px) {
@@ -136,6 +139,16 @@
     -webkit-user-select:none;
     user-select:none;
     -webkit-touch-callout:none;
+  }
+  /* Paint titles via CSS so iOS has no text node to long-press-select */
+  .word__blur::before,
+  .word__label::before {
+    content:attr(data-word);
+    white-space:inherit;
+    font:inherit;
+    letter-spacing:inherit;
+    line-height:inherit;
+    color:inherit;
   }
   .word__blur {
     z-index:0;
@@ -363,16 +376,15 @@
     function pointOverWordGlyphs(wordEl, clientX, clientY) {
       const label = wordEl.querySelector('.word__label');
       if (!label) return false;
-      // Prefer caret hit-testing so empty box space (full-width wrap column) doesn't count
-      if (typeof document.caretRangeFromPoint === 'function') {
-        const range = document.caretRangeFromPoint(clientX, clientY);
-        return !!(range && label.contains(range.startContainer));
+      // Titles are CSS content (no text nodes) — hit the painted line boxes
+      const rects = label.getClientRects();
+      for (let i = 0; i < rects.length; i++) {
+        const r = rects[i];
+        if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
+          return true;
+        }
       }
-      if (typeof document.caretPositionFromPoint === 'function') {
-        const pos = document.caretPositionFromPoint(clientX, clientY);
-        return !!(pos && label.contains(pos.offsetNode));
-      }
-      return true;
+      return false;
     }
 
     function hitWord(point) {
@@ -393,7 +405,8 @@
     let settleWideAfterScatter = false;
 
     function wordLabel(el) {
-      return el.querySelector('.word__label')?.textContent || el.textContent || '';
+      const label = el.querySelector('.word__label');
+      return label?.dataset.word || label?.textContent || el.textContent || '';
     }
 
     function applyWordFont(el, project) {
@@ -411,11 +424,11 @@
       const blur = document.createElement('span');
       blur.className = 'word__blur';
       blur.setAttribute('aria-hidden', 'true');
-      blur.textContent = name;
+      blur.dataset.word = name;
 
       const label = document.createElement('span');
       label.className = 'word__label';
-      label.textContent = name;
+      label.dataset.word = name;
 
       el.appendChild(blur);
       el.appendChild(label);
@@ -1106,6 +1119,7 @@
 
     hero.addEventListener('touchmove', (e) => {
       if (!touchState || e.touches.length !== 1) return;
+      e.preventDefault();
       const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
       if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 16) {
         touchState.moved = true;
@@ -1119,14 +1133,13 @@
           beginDrag(touchState.hit, pos);
         }
       }
-      if (touchState.dragging) {
-        e.preventDefault();
-        moveDrag(pos);
-      }
+      if (touchState.dragging) moveDrag(pos);
     }, { passive: false });
 
-    hero.addEventListener('touchend', () => {
+    function endTouch(e) {
+      if (e) e.preventDefault();
       clearTimeout(holdTimer);
+      window.getSelection()?.removeAllRanges();
       if (touchState?.dragging) {
         endDrag();
       } else if (touchState?.holding) {
@@ -1135,11 +1148,18 @@
         window.location.href = touchState.hit.url;
       }
       touchState = null;
-    }, { passive: true });
+    }
 
-    // Kill any lingering text selection inside the hero
+    hero.addEventListener('touchend', endTouch, { passive: false });
+    // iOS fires this when it steals the gesture for selection — treat like release
+    hero.addEventListener('touchcancel', endTouch, { passive: false });
+
     document.addEventListener('selectstart', (e) => {
       if (e.target.closest?.('.hero, .word')) e.preventDefault();
+    });
+    document.addEventListener('selectionchange', () => {
+      if (!touchState) return;
+      window.getSelection()?.removeAllRanges();
     });
     document.addEventListener('contextmenu', (e) => {
       if (e.target.closest?.('.hero, .word')) e.preventDefault();
