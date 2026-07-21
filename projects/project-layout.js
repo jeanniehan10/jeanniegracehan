@@ -20,12 +20,19 @@
     const imgs = [...scope.querySelectorAll('img')];
     imgs.forEach((img, i) => {
       if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
-      // First couple of images: eager (LCP). Everything else lazy.
-      if (i < 2) {
-        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'eager');
-        if (i === 0) img.setAttribute('fetchpriority', 'high');
-      } else if (!img.hasAttribute('loading')) {
+      // First image only: eager + high priority. Everything else lazy.
+      const inSequence = !!img.closest('[data-frame-sequence]');
+      const inSpreadGrid = !!img.closest('.triptych-rows');
+      if (i === 0 && !inSpreadGrid) {
+        img.setAttribute('loading', 'eager');
+        img.setAttribute('fetchpriority', 'high');
+      } else {
         img.setAttribute('loading', 'lazy');
+        img.removeAttribute('fetchpriority');
+      }
+      // Sequence poster stays eager so the gif-like block appears immediately
+      if (inSequence && i < 3) {
+        img.setAttribute('loading', 'eager');
       }
     });
   }
@@ -214,8 +221,10 @@
       function showFrame(i) {
         const src = frames[i];
         if (!src) return;
-        preload(src);
         if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+        // Only warm the next 1–2 frames — never the whole sequence
+        preload(frames[(i + 1) % frames.length]);
+        preload(frames[(i + 2) % frames.length]);
       }
 
       function restart() {
@@ -223,19 +232,14 @@
           clearInterval(timer);
           timer = null;
         }
+        cache.clear();
         buildFrames();
         if (!frames.length) return;
         index = 0;
         showFrame(0);
-        // Warm the next few frames; don't block playback on the full set
-        frames.slice(0, Math.min(frames.length, 4)).forEach(preload);
-        frames.forEach((src, i) => {
-          if (i >= 4) preload(src);
-        });
         timer = setInterval(() => {
           index = (index + 1) % frames.length;
           showFrame(index);
-          preload(frames[(index + 1) % frames.length]);
         }, 1000 / fps);
       }
 
