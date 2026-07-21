@@ -2,18 +2,36 @@
   const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
 
   function fullSrc(img) {
-    return img.dataset.fullSrc || img.getAttribute('src') || '';
+    return img.dataset.fullSrc || img.dataset.desktopSrc || img.getAttribute('src') || '';
   }
 
   function applyResponsiveImages(root) {
     (root || document).querySelectorAll('img[data-mobile-src]').forEach((img) => {
-      if (!img.dataset.fullSrc) img.dataset.fullSrc = img.getAttribute('src') || '';
-      const next = MOBILE_MQ.matches && img.dataset.mobileSrc ? img.dataset.mobileSrc : img.dataset.fullSrc;
+      if (!img.dataset.desktopSrc) img.dataset.desktopSrc = img.getAttribute('src') || '';
+      // Keep lightbox master if provided; otherwise desktop display file
+      if (!img.dataset.fullSrc) img.dataset.fullSrc = img.dataset.desktopSrc;
+      const next = MOBILE_MQ.matches && img.dataset.mobileSrc ? img.dataset.mobileSrc : img.dataset.desktopSrc;
       if (img.getAttribute('src') !== next) img.setAttribute('src', next);
     });
   }
 
+  function applyImageLoading(root) {
+    const scope = root || document;
+    const imgs = [...scope.querySelectorAll('img')];
+    imgs.forEach((img, i) => {
+      if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+      // First couple of images: eager (LCP). Everything else lazy.
+      if (i < 2) {
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'eager');
+        if (i === 0) img.setAttribute('fetchpriority', 'high');
+      } else if (!img.hasAttribute('loading')) {
+        img.setAttribute('loading', 'lazy');
+      }
+    });
+  }
+
   applyResponsiveImages();
+  applyImageLoading();
   MOBILE_MQ.addEventListener('change', () => applyResponsiveImages());
 
   const lightbox = document.getElementById('lightbox');
