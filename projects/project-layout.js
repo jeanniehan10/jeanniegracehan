@@ -8,7 +8,6 @@
   function applyResponsiveImages(root) {
     (root || document).querySelectorAll('img[data-mobile-src]').forEach((img) => {
       if (!img.dataset.desktopSrc) img.dataset.desktopSrc = img.getAttribute('src') || '';
-      // Keep lightbox master if provided; otherwise desktop display file
       if (!img.dataset.fullSrc) img.dataset.fullSrc = img.dataset.desktopSrc;
       const next = MOBILE_MQ.matches && img.dataset.mobileSrc ? img.dataset.mobileSrc : img.dataset.desktopSrc;
       if (img.getAttribute('src') !== next) img.setAttribute('src', next);
@@ -20,7 +19,6 @@
     const imgs = [...scope.querySelectorAll('img')];
     imgs.forEach((img, i) => {
       if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
-      // First image only: eager + high priority. Everything else lazy.
       const inSequence = !!img.closest('[data-frame-sequence]');
       const inSpreadGrid = !!img.closest('.triptych-rows');
       if (i === 0 && !inSpreadGrid) {
@@ -30,8 +28,7 @@
         img.setAttribute('loading', 'lazy');
         img.removeAttribute('fetchpriority');
       }
-      // Sequence poster stays eager so the gif-like block appears immediately
-      if (inSequence && i < 3) {
+      if (inSequence) {
         img.setAttribute('loading', 'eager');
       }
     });
@@ -43,31 +40,32 @@
 
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
-  if (!lightbox || !lightboxImg) return;
 
-  function openLightbox(src, alt) {
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || '';
-    lightbox.classList.add('is-open');
-    lightbox.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+  if (lightbox && lightboxImg) {
+    function openLightbox(src, alt) {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || '';
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      lightboxImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-zoomable]').forEach((img) => {
+      img.addEventListener('click', () => openLightbox(fullSrc(img), img.alt));
+    });
+
+    lightbox.addEventListener('click', () => closeLightbox());
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+    });
   }
-
-  function closeLightbox() {
-    lightbox.classList.remove('is-open');
-    lightbox.setAttribute('aria-hidden', 'true');
-    lightboxImg.removeAttribute('src');
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('[data-zoomable]').forEach((img) => {
-    img.addEventListener('click', () => openLightbox(fullSrc(img), img.alt));
-  });
-
-  lightbox.addEventListener('click', () => closeLightbox());
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
-  });
 
   const tracks = [...document.querySelectorAll('.triptych__track')].filter(
     (track) => !track.closest('.triptych-rows')
@@ -157,7 +155,8 @@
   MOBILE_MQ.addEventListener('change', startAllSlideshows);
 
   function frameSrc(template, index) {
-    return template.replace('{n}', String(index));
+    const n = String(index).padStart(2, '0');
+    return template.replace(/\{n\}/g, n);
   }
 
   function parseFrameList(raw) {
@@ -177,7 +176,6 @@
       const img = figure.querySelector('img');
       if (!img) return;
 
-      // Clean up any prior canvas experiment
       figure.querySelectorAll('canvas.sequence-canvas').forEach((el) => el.remove());
       figure.classList.remove('is-canvas-ready');
 
@@ -190,11 +188,16 @@
       const mobileTemplate = figure.dataset.srcMobile || desktopTemplate;
       if (!explicitList && (!count || !desktopTemplate)) return;
 
+      let canvas = document.createElement('canvas');
+      canvas.className = 'sequence-canvas';
+      canvas.setAttribute('aria-hidden', 'true');
+      figure.appendChild(canvas);
+
       let timer = null;
       let index = 0;
       let frames = [];
+      let decoded = [];
       let loadToken = 0;
-      const cache = new Map();
 
       function activeTemplate() {
         return MOBILE_MQ.matches && mobileTemplate ? mobileTemplate : desktopTemplate;
@@ -210,34 +213,25 @@
         for (let i = 1; i <= count; i += 1) frames.push(frameSrc(template, i));
       }
 
-      function preload(src) {
-        if (!src) return null;
-        if (cache.has(src)) return cache.get(src);
-        const preloadImg = new Image();
-        preloadImg.decoding = 'async';
-        preloadImg.src = src;
-        cache.set(src, preloadImg);
-        return preloadImg;
+      function drawFrame(i) {
+        const source = decoded[i];
+        if (!source || !source.naturalWidth) return;
+        if (canvas.width !== source.naturalWidth || canvas.height !== source.naturalHeight) {
+          canvas.width = source.naturalWidth;
+          canvas.height = source.naturalHeight;
+        }
+        const ctx = canvas.getContext('2d', { alpha: false });
+        ctx.drawImage(source, 0, 0);
       }
 
-      function isReady(preloadImg) {
-        return !!(preloadImg && preloadImg.complete && preloadImg.naturalWidth > 0);
-      }
-
-      function waitFor(preloadImg) {
-        if (isReady(preloadImg)) return Promise.resolve();
+      function loadImage(src) {
         return new Promise((resolve) => {
-          const done = () => resolve();
-          preloadImg.addEventListener('load', done, { once: true });
-          preloadImg.addEventListener('error', done, { once: true });
+          const el = new Image();
+          el.decoding = 'async';
+          el.onload = () => resolve(el);
+          el.onerror = () => resolve(el);
+          el.src = src;
         });
-      }
-
-      function showFrame(i) {
-        const src = frames[i];
-        if (!src) return;
-        preload(src);
-        if (img.getAttribute('src') !== src) img.src = src;
       }
 
       async function restart() {
@@ -245,20 +239,25 @@
           clearInterval(timer);
           timer = null;
         }
-        cache.clear();
+        figure.classList.remove('is-canvas-ready');
         buildFrames();
         if (!frames.length) return;
 
+        // Poster while buffering
+        img.src = frames[0];
         index = 0;
-        showFrame(0);
 
         const token = ++loadToken;
-        await Promise.all(frames.map((src) => waitFor(preload(src))));
+        decoded = await Promise.all(frames.map(loadImage));
         if (token !== loadToken) return;
+        if (!decoded[0] || !decoded[0].naturalWidth) return;
+
+        drawFrame(0);
+        figure.classList.add('is-canvas-ready');
 
         timer = setInterval(() => {
-          index = (index + 1) % frames.length;
-          showFrame(index);
+          index = (index + 1) % decoded.length;
+          drawFrame(index);
         }, 1000 / fps);
       }
 
@@ -320,8 +319,8 @@
       nav.appendChild(spacer);
     }
 
-    const lightbox = document.getElementById('lightbox');
-    if (lightbox) document.body.insertBefore(nav, lightbox);
+    const lightboxEl = document.getElementById('lightbox');
+    if (lightboxEl) document.body.insertBefore(nav, lightboxEl);
     else document.body.appendChild(nav);
   }
 
