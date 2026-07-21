@@ -220,18 +220,21 @@ a { color:inherit; text-decoration:none; }
     grid-template-columns:repeat(3, 1fr);
     gap:var(--img-gap);
   }
-  /* Landing triptych: size to the squares so posters aren't clipped */
+  /* Full-bleed (minus page pad) side-by-side — height follows the images, no crop */
   .landing > .triptych {
     height:auto;
+    align-self:stretch;
+    width:100%;
   }
   .landing > .triptych figure {
     height:auto;
-    aspect-ratio:1;
     align-items:stretch;
+    overflow:visible;
   }
   .landing > .triptych img {
     width:100%;
-    height:100%;
+    height:auto;
+    max-width:100%;
     max-height:none;
     object-fit:contain;
     object-position:center center;
