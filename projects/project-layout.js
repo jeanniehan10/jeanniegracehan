@@ -210,7 +210,8 @@
       }
 
       function preload(src) {
-        if (!src || cache.has(src)) return cache.get(src);
+        if (!src) return null;
+        if (cache.has(src)) return cache.get(src);
         const preloadImg = new Image();
         preloadImg.decoding = 'async';
         preloadImg.src = src;
@@ -218,13 +219,26 @@
         return preloadImg;
       }
 
+      function isReady(preloadImg) {
+        return !!(preloadImg && preloadImg.complete && preloadImg.naturalWidth > 0);
+      }
+
+      function warmAround(i) {
+        // Keep a small buffer ahead + wrap so the loop doesn't blank
+        for (let k = 0; k <= 5; k += 1) {
+          preload(frames[(i + k) % frames.length]);
+        }
+      }
+
       function showFrame(i) {
         const src = frames[i];
-        if (!src) return;
-        if (img.getAttribute('src') !== src) img.setAttribute('src', src);
-        // Only warm the next 1–2 frames — never the whole sequence
-        preload(frames[(i + 1) % frames.length]);
-        preload(frames[(i + 2) % frames.length]);
+        if (!src) return false;
+        const ready = preload(src);
+        warmAround(i);
+        // Never swap until decoded — prevents the blank flash
+        if (!isReady(ready)) return false;
+        if (img.getAttribute('src') !== src) img.src = src;
+        return true;
       }
 
       function restart() {
@@ -237,9 +251,13 @@
         if (!frames.length) return;
         index = 0;
         showFrame(0);
+        // Prime first few frames before starting the clock
+        warmAround(0);
         timer = setInterval(() => {
-          index = (index + 1) % frames.length;
-          showFrame(index);
+          const next = (index + 1) % frames.length;
+          warmAround(next);
+          if (!showFrame(next)) return; // hold current frame until next is ready
+          index = next;
         }, 1000 / fps);
       }
 
