@@ -239,7 +239,7 @@
       </picture>
     </div>
     <div class="hero-bg" id="heroBg" aria-hidden="true">
-      <img id="heroBgImg" alt="">
+      <img id="heroBgImg" alt="" decoding="async">
     </div>
     <div class="compose-meta" id="composeMeta" aria-hidden="true"></div>
     <div id="words"></div>
@@ -326,6 +326,11 @@
 
   function projectImg(project) {
     if (MOBILE_MQ.matches && project.imgMobile) return project.imgMobile;
+    return project.img;
+  }
+
+  // Full-quality hold/hover fill — warmed in the background after boot
+  function projectImgHi(project) {
     return project.img;
   }
 
@@ -533,20 +538,54 @@
       bodies.forEach(syncBodyToElement);
     }
 
+    const previewHiCache = new Map();
+
+    function warmPreviewImage(src) {
+      if (!src) return null;
+      let img = previewHiCache.get(src);
+      if (img) return img;
+      img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+      previewHiCache.set(src, img);
+      return img;
+    }
+
+    function preloadHiPreviews() {
+      PROJECTS.forEach((p) => warmPreviewImage(projectImgHi(p)));
+    }
+
     function setPreview(body) {
-      if (body && body === previewBody && hero.classList.contains('is-previewing')) return;
-      if (body) {
-        previewBody = body;
-        heroBgImg.src = body.previewImg;
-        heroBgImg.alt = wordLabel(body.el);
-        heroBg.classList.add('is-visible');
-        heroBg.setAttribute('aria-hidden', 'false');
-        hero.classList.add('is-previewing');
-      } else {
+      if (!body) {
         previewBody = null;
         heroBg.classList.remove('is-visible');
         heroBg.setAttribute('aria-hidden', 'true');
         hero.classList.remove('is-previewing');
+        return;
+      }
+
+      const already = body === previewBody && hero.classList.contains('is-previewing');
+      previewBody = body;
+      heroBgImg.alt = wordLabel(body.el);
+
+      const lo = body.previewImg;
+      const hi = body.previewImgHi || lo;
+
+      if (!already) {
+        // Instant soft image first (already tiny / likely cached)
+        heroBgImg.src = lo;
+        heroBg.classList.add('is-visible');
+        heroBg.setAttribute('aria-hidden', 'false');
+        hero.classList.add('is-previewing');
+      }
+
+      if (hi && hi !== lo) {
+        const warmed = warmPreviewImage(hi);
+        const applyHi = () => {
+          if (previewBody === body) heroBgImg.src = hi;
+        };
+        if (warmed.complete && warmed.naturalWidth) applyHi();
+        else warmed.addEventListener('load', applyHi, { once: true });
       }
     }
 
@@ -796,6 +835,7 @@
         body.el = el;
         body.url = p.url;
         body.previewImg = projectImg(p);
+        body.previewImgHi = projectImgHi(p);
         body.project = p;
         bodies.push(body);
         Composite.add(world, body);
@@ -815,7 +855,13 @@
           .then(() => document.fonts.ready)
       : Promise.resolve();
 
-    fontReady.then(boot);
+    fontReady.then(() => {
+      boot();
+      // Warm sharp previews after first paint so hold looks crisp without blocking load
+      const warm = () => preloadHiPreviews();
+      if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 2000 });
+      else setTimeout(warm, 1000);
+    });
 
     const mouse = Mouse.create(hero);
     mouse.element.removeEventListener('wheel', mouse.mousewheel);
@@ -954,6 +1000,7 @@
           el: b.el,
           url: b.url,
           previewImg: b.previewImg,
+          previewImgHi: b.previewImgHi,
           project: b.project,
           throw: {
             angle: (Math.random() - 0.5) * 0.7,
@@ -983,6 +1030,7 @@
           body.el = snap.el;
           body.url = snap.url;
           body.previewImg = snap.previewImg;
+          body.previewImgHi = snap.previewImgHi;
           body.project = snap.project;
           bodies[i] = body;
           Composite.add(world, body);
@@ -1096,10 +1144,16 @@
 
     window.addEventListener('mouseup', endDrag);
 
+    function isComposeControl(target) {
+      return !!target?.closest?.('.compose-btn, .topbar, .topbar-nav, a');
+    }
+
     hero.addEventListener('touchstart', (e) => {
+      // Let Revert / nav receive normal taps — don't steal the gesture
+      if (isComposeControl(e.target)) return;
       if (!allowsPreview() && !canDrag()) return;
       if (e.touches.length !== 1) return;
-      // Always take over the gesture in the hero — blocks iOS text selection / callout
+      // Take over word gestures — blocks iOS text selection / callout
       e.preventDefault();
       window.getSelection()?.removeAllRanges();
       const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
@@ -1137,6 +1191,11 @@
     }, { passive: false });
 
     function endTouch(e) {
+      if (isComposeControl(e?.target)) {
+        clearTimeout(holdTimer);
+        touchState = null;
+        return;
+      }
       if (e) e.preventDefault();
       clearTimeout(holdTimer);
       window.getSelection()?.removeAllRanges();
@@ -1155,6 +1214,7 @@
     hero.addEventListener('touchcancel', endTouch, { passive: false });
 
     document.addEventListener('selectstart', (e) => {
+      if (isComposeControl(e.target)) return;
       if (e.target.closest?.('.hero, .word')) e.preventDefault();
     });
     document.addEventListener('selectionchange', () => {
@@ -1162,6 +1222,7 @@
       window.getSelection()?.removeAllRanges();
     });
     document.addEventListener('contextmenu', (e) => {
+      if (isComposeControl(e.target)) return;
       if (e.target.closest?.('.hero, .word')) e.preventDefault();
     });
 
@@ -1264,9 +1325,9 @@
         if (clutterSettled) settleWideAfterScatter = false;
       }
 
-      const touchHolding = !!(touchState && touchState.holding);
+      // Desktop: follow the cursor. Touch: only the active hold (previewBody).
       const hovered = allowsPreview()
-        ? (previewBody || ((touchPreview || touchHolding) ? null : hitWord(mouse.position)))
+        ? (touchPreview ? previewBody : hitWord(mouse.position))
         : null;
       for (const b of bodies) {
         b.el.classList.toggle('hot', b === hovered);
@@ -1275,7 +1336,7 @@
       }
       updateWordDepth();
 
-      if (!touchPreview && !touchHolding && allowsPreview() && hoverEnabled) {
+      if (!touchPreview && allowsPreview() && hoverEnabled) {
         if (hovered !== lastHovered) {
           setPreview(hovered || null);
           lastHovered = hovered;
@@ -1301,6 +1362,7 @@
     MOBILE_MQ.addEventListener('change', () => {
       bodies.forEach((b) => {
         b.previewImg = projectImg(b.project);
+        b.previewImgHi = projectImgHi(b.project);
       });
       if (bodies.length) {
         if (mode === 'composed' || mode === 'composing') {
