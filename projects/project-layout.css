@@ -201,14 +201,13 @@ a { color:inherit; text-decoration:none; }
   align-items:flex-end;
   justify-content:center;
   min-height:0;
-  overflow:hidden;
 }
 .triptych img {
   display:block;
-  width:100%;
-  height:100%;
   max-width:100%;
   max-height:100%;
+  width:auto;
+  height:auto;
   object-fit:contain;
   object-position:center bottom;
   background:transparent;
@@ -220,6 +219,22 @@ a { color:inherit; text-decoration:none; }
     display:grid;
     grid-template-columns:repeat(3, 1fr);
     gap:var(--img-gap);
+  }
+  /* Landing triptych: size to the squares so posters aren't clipped */
+  .landing > .triptych {
+    height:auto;
+  }
+  .landing > .triptych figure {
+    height:auto;
+    aspect-ratio:1;
+    align-items:stretch;
+  }
+  .landing > .triptych img {
+    width:100%;
+    height:100%;
+    max-height:none;
+    object-fit:contain;
+    object-position:center center;
   }
 }
 
