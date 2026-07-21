@@ -511,7 +511,7 @@
     }
 
     function setPreview(body) {
-      if (body && body === previewBody) return;
+      if (body && body === previewBody && hero.classList.contains('is-previewing')) return;
       if (body) {
         previewBody = body;
         heroBgImg.src = body.previewImg;
@@ -578,10 +578,22 @@
 
     const bodies = [];
     const metaRows = [];
+    let activeWordSize = null;
+
+    function resolveCssWordSize() {
+      // --word-size can be clamp(); parseFloat on the raw value is wrong
+      const probe = document.createElement('span');
+      probe.style.cssText =
+        'position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;font-size:var(--word-size)';
+      document.body.appendChild(probe);
+      const size = parseFloat(getComputedStyle(probe).fontSize) || 24;
+      probe.remove();
+      return size;
+    }
 
     function uniformWordSize(els) {
       const maxW = W * (MOBILE_MQ.matches ? 0.88 : 0.92);
-      const baseSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-size')) || 24;
+      const baseSize = resolveCssWordSize();
 
       els.forEach((el) => {
         el.style.whiteSpace = 'nowrap';
@@ -593,10 +605,13 @@
       let widest = 0;
       els.forEach((el) => { widest = Math.max(widest, el.offsetWidth); });
 
+      let size = baseSize;
       if (widest > maxW) {
-        const size = Math.max(14, baseSize * (maxW / widest));
+        size = Math.max(14, baseSize * (maxW / widest));
         els.forEach((el) => { el.style.fontSize = size + 'px'; });
       }
+      activeWordSize = size;
+      return size;
     }
 
     function dropPositionY(i) {
@@ -632,8 +647,8 @@
     }
 
     function fitComposeFontSize(els) {
-      // Keep the CSS word size — do not shrink type to fit the stack
-      const size = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-size')) || 24;
+      // Same size as jumble — don't jump up when titles settle into place
+      const size = activeWordSize ?? resolveCssWordSize();
       els.forEach((el) => prepareComposeWordStyles(el, size));
       return size;
     }
@@ -1039,11 +1054,11 @@
       touchState = { x: pos.x, y: pos.y, hit, holding: false, moved: false, dragging: false };
       down = { body: hit, x: pos.x, y: pos.y, t: Date.now() };
       clearTimeout(holdTimer);
-      if (hit && allowsPreview() && touchPreview) {
+      // Hold-to-preview on any touch path (not only when TOUCH_MQ matched at boot)
+      if (hit && allowsPreview()) {
         holdTimer = setTimeout(() => {
           if (!touchState || touchState.moved || touchState.dragging) return;
           touchState.holding = true;
-          previewBody = hit;
           setPreview(hit);
         }, 280);
       }
@@ -1052,12 +1067,12 @@
     hero.addEventListener('touchmove', (e) => {
       if (!touchState || e.touches.length !== 1) return;
       const pos = heroPoint(e.touches[0].clientX, e.touches[0].clientY);
-      if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 10) {
+      // Slightly looser than before so finger jitter doesn't cancel the hold
+      if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 16) {
         touchState.moved = true;
         clearTimeout(holdTimer);
         if (touchState.holding) {
           touchState.holding = false;
-          previewBody = null;
           setPreview(null);
         }
         if (canDrag() && touchState.hit && !touchState.dragging) {
@@ -1073,7 +1088,6 @@
       if (touchState?.dragging) {
         endDrag();
       } else if (touchState?.holding) {
-        previewBody = null;
         setPreview(null);
       } else if (touchState?.hit && !touchState.moved && (canDrag() || mode === 'composed')) {
         window.location.href = touchState.hit.url;
@@ -1176,8 +1190,9 @@
         if (clutterSettled) settleWideAfterScatter = false;
       }
 
+      const touchHolding = !!(touchState && touchState.holding);
       const hovered = allowsPreview()
-        ? (touchPreview ? previewBody : hitWord(mouse.position))
+        ? (previewBody || ((touchPreview || touchHolding) ? null : hitWord(mouse.position)))
         : null;
       for (const b of bodies) {
         b.el.classList.toggle('hot', b === hovered);
@@ -1186,7 +1201,7 @@
       }
       updateWordDepth();
 
-      if (!touchPreview && allowsPreview() && hoverEnabled) {
+      if (!touchPreview && !touchHolding && allowsPreview() && hoverEnabled) {
         if (hovered !== lastHovered) {
           setPreview(hovered || null);
           lastHovered = hovered;
