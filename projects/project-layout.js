@@ -193,6 +193,7 @@
       let timer = null;
       let index = 0;
       let frames = [];
+      let loadToken = 0;
       const cache = new Map();
 
       function activeTemplate() {
@@ -223,25 +224,23 @@
         return !!(preloadImg && preloadImg.complete && preloadImg.naturalWidth > 0);
       }
 
-      function warmAround(i) {
-        // Keep a small buffer ahead + wrap so the loop doesn't blank
-        for (let k = 0; k <= 5; k += 1) {
-          preload(frames[(i + k) % frames.length]);
-        }
+      function waitFor(preloadImg) {
+        if (isReady(preloadImg)) return Promise.resolve();
+        return new Promise((resolve) => {
+          const done = () => resolve();
+          preloadImg.addEventListener('load', done, { once: true });
+          preloadImg.addEventListener('error', done, { once: true });
+        });
       }
 
       function showFrame(i) {
         const src = frames[i];
-        if (!src) return false;
-        const ready = preload(src);
-        warmAround(i);
-        // Never swap until decoded — prevents the blank flash
-        if (!isReady(ready)) return false;
+        if (!src) return;
+        preload(src);
         if (img.getAttribute('src') !== src) img.src = src;
-        return true;
       }
 
-      function restart() {
+      async function restart() {
         if (timer) {
           clearInterval(timer);
           timer = null;
@@ -249,15 +248,17 @@
         cache.clear();
         buildFrames();
         if (!frames.length) return;
+
         index = 0;
         showFrame(0);
-        // Prime first few frames before starting the clock
-        warmAround(0);
+
+        const token = ++loadToken;
+        await Promise.all(frames.map((src) => waitFor(preload(src))));
+        if (token !== loadToken) return;
+
         timer = setInterval(() => {
-          const next = (index + 1) % frames.length;
-          warmAround(next);
-          if (!showFrame(next)) return; // hold current frame until next is ready
-          index = next;
+          index = (index + 1) % frames.length;
+          showFrame(index);
         }, 1000 / fps);
       }
 
