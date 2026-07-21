@@ -234,6 +234,22 @@
         });
       }
 
+      function startTimer() {
+        if (timer) clearInterval(timer);
+        timer = setInterval(() => {
+          if (!decoded.length) return;
+          // Find next loaded frame (usually just +1 once buffer fills)
+          for (let step = 1; step <= decoded.length; step += 1) {
+            const next = (index + step) % decoded.length;
+            if (decoded[next] && decoded[next].naturalWidth) {
+              index = next;
+              drawFrame(index);
+              return;
+            }
+          }
+        }, 1000 / fps);
+      }
+
       async function restart() {
         if (timer) {
           clearInterval(timer);
@@ -243,22 +259,32 @@
         buildFrames();
         if (!frames.length) return;
 
-        // Poster while buffering
         img.src = frames[0];
         index = 0;
+        decoded = new Array(frames.length);
 
         const token = ++loadToken;
-        decoded = await Promise.all(frames.map(loadImage));
+
+        // Load first frame ASAP → start playing immediately
+        decoded[0] = await loadImage(frames[0]);
         if (token !== loadToken) return;
         if (!decoded[0] || !decoded[0].naturalWidth) return;
 
         drawFrame(0);
         figure.classList.add('is-canvas-ready');
+        startTimer();
 
-        timer = setInterval(() => {
-          index = (index + 1) % decoded.length;
-          drawFrame(index);
-        }, 1000 / fps);
+        // Kick the next couple first, then the rest in parallel
+        const rest = frames.map((src, i) => {
+          if (i === 0) return Promise.resolve();
+          return loadImage(src).then((el) => {
+            if (token !== loadToken) return;
+            decoded[i] = el;
+          });
+        });
+        // Prioritize frames 1–3 completing sooner
+        await Promise.all(rest.slice(1, 4));
+        await Promise.all(rest);
       }
 
       restart();
