@@ -118,6 +118,8 @@ body::before {
   grid-column: 1;
   color: #fff;
   pointer-events: auto;
+  font-family: "Input Mono Medium", "Input Mono", monospace;
+  font-weight: bold;
 }
 .topbar a {
   pointer-events: auto;
