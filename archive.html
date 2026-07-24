@@ -28,24 +28,6 @@
     }
   }
 
-  /* Same always-on mark as landing */
-  .page-bg {
-    position:fixed;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-  }
-  .page-bg picture,
-  .page-bg img {
-    display:block;
-    width:100%;
-    height:100%;
-  }
-  .page-bg img {
-    object-fit:cover;
-    object-position:center;
-  }
-
   .slideshow {
     position:fixed;
     top:calc(var(--topbar-h) + var(--slide-top-gap));
@@ -115,13 +97,6 @@
   </header>
 
   <div class="chrome-rule chrome-rule--bottom" aria-hidden="true"></div>
-
-  <div class="page-bg" aria-hidden="true">
-    <picture>
-      <source media="(max-width: 768px)" srcset="BG_SVG/BACKGROUND_PORT_MOBILE.svg">
-      <img src="BG_SVG/PORTFOLIO_BACKGROUND_DESKTOP.svg" alt="">
-    </picture>
-  </div>
 
   <div class="slideshow" id="slideshow">
     <div class="slideshow-track" id="track"></div>
