@@ -71,7 +71,7 @@
   --col-gap: 8px;
   --pad: 12px;
   --pad-x: 14px;
-  --topbar-h: calc(12px + 0.5px + 10px + 12px + var(--pad));
+  --topbar-h: calc(12px + 0.5px + 11px + 12px + var(--pad));
   --hover-pink: #E63462;
 }
 
@@ -105,9 +105,9 @@ body::before {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
-  padding: calc(12px + 0.5px + 9px) var(--pad-x) var(--pad);
+  padding: calc(12px + 0.5px + 11px) var(--pad-x) var(--pad);
   font-family: "Input Mono", monospace;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0;
   line-height: 1;
   pointer-events: none;
