@@ -227,7 +227,7 @@
     <div id="words"></div>
   </section>
 
-  <button class="compose-btn" id="composeBtn" type="button" tabindex="0">Revert.</button>
+  <button class="compose-btn" id="composeBtn" type="button" tabindex="0">Revert!</button>
 
   <div class="print-overlay" aria-hidden="true"></div>
 
@@ -965,7 +965,7 @@
       mode = 'composing';
       hero.classList.add('is-composing');
       hero.classList.remove('is-composed');
-      composeBtn.textContent = 'Revert';
+      composeBtn.textContent = 'Revert!';
       composeStart = performance.now();
 
       bodies.forEach((b, i) => {
@@ -984,7 +984,7 @@
       previewBody = null;
       drag = null;
       mode = 'scattering';
-      composeBtn.textContent = 'Revert';
+      composeBtn.textContent = 'Revert!';
       engine.gravity.y = 0;
 
       const snapshots = bodies.map((b) => {
