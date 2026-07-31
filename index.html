@@ -148,18 +148,11 @@
   .hero.is-previewing .word.hot .word__label,
   .hero.is-previewing .word.hot .word__label::before { color:var(--hover-pink); }
 
-  /* Preview: only the hovered title's line + subtitle, plus the next line (below) */
-  .hero.is-previewing .compose-meta__row {
-    opacity:0;
-    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Preview: image only — every rule and subhead drops away */
+  .compose-meta {
+    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .hero.is-previewing .compose-meta__row.is-active,
-  .hero.is-previewing .compose-meta__row.is-line-below {
-    opacity:1;
-  }
-  .hero.is-previewing .compose-meta__row.is-line-below .compose-meta__label {
-    opacity:0;
-  }
+  .hero.is-previewing .compose-meta { opacity:0; }
 
   /* Wrap only when fully settled — not during flight (prevents click shift) */
   .hero.is-composed .word {
@@ -175,8 +168,8 @@
     right:var(--pad-x);
     left:auto;
     z-index:101;
-    font-size:10pt;
-    font-family:"Input Mono Medium", "Input Mono", monospace;
+    font-size:14pt;
+    font-family:"Terminal Grotesque", "Input Mono Medium", monospace;
     font-weight:bold;
     letter-spacing:0;
     line-height:1;
@@ -192,6 +185,25 @@
     -webkit-tap-highlight-color:transparent;
     -webkit-user-select:none;
     user-select:none;
+    animation:compose-btn-rainbow 3s linear infinite;
+  }
+  /* Starts and ends on the same hue so the loop never visibly restarts.
+     text-fill-color also wins over the global :hover pink, so the fade never stalls. */
+  @keyframes compose-btn-rainbow {
+    0%   { color:#e63462; -webkit-text-fill-color:#e63462; }
+    16%  { color:#ff7a18; -webkit-text-fill-color:#ff7a18; }
+    33%  { color:#f2c200; -webkit-text-fill-color:#f2c200; }
+    50%  { color:#28c76f; -webkit-text-fill-color:#28c76f; }
+    66%  { color:#1e9bff; -webkit-text-fill-color:#1e9bff; }
+    83%  { color:#b026ff; -webkit-text-fill-color:#b026ff; }
+    100% { color:#e63462; -webkit-text-fill-color:#e63462; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .compose-btn {
+      animation:none;
+      color:var(--hover-pink);
+      -webkit-text-fill-color:var(--hover-pink);
+    }
   }
   .compose-btn::after {
     content:"";
@@ -262,7 +274,8 @@
       name: 'New School New Books 2025',
       url: 'projects/NSNB/new-school-new-books.html',
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
-      imgMobile: 'projects/NSNB/NSNB_EXHIBIT.jpg',
+      imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
+      imgMobileHi: 'projects/NSNB/NSNB_HOVER.jpg',
       fontFamily: '"Neue Haas Unica Heavy", sans-serif',
       fontStyle: 'normal',
       subhead: 'Broadsheet Publication',
@@ -272,7 +285,8 @@
       name: 'The C*lour of Pomegranates',
       url: 'projects/COP/pomegranates.html',
       img: 'projects/COP/COP_Editorial_2.jpg',
-      imgMobile: 'projects/COP/COP_Editorial_2(MOBILE).jpg',
+      imgMobile: 'projects/COP/COP_HOVER(MOBILE).jpg',
+      imgMobileHi: 'projects/COP/COP_HOVER.jpg',
       fontFamily: '"Neue Haas Unica Bold", sans-serif',
       fontStyle: 'normal',
       subhead: 'Editorial Book Design',
@@ -324,8 +338,10 @@
     return project.img;
   }
 
-  // Full-quality hold/hover fill — warmed in the background after boot
+  // Full-quality hold/hover fill — warmed in the background after boot.
+  // imgMobileHi keeps mobile-only artwork from being swapped for the desktop shot.
   function projectImgHi(project) {
+    if (MOBILE_MQ.matches && project.imgMobileHi) return project.imgMobileHi;
     return project.img;
   }
 
@@ -563,28 +579,18 @@
       PROJECTS.forEach((p) => warmPreviewImage(projectImgHi(p)));
     }
 
-    function syncMetaPreview(body) {
-      const idx = body ? bodies.indexOf(body) : -1;
-      metaRows.forEach((row, i) => {
-        row.classList.toggle('is-active', i === idx);
-        row.classList.toggle('is-line-below', idx >= 0 && i === idx + 1);
-      });
-    }
-
     function setPreview(body) {
       if (!body) {
         previewBody = null;
         heroBg.classList.remove('is-visible');
         heroBg.setAttribute('aria-hidden', 'true');
         hero.classList.remove('is-previewing');
-        syncMetaPreview(null);
         return;
       }
 
       const already = body === previewBody && hero.classList.contains('is-previewing');
       previewBody = body;
       heroBgImg.alt = wordLabel(body.el);
-      syncMetaPreview(body);
 
       const lo = body.previewImg;
       const hi = body.previewImgHi || lo;

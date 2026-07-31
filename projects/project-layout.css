@@ -313,6 +313,24 @@ a { color:inherit; text-decoration:none; }
     max-width:100%;
     max-height:none;
   }
+
+  /* Artwork already sits on black — matching the stage kills the white
+     letterbox that flashed between slides. */
+  .triptych--dark,
+  .triptych--dark figure {
+    background:#000;
+  }
+
+  /* Edge-to-edge column: uniform width, no seams. */
+  .below--strip .below__stack {
+    gap:0;
+  }
+  .below--strip .hero-shot,
+  .below--strip .hero-shot--wide,
+  .below--strip .hero-shot.hero-shot--full {
+    width:100%;
+    align-self:stretch;
+  }
 }
 
 .below {
@@ -363,12 +381,14 @@ a { color:inherit; text-decoration:none; }
   font-size:18px;
   line-height:1;
   letter-spacing:0;
+  /* Inverts against whatever scrolls under it, same as the topbar */
+  mix-blend-mode:difference;
 }
 .project-adjacent a {
   position:fixed;
   top:50%;
   transform:translateY(-50%);
-  color:inherit;
+  color:#fff;
   text-decoration:none;
   pointer-events:auto;
   padding:16px var(--pad-x);

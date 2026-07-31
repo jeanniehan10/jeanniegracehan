@@ -62,6 +62,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Terminal Grotesque";
+  src: url("Terminal/terminal-grotesque-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #fff;
   --text: #2a2527;
