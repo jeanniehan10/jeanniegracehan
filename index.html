@@ -148,6 +148,19 @@
   .hero.is-previewing .word.hot .word__label,
   .hero.is-previewing .word.hot .word__label::before { color:var(--hover-pink); }
 
+  /* Preview: only the hovered title's line + subtitle, plus the next line (below) */
+  .hero.is-previewing .compose-meta__row {
+    opacity:0;
+    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hero.is-previewing .compose-meta__row.is-active,
+  .hero.is-previewing .compose-meta__row.is-line-below {
+    opacity:1;
+  }
+  .hero.is-previewing .compose-meta__row.is-line-below .compose-meta__label {
+    opacity:0;
+  }
+
   /* Wrap only when fully settled — not during flight (prevents click shift) */
   .hero.is-composed .word {
     line-height:var(--word-leading-composed);
@@ -550,18 +563,28 @@
       PROJECTS.forEach((p) => warmPreviewImage(projectImgHi(p)));
     }
 
+    function syncMetaPreview(body) {
+      const idx = body ? bodies.indexOf(body) : -1;
+      metaRows.forEach((row, i) => {
+        row.classList.toggle('is-active', i === idx);
+        row.classList.toggle('is-line-below', idx >= 0 && i === idx + 1);
+      });
+    }
+
     function setPreview(body) {
       if (!body) {
         previewBody = null;
         heroBg.classList.remove('is-visible');
         heroBg.setAttribute('aria-hidden', 'true');
         hero.classList.remove('is-previewing');
+        syncMetaPreview(null);
         return;
       }
 
       const already = body === previewBody && hero.classList.contains('is-previewing');
       previewBody = body;
       heroBgImg.alt = wordLabel(body.el);
+      syncMetaPreview(body);
 
       const lo = body.previewImg;
       const hi = body.previewImgHi || lo;

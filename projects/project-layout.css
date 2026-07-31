@@ -355,25 +355,34 @@ a { color:inherit; text-decoration:none; }
 }
 
 .project-adjacent {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  width:100%;
-  padding:18px var(--pad-x) 20px;
+  position:fixed;
+  inset:0;
+  z-index:90;
+  pointer-events:none;
   font-family:"Input Mono", monospace;
-  font-size:10px;
+  font-size:18px;
   line-height:1;
   letter-spacing:0;
 }
 .project-adjacent a {
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
   color:inherit;
   text-decoration:none;
   pointer-events:auto;
+  padding:16px var(--pad-x);
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.project-adjacent__prev {
+  left:0;
+}
+.project-adjacent__next {
+  right:0;
 }
 .project-adjacent__spacer {
-  display:block;
-  width:1ch;
-  pointer-events:none;
+  display:none;
 }
 
 .lightbox {

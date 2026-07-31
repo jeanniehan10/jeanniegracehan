@@ -321,28 +321,18 @@
       const a = document.createElement('a');
       a.className = 'project-adjacent__prev';
       a.href = '../' + prev;
-      a.textContent = '< Previous';
+      a.textContent = '<';
       a.setAttribute('aria-label', 'Previous project');
       nav.appendChild(a);
-    } else {
-      const spacer = document.createElement('span');
-      spacer.className = 'project-adjacent__spacer';
-      spacer.setAttribute('aria-hidden', 'true');
-      nav.appendChild(spacer);
     }
 
     if (next) {
       const a = document.createElement('a');
       a.className = 'project-adjacent__next';
       a.href = '../' + next;
-      a.textContent = 'Next >';
+      a.textContent = '>';
       a.setAttribute('aria-label', 'Next project');
       nav.appendChild(a);
-    } else {
-      const spacer = document.createElement('span');
-      spacer.className = 'project-adjacent__spacer';
-      spacer.setAttribute('aria-hidden', 'true');
-      nav.appendChild(spacer);
     }
 
     const lightboxEl = document.getElementById('lightbox');
