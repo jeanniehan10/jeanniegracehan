@@ -19,22 +19,10 @@
 
   /*
     Top structure (matches index chrome):
-      12px → line → 9px → nav text → 9px → line → 9px → ABOUT
-    Bottom rule is outside .topbar so nav hover blend never affects it.
+      12px → line → 9px → nav text → 9px → 9px → ABOUT
   */
   .topbar {
     padding-bottom:9px;
-  }
-
-  .chrome-rule--below-nav {
-    position:fixed;
-    left:var(--pad-x);
-    right:var(--pad-x);
-    height:0.5px;
-    background:#fff;
-    mix-blend-mode:difference;
-    z-index:101;
-    pointer-events:none;
   }
 
   /* Matches landing compose-btn bottom hairline */
@@ -50,8 +38,10 @@
   }
 
   .wrap {
-    /* top line + gaps + nav + gap + bottom line box + gap → ABOUT */
-    padding:calc(12px + 0.5px + 9px + 9px + 9px + 9px) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
+    /* one line of body copy, used to offset the whole page from the chrome */
+    --line:calc(10px * 1.45);
+    /* top line + gaps + nav + gap → ABOUT, dropped four lines */
+    padding:calc(12px + 0.5px + 9px + 9px + 9px + 9px + var(--line)) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
   }
 
   .about-title {
@@ -133,7 +123,7 @@
   @media (max-width:768px) {
     /* name | stacked nav side-by-side, then 9px to line, 9px to ABOUT */
     .wrap {
-      padding-top:calc(12px + 0.5px + 9px + 9px + (12px + 9px) * 2 + 9px + 9px);
+      padding-top:calc(12px + 0.5px + 9px + 9px + (12px + 9px) * 2 + 9px + 9px + var(--line) * 4);
     }
   }
 </style>
@@ -144,10 +134,9 @@
     <nav class="topbar-nav">
       <a href="../archive.html">Work</a>
       <a href="about.html">Information</a>
-      <a href="mailto:jeanniehan10@gmail.com">Let's Connect!</a>
+      <a href="../contact.html">Let's Connect!</a>
     </nav>
   </header>
-  <div class="chrome-rule chrome-rule--below-nav" aria-hidden="true"></div>
   <div class="chrome-rule chrome-rule--bottom" aria-hidden="true"></div>
 
   <main class="wrap">
@@ -191,23 +180,5 @@
   </main>
 
 <script src="../text-trail.js"></script>
-<script>
-  (function () {
-    const topbar = document.querySelector('.topbar');
-    const rule = document.querySelector('.chrome-rule--below-nav');
-    if (!topbar || !rule) return;
-
-    function placeRule() {
-      const bottom = topbar.getBoundingClientRect().bottom;
-      rule.style.top = `${Math.round(bottom) - 0.5}px`;
-    }
-
-    placeRule();
-    window.addEventListener('resize', placeRule);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', placeRule);
-    }
-  })();
-</script>
 </body>
 </html>

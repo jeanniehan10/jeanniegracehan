@@ -321,7 +321,6 @@
       const a = document.createElement('a');
       a.className = 'project-adjacent__prev';
       a.href = '../' + prev;
-      a.textContent = '<';
       a.setAttribute('aria-label', 'Previous project');
       nav.appendChild(a);
     }
@@ -330,7 +329,6 @@
       const a = document.createElement('a');
       a.className = 'project-adjacent__next';
       a.href = '../' + next;
-      a.textContent = '>';
       a.setAttribute('aria-label', 'Next project');
       nav.appendChild(a);
     }
