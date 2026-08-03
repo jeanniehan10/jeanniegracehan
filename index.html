@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="fonts.css">
 <script src="matter.min.js"></script>
 <meta charset="UTF-8">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jeannie Han</title>
 <style>
@@ -53,6 +55,13 @@
     width:100%;
     height:100%;
     object-fit:cover;
+  }
+  .hero-bg.is-contain img {
+    object-fit:contain;
+  }
+  .hero.is-preview-dark,
+  .hero.is-preview-dark .hero-bg {
+    background:#000;
   }
   #words { position:absolute; inset:0; z-index:1; pointer-events:none; }
   .compose-meta {
@@ -316,6 +325,8 @@
       url: 'projects/FORCE!/force.html',
       img: 'projects/FORCE!/FORCE!_.jpg',
       imgMobile: 'projects/FORCE!/FORCE!_(MOBILE).jpg',
+      previewFit: 'contain',
+      previewBg: '#000',
       fontFamily: '"Neue Haas Unica Light", sans-serif',
       fontStyle: 'normal',
       subhead: 'Libretto Design',
@@ -579,18 +590,27 @@
       PROJECTS.forEach((p) => warmPreviewImage(projectImgHi(p)));
     }
 
+    function syncPreviewChrome(body) {
+      const fit = body?.project?.previewFit || 'cover';
+      const bg = body?.project?.previewBg;
+      heroBg.classList.toggle('is-contain', fit === 'contain');
+      hero.classList.toggle('is-preview-dark', !!bg);
+    }
+
     function setPreview(body) {
       if (!body) {
         previewBody = null;
         heroBg.classList.remove('is-visible');
         heroBg.setAttribute('aria-hidden', 'true');
         hero.classList.remove('is-previewing');
+        syncPreviewChrome(null);
         return;
       }
 
       const already = body === previewBody && hero.classList.contains('is-previewing');
       previewBody = body;
       heroBgImg.alt = wordLabel(body.el);
+      syncPreviewChrome(body);
 
       const lo = body.previewImg;
       const hi = body.previewImgHi || lo;
