@@ -59,8 +59,8 @@
   .hero-bg.is-contain img {
     object-fit:contain;
   }
-  .hero.is-preview-dark,
-  .hero.is-preview-dark .hero-bg {
+  /* Lives on the fading layer, not .hero, so it never snaps in or out */
+  .hero-bg.is-dark {
     background:#000;
   }
   #words { position:absolute; inset:0; z-index:1; pointer-events:none; }
@@ -305,6 +305,7 @@
       name: 'The Gestalt Series',
       url: 'projects/GESTALT/gestalt.html',
       img: 'projects/GESTALT/GESTALT_EDITED.jpg',
+      imgHi: 'projects/GESTALT/GESTALT_HOVER.jpg',
       imgMobile: 'projects/GESTALT/GESTALT_EDITED(MOBILE).jpg',
       fontFamily: '"Neue Haas Unica Medium", sans-serif',
       fontStyle: 'normal',
@@ -352,8 +353,8 @@
   // Full-quality hold/hover fill — warmed in the background after boot.
   // imgMobileHi keeps mobile-only artwork from being swapped for the desktop shot.
   function projectImgHi(project) {
-    if (MOBILE_MQ.matches && project.imgMobileHi) return project.imgMobileHi;
-    return project.img;
+    if (MOBILE_MQ.matches) return project.imgMobileHi || project.img;
+    return project.imgHi || project.img;
   }
 
   /* =========================================================
@@ -590,11 +591,11 @@
       PROJECTS.forEach((p) => warmPreviewImage(projectImgHi(p)));
     }
 
-    function syncPreviewChrome(body) {
-      const fit = body?.project?.previewFit || 'cover';
-      const bg = body?.project?.previewBg;
-      heroBg.classList.toggle('is-contain', fit === 'contain');
-      hero.classList.toggle('is-preview-dark', !!bg);
+    // Only ever runs on the way in. Resetting on hide would re-crop the image
+    // mid fade-out, which reads as a size jump.
+    function syncPreviewChrome(project) {
+      heroBg.classList.toggle('is-contain', project?.previewFit === 'contain');
+      heroBg.classList.toggle('is-dark', !!project?.previewBg);
     }
 
     function setPreview(body) {
@@ -603,14 +604,13 @@
         heroBg.classList.remove('is-visible');
         heroBg.setAttribute('aria-hidden', 'true');
         hero.classList.remove('is-previewing');
-        syncPreviewChrome(null);
         return;
       }
 
       const already = body === previewBody && hero.classList.contains('is-previewing');
       previewBody = body;
       heroBgImg.alt = wordLabel(body.el);
-      syncPreviewChrome(body);
+      syncPreviewChrome(body.project);
 
       const lo = body.previewImg;
       const hi = body.previewImgHi || lo;
