@@ -325,7 +325,10 @@
       name: 'FORCE! An Opera of Three Acts',
       url: 'projects/FORCE!/force.html',
       img: 'projects/FORCE!/FORCE!_.jpg',
-      imgMobile: 'projects/FORCE!/FORCE!_(MOBILE).jpg',
+      // Portrait crop — the 16:9 original leaves the libretto tiny on a phone.
+      // Both slots point at it so the preload can't swap the wide shot back in.
+      imgMobile: 'projects/FORCE!/FORCE!_HOVER(MOBILE).jpg',
+      imgMobileHi: 'projects/FORCE!/FORCE!_HOVER(MOBILE).jpg',
       previewFit: 'contain',
       previewBg: '#000',
       fontFamily: '"Neue Haas Unica Light", sans-serif',
@@ -366,7 +369,7 @@
   (function initWords() {
     if (!window.Matter) return;
 
-    const { Engine, Runner, Bodies, Body, Composite, Mouse, Sleeping } = Matter;
+    const { Engine, Runner, Bodies, Body, Composite, Mouse, Sleeping, Events } = Matter;
 
     const hero = document.querySelector('.hero');
     const layer = document.getElementById('words');
@@ -642,8 +645,36 @@
     const world = engine.world;
 
     const wallOpts = { isStatic: true };
+    // Sides only — the floor stays dead so titles don't jitter once they land
+    const SIDE_BOUNCE = 0.55;
+    const sideWallOpts = { isStatic: true, restitution: SIDE_BOUNCE };
     let walls = [];
     let btnWall = null;
+
+    /*
+      A dragged title is a sensor, so it passes straight through the side walls,
+      and a hard throw can tunnel one. Either way it ends up stranded off screen
+      with no way back short of a refresh, so the left/right bounds are also
+      enforced directly. Nothing here touches the vertical axis.
+    */
+    function clampBodyX(b, bounce) {
+      const halfW = (b.bounds.max.x - b.bounds.min.x) / 2;
+      // A title wider than the viewport can't be clamped, so just centre it
+      if (!W || halfW * 2 >= W) return;
+
+      const min = halfW;
+      const max = W - halfW;
+      const x = b.position.x;
+      if (x >= min && x <= max) return;
+
+      const edge = x < min ? min : max;
+      Body.setPosition(b, { x: edge, y: b.position.y });
+      if (!bounce) return;
+
+      const vx = b.velocity.x;
+      const headingOut = edge === min ? vx < 0 : vx > 0;
+      if (headingOut) Body.setVelocity(b, { x: -vx * SIDE_BOUNCE, y: b.velocity.y });
+    }
 
     function buttonExclusionRect() {
       const heroRect = hero.getBoundingClientRect();
@@ -665,8 +696,8 @@
       const FLOOR_GAP = 6;
       walls = [
         Bodies.rectangle(W / 2, (H - FLOOR_GAP) + t / 2, W * 3, t, wallOpts),
-        Bodies.rectangle(-t / 2, H / 2, t, H * 4, wallOpts),
-        Bodies.rectangle(W + t / 2, H / 2, t, H * 4, wallOpts),
+        Bodies.rectangle(-t / 2, H / 2, t, H * 4, sideWallOpts),
+        Bodies.rectangle(W + t / 2, H / 2, t, H * 4, sideWallOpts),
         Bodies.rectangle(W / 2, -H - t, W * 3, t, wallOpts),
       ];
       walls.forEach((w) => Composite.add(world, w));
@@ -1164,6 +1195,7 @@
       drag.lastY = pos.y;
       drag.lastT = now;
       Body.setPosition(drag.body, { x: pos.x + drag.ox, y: pos.y + drag.oy });
+      clampBodyX(drag.body, false);
       Body.setVelocity(drag.body, { x: 0, y: 0 });
       Body.setAngularVelocity(drag.body, 0);
     }
@@ -1304,6 +1336,14 @@
     document.addEventListener('contextmenu', (e) => {
       if (isComposeControl(e.target)) return;
       if (eventElement(e.target)?.closest?.('.hero, .word')) e.preventDefault();
+    });
+
+    Events.on(engine, 'afterUpdate', () => {
+      if (mode === 'composed' || mode === 'composing') return;
+      for (const b of bodies) {
+        if (b.isStatic) continue;
+        clampBodyX(b, drag?.body !== b);
+      }
     });
 
     runner = Runner.create();

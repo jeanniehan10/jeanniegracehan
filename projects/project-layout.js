@@ -1,6 +1,125 @@
 (function () {
   const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
 
+  /*
+    Scroll reveal. Blocks ease up into place as they cross into view.
+    The hidden state is declared in the stylesheet rather than added here, so
+    nothing flashes before this runs — which is also why this runs first: an
+    error further down must never be able to leave the page invisible.
+  */
+  function initScrollReveal() {
+    const root = document.body;
+    if (!root || !root.hasAttribute('data-scroll-reveal')) return;
+
+    const REVEAL_SELECTOR = [
+      '.landing__grid .copy',
+      '.landing > .triptych',
+      '.landing-hero-stack > *',
+      '.triptych-rows > .triptych',
+      '.below__stack > *',
+    ].join(', ');
+
+    const targets = [...document.querySelectorAll(REVEAL_SELECTOR)];
+    if (!targets.length) return;
+
+    const showAll = () => targets.forEach((el) => el.classList.add('is-revealed'));
+
+    targets.forEach((el) => el.classList.add('reveal'));
+
+    if (!('IntersectionObserver' in window)
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      showAll();
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      // Everything arriving in one batch gets walked in, rather than snapping
+      // together — a lone block still starts instantly.
+      entries
+        .filter((entry) => entry.isIntersecting)
+        .forEach((entry, i) => {
+          entry.target.style.setProperty('--reveal-delay', `${Math.min(i, 3) * 80}ms`);
+          entry.target.classList.add('is-revealed');
+          observer.unobserve(entry.target);
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+
+    targets.forEach((el) => observer.observe(el));
+  }
+
+  try {
+    initScrollReveal();
+  } catch (err) {
+    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-revealed'));
+  }
+
+  /*
+    Smooth scroll. Wheel and trackpad input set a target; the page eases toward
+    it each frame instead of moving 1:1 with the gesture. Touch and keyboard
+    stay native — only desktop wheel is softened.
+  */
+  function initSmoothScroll() {
+    const root = document.body;
+    if (!root?.hasAttribute('data-scroll-reveal')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (MOBILE_MQ.matches) return;
+
+    const EASE = 0.095;
+    const WHEEL_SCALE = 0.92;
+    let maxScroll = 0;
+    let current = window.scrollY;
+    let target = current;
+    let rafId = null;
+
+    function clampY(y) {
+      return Math.max(0, Math.min(y, maxScroll));
+    }
+
+    function refreshMax() {
+      maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      target = clampY(target);
+      current = clampY(current);
+    }
+
+    function tick() {
+      const delta = target - current;
+      if (Math.abs(delta) < 0.35) {
+        current = target;
+        window.scrollTo(0, current);
+        rafId = null;
+        return;
+      }
+      current += delta * EASE;
+      window.scrollTo(0, current);
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function queueTick() {
+      if (rafId == null) rafId = requestAnimationFrame(tick);
+    }
+
+    function isScrollLocked() {
+      return document.body.style.overflow === 'hidden';
+    }
+
+    window.addEventListener('wheel', (e) => {
+      if (isScrollLocked()) return;
+      e.preventDefault();
+      refreshMax();
+      target = clampY(target + e.deltaY * WHEEL_SCALE);
+      queueTick();
+    }, { passive: false });
+
+    window.addEventListener('resize', refreshMax);
+    refreshMax();
+  }
+
+  try {
+    initSmoothScroll();
+  } catch (_) {
+    /* native scroll is fine */
+  }
+
   function fullSrc(img) {
     return img.dataset.fullSrc || img.dataset.desktopSrc || img.getAttribute('src') || '';
   }

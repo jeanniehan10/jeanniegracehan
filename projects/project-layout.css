@@ -22,6 +22,34 @@ html, body {
 
 a { color:inherit; text-decoration:none; }
 
+/*
+  Scroll reveal, opted into per page via [data-scroll-reveal] on <body>.
+  The resting state is declared here so it is in effect on first paint and
+  nothing is visible before it settles.
+*/
+body[data-scroll-reveal] .reveal {
+  opacity:0;
+  transform:translate3d(0, 34px, 0);
+  transition:
+    opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 2s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+}
+body[data-scroll-reveal] .reveal.is-revealed {
+  opacity:1;
+  transform:none;
+}
+/* A seamless strip would tear open if its images travelled independently */
+body[data-scroll-reveal] .below--strip .reveal {
+  transform:none;
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-scroll-reveal] .reveal {
+    opacity:1;
+    transform:none;
+    transition:none;
+  }
+}
+
 .landing {
   position:relative;
   display:flex;
