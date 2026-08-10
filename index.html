@@ -406,6 +406,9 @@
       return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
+    // A little slop so a title still answers when the cursor rides its edge
+    const HIT_PAD = 6;
+
     function pointOverWordGlyphs(wordEl, clientX, clientY) {
       const label = wordEl.querySelector('.word__label');
       if (!label) return false;
@@ -413,22 +416,37 @@
       const rects = label.getClientRects();
       for (let i = 0; i < rects.length; i++) {
         const r = rects[i];
-        if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
+        if (
+          clientX >= r.left - HIT_PAD && clientX <= r.right + HIT_PAD &&
+          clientY >= r.top - HIT_PAD && clientY <= r.bottom + HIT_PAD
+        ) {
           return true;
         }
       }
       return false;
     }
 
-    function hitWord(point) {
-      const rect = hero.getBoundingClientRect();
-      const px = rect.left + point.x;
-      const py = rect.top + point.y;
-      const glyphOnly = mode === 'composed' || mode === 'composing';
+    function pointOverWordBox(b, hx, hy) {
+      const w = b._hitW ?? b.el.offsetWidth;
+      const h = b._hitH ?? b.el.offsetHeight;
+      if (w < 1 || h < 1) return false;
+      const dx = hx - b.position.x;
+      const dy = hy - b.position.y;
+      const cos = Math.cos(b.angle);
+      const sin = Math.sin(b.angle);
+      // Spin the cursor back into the title's own frame, otherwise a slanted
+      // word answers from the empty corners of its upright bounding box
+      const lx = dx * cos + dy * sin;
+      const ly = -dx * sin + dy * cos;
+      return Math.abs(lx) <= w / 2 + HIT_PAD && Math.abs(ly) <= h / 2 + HIT_PAD;
+    }
 
-      // Safari: while previewing, other titles get pointer-events:none and
-      // elementsFromPoint can stay stuck on the hot word — use painted rects
-      if (!usingTouch && hero.classList.contains('is-previewing')) {
+    function hitWord(point) {
+      if (mode === 'composed' || mode === 'composing') {
+        // Composed titles sit upright and wrap, so the painted line boxes are exact
+        const rect = hero.getBoundingClientRect();
+        const px = rect.left + point.x;
+        const py = rect.top + point.y;
         for (let i = bodies.length - 1; i >= 0; i--) {
           const b = bodies[i];
           if (pointOverWordGlyphs(b.el, px, py)) return b;
@@ -436,14 +454,22 @@
         return null;
       }
 
-      const stack = document.elementsFromPoint(px, py);
-      for (const el of stack) {
-        const wordEl = el.closest?.('.word');
-        if (!wordEl || !layer.contains(wordEl)) continue;
-        if (glyphOnly && !pointOverWordGlyphs(wordEl, px, py)) continue;
-        return bodies.find((b) => b.el === wordEl) || null;
+      // Jumbled titles are rotated, and a preview drops pointer-events on the
+      // rest of them, so hit-test the geometry rather than asking the document
+      let hit = null;
+      let topZ = -Infinity;
+      for (const b of bodies) {
+        if (!pointOverWordBox(b, point.x, point.y)) continue;
+        // Where two titles overlap, hold the one already previewing so the
+        // image doesn't flip back and forth under a barely-moving cursor
+        if (b === previewBody && hero.classList.contains('is-previewing')) return b;
+        const z = parseFloat(b.el.style.zIndex) || 0;
+        if (z >= topZ) {
+          topZ = z;
+          hit = b;
+        }
       }
-      return null;
+      return hit;
     }
 
     let settleWideAfterScatter = false;
@@ -561,6 +587,9 @@
     function syncBodyToElement(b) {
       const { w, h, elW, elH } = bodyDims(b.el);
       if (elW < 1 || elH < 1) return;
+      // Kept for hit-testing so the hover loop never has to re-measure the DOM
+      b._hitW = elW;
+      b._hitH = elH;
       if (b._lastBw === w && b._lastBh === h) return;
 
       const { x, y } = b.position;
@@ -903,11 +932,13 @@
 
       PROJECTS.forEach((p, i) => {
         const el = els[i];
-        const { w, h } = bodyDims(el);
+        const { w, h, elW, elH } = bodyDims(el);
 
         const body = Bodies.rectangle(spawnXs[i], dropPositionY(i), w, h, wordPhysicsOpts());
         Body.setAngle(body, (Math.random() - 0.5) * 0.7);
         Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        body._hitW = elW;
+        body._hitH = elH;
         body.el = el;
         body.url = p.url;
         body.previewImg = projectImg(p);
@@ -1098,11 +1129,13 @@
 
         snapshots.forEach((snap, i) => {
           Composite.remove(world, bodies[i]);
-          const { w, h } = bodyDims(snap.el);
+          const { w, h, elW, elH } = bodyDims(snap.el);
           const body = Bodies.rectangle(snap.x, snap.y, w, h, wordPhysicsOpts());
           Body.setAngle(body, snap.throw.angle);
           Body.setVelocity(body, snap.throw.velocity);
           Body.setAngularVelocity(body, snap.throw.angularVelocity);
+          body._hitW = elW;
+          body._hitH = elH;
           body.el = snap.el;
           body.url = snap.url;
           body.previewImg = snap.previewImg;
