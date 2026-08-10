@@ -12,8 +12,8 @@
 
   html, body {
     min-height:100%;
-    background:#fff;
-    color:#000;
+    background:var(--bg);
+    color:var(--text);
     font-family:"Input Mono", monospace;
   }
 
@@ -34,7 +34,7 @@
     left:var(--pad-x);
     right:var(--pad-x);
     height:0.5px;
-    background:#000;
+    background:var(--text);
     z-index:101;
     pointer-events:none;
   }
@@ -51,7 +51,7 @@
     font-weight:700;
     line-height:1;
     text-transform:uppercase;
-    color:#000;
+    color:var(--text);
   }
 
   .about-body {

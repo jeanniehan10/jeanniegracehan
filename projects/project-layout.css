@@ -396,7 +396,7 @@ body[data-scroll-reveal] .below--strip .reveal {
   width:100%;
   height:auto;
   object-fit:contain;
-  background:#e8e8e8;
+  background:var(--bg);
   cursor:zoom-in;
 }
 
@@ -414,7 +414,7 @@ body[data-scroll-reveal] .below--strip .reveal {
   transform:translateY(-50%);
   display:flex;
   align-items:center;
-  color:#fff;
+  color:var(--blend-ink);
   text-decoration:none;
   pointer-events:auto;
   padding:16px var(--pad-x);

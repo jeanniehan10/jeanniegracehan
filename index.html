@@ -12,12 +12,11 @@
   * { margin:0; padding:0; box-sizing:border-box; }
 
   html, body {
-    background:#fff;
+    background:var(--bg);
     color:var(--text);
     height:100%;
     overflow:hidden;
     cursor:default;
-    --bg:#fff;
     --word-size:42px;
     --word-leading-composed:0.72;
     -webkit-text-size-adjust:100%;
@@ -35,7 +34,7 @@
     height:100vh;
     height:100dvh;
     overflow:hidden;
-    background:#fff;
+    background:var(--bg);
     touch-action:none;
     -webkit-user-select:none;
     user-select:none;
@@ -534,6 +533,10 @@
       subToWord: 20,
       wordToNext: 16,
     };
+    // Gap under the topbar. Drives the subheads and the composed titles from the
+    // same origin, so raising it slides the whole stack down without changing
+    // how the titles sit against their subheads.
+    const COMPOSE_TOP_GAP = 30;
     let lastComposeRows = [];
 
     function composedLineHeight() {
@@ -1021,7 +1024,7 @@
     function composedLayoutOrigin() {
       const heroRect = hero.getBoundingClientRect();
       const topbar = document.querySelector('.topbar');
-      const top = (topbar ? topbar.getBoundingClientRect().bottom - heroRect.top : 36) + 15;
+      const top = (topbar ? topbar.getBoundingClientRect().bottom - heroRect.top : 36) + COMPOSE_TOP_GAP;
       const left = composePadX();
       return { top, left };
     }

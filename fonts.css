@@ -71,8 +71,11 @@
 }
 
 :root {
-  --bg: #fff;
-  --text: #2a2527;
+  --bg: #F2F3F5;
+  --text: #1C1C1C;
+  /* --bg minus --text: what the difference-blended chrome must be painted so it
+     reads as --text over the page and still inverts over artwork */
+  --blend-ink: #D6D7D9;
   --pit: #c2bbc5;
   --asterisk: #75908b;
   --compose-num: #66807b;
@@ -99,7 +102,7 @@ body::before {
   left: var(--pad-x);
   right: var(--pad-x);
   height: 0.5px;
-  background: #fff;
+  background: var(--blend-ink);
   mix-blend-mode: difference;
   z-index: 101;
   pointer-events: none;
@@ -124,14 +127,14 @@ body::before {
 }
 .topbar .name {
   grid-column: 1;
-  color: #fff;
+  color: var(--blend-ink);
   pointer-events: auto;
   font-family: "Input Mono Medium", "Input Mono", monospace;
   font-weight: bold;
 }
 .topbar a {
   pointer-events: auto;
-  color: #fff;
+  color: var(--blend-ink);
   text-decoration: none;
 }
 .topbar-nav {
