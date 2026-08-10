@@ -140,7 +140,9 @@ body::before {
 .topbar-nav {
   grid-column: 2;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 1.25em;
   width: 100%;
 }
 
@@ -155,10 +157,11 @@ body::before {
   }
   .topbar-nav {
     grid-column: 2;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;
-    gap: var(--pad);
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 1.25em;
     width: 100%;
   }
 }
