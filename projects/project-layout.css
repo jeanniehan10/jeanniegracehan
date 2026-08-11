@@ -38,10 +38,6 @@ body[data-scroll-reveal] .reveal.is-revealed {
   opacity:1;
   transform:none;
 }
-/* A seamless strip would tear open if its images travelled independently */
-body[data-scroll-reveal] .below--strip .reveal {
-  transform:none;
-}
 @media (prefers-reduced-motion: reduce) {
   body[data-scroll-reveal] .reveal {
     opacity:1;
@@ -349,16 +345,6 @@ body[data-scroll-reveal] .below--strip .reveal {
     background:#000;
   }
 
-  /* Edge-to-edge column: uniform width, no seams. */
-  .below--strip .below__stack {
-    gap:0;
-  }
-  .below--strip .hero-shot,
-  .below--strip .hero-shot--wide,
-  .below--strip .hero-shot.hero-shot--full {
-    width:100%;
-    align-self:stretch;
-  }
 }
 
 .below {
