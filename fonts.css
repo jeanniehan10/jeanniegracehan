@@ -142,7 +142,7 @@ body::before {
   display: flex;
   justify-content: flex-end;
   align-items: baseline;
-  gap: 1.25em;
+  gap: 2.75em;
   width: 100%;
 }
 
@@ -161,7 +161,7 @@ body::before {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-end;
-    gap: 1.25em;
+    gap: 2.75em;
     width: 100%;
   }
 }
@@ -255,5 +255,40 @@ body::before {
   }
   a.link-instant:hover {
     color: var(--hover-pink) !important;
+  }
+
+  a.link-project,
+  a.link-project:hover {
+    color: #E20000 !important;
+    transition: none !important;
+  }
+}
+
+a.link-project {
+  color: #E20000;
+  animation: link-project-blink 1s step-end infinite;
+}
+@keyframes link-project-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  a.link-project {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* COP: words vanish on hover, then fade back in very slowly — no pink flash */
+@media (min-width: 769px) and (hover: hover) {
+  body[data-trail-vanish] .text-trail .trail-word {
+    transition: opacity 10s ease;
+    opacity: 1;
+  }
+  body[data-trail-vanish] .text-trail .trail-word.is-lit,
+  body[data-trail-vanish] .text-trail .trail-word.is-lit:hover {
+    color: inherit !important;
+    opacity: 0;
+    transition: opacity 0.05s linear;
   }
 }

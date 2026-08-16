@@ -738,6 +738,7 @@
 
     const bodies = [];
     const metaRows = [];
+    let closerMeta = null;
     let activeWordSize = null;
 
     function resolveCssWordSize() {
@@ -828,6 +829,8 @@
         total += composeHeaderHeight() + measureComposeMetrics(el).height;
         if (i < els.length - 1) total += COMPOSE_META.wordToNext;
       });
+      // Closing rule under the last title — same gap as between titles
+      if (els.length) total += COMPOSE_META.wordToNext + COMPOSE_META.lineH;
       return total;
     }
 
@@ -881,6 +884,12 @@
         const y = Math.round(row.y * dpr) / dpr;
         metaRows[i].style.transform = `translate3d(0, ${y}px, 0)`;
       });
+      if (closerMeta && rows.length) {
+        const last = rows[rows.length - 1];
+        // Same gap under a title as the rule that opens the next project
+        const y = Math.round((last.wordTop + last.bh + COMPOSE_META.wordToNext) * dpr) / dpr;
+        closerMeta.style.transform = `translate3d(0, ${y}px, 0)`;
+      }
     }
 
     function layoutComposeMeta() {
@@ -918,6 +927,12 @@
 
         return el;
       });
+
+      // Closing rule under FORCE! — line only, same gap as between titles
+      closerMeta = document.createElement('div');
+      closerMeta.className = 'compose-meta__row';
+      closerMeta.innerHTML = '<span class="compose-meta__line" aria-hidden="true"></span>';
+      composeMeta.appendChild(closerMeta);
 
       uniformWordSize(els);
 
