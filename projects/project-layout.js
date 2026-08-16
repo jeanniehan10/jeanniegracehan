@@ -418,7 +418,6 @@
     'NSNB/new-school-new-books.html',
     'COP/pomegranates.html',
     'GESTALT/gestalt.html',
-    'BUSINESSCARD/business-card.html',
     'FORCE!/force.html',
   ];
 

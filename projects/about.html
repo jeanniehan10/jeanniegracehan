@@ -40,22 +40,47 @@
   }
 
   .wrap {
-    /* one line of body copy, used to offset the whole page from the chrome */
     --line:calc(10px * 1.45);
-    /* top line + gaps + nav + gap → ABOUT, dropped four lines */
-    padding:calc(12px + 0.5px + 9px + 9px + 9px + 9px + var(--line)) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
+    /*
+      Top chrome: 12px → hairline → 11px → name (11px tall).
+      Mirror that under the name: 11px → hairline → 11px → ABOUT.
+    */
+    padding:calc(12px + 0.5px + 11px + 11px + 11px + 0.5px + 11px) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
   }
 
-  .about-title {
-    font-size:12px;
-    font-weight:700;
-    line-height:1;
+  /* Shared section lead-ins — same size, all caps, hairline tucked just above */
+  .about-title,
+  .experience-label,
+  .education-label,
+  .contact-label {
+    position:relative;
+    margin:0 0 var(--line);
+    font-size:10px;
+    font-weight:400;
+    line-height:1.45;
     text-transform:uppercase;
     color:var(--text);
   }
+  .about-title::before,
+  .experience-label::before,
+  .education-label::before,
+  .contact-label::before {
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:-4px;
+    height:0.5px;
+    background:var(--text);
+    pointer-events:none;
+  }
+  /* Same 11px gap the top chrome line has above the name */
+  .about-title::before {
+    top:calc(-11px - 0.5px);
+  }
 
   .about-body {
-    margin-top:1.2em;
+    margin-top:0;
     max-width:152ch;
     font-size:10px;
     line-height:1.45;
@@ -72,14 +97,13 @@
     font-family:"Input Mono Medium", "Input Mono", monospace;
   }
 
-  .experience {
-    margin-top:1.45em;
+  /* One blank line before the hairline, plus 4px so the rule doesn't sit on the text above */
+  .experience,
+  .education,
+  .contact-block {
+    margin-top:calc(var(--line) * 2 + 4px);
     font-size:10px;
     line-height:1.45;
-  }
-  .experience-label {
-    margin:0;
-    font-weight:400;
   }
   .experience-org {
     margin:0;
@@ -90,15 +114,6 @@
     padding-left:8ch;
   }
 
-  .education {
-    margin-top:1.45em; /* one line gap under Experience */
-    font-size:10px;
-    line-height:1.45;
-  }
-  .education-label {
-    margin:0;
-    font-weight:400;
-  }
   .education-school {
     margin:0;
     padding-left:4ch;
@@ -108,24 +123,24 @@
     padding-left:8ch;
   }
 
-  .contact-block {
-    margin-top:1.45em; /* one line gap under Education */
-    font-size:10px;
-    line-height:1.45;
-  }
-  .contact-label {
-    margin:0;
-    font-weight:400;
-  }
   .contact-line {
     margin:0;
     padding-left:4ch;
   }
 
+  /* Closing hairline after Contact — same rule, same lead-in space */
+  .contact-block::after {
+    content:"";
+    display:block;
+    margin-top:calc(var(--line) * 2 + 4px);
+    height:0.5px;
+    background:var(--text);
+  }
+
   @media (max-width:768px) {
-    /* name | stacked nav side-by-side, then 9px to line, 9px to ABOUT */
+    /* Name sits on the first row — same vertical rhythm as desktop */
     .wrap {
-      padding-top:calc(12px + 0.5px + 9px + 9px + (12px + 9px) * 2 + 9px + 9px + var(--line) * 4);
+      padding-top:calc(12px + 0.5px + 11px + 11px + 11px + 0.5px + 11px);
     }
   }
 </style>

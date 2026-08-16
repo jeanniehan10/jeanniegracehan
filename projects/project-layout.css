@@ -158,6 +158,14 @@ body[data-scroll-reveal] .reveal.is-revealed {
   width:100%;
   align-self:stretch;
 }
+/* Stacked quads share the skinny image gap, not the large hero offset */
+.landing-hero-quads {
+  display:flex;
+  flex-direction:column;
+  gap:var(--img-gap);
+  width:100%;
+  align-self:stretch;
+}
 .landing-hero-pair .landing-hero,
 .landing-hero-quad .landing-hero {
   width:100%;
