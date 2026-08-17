@@ -218,7 +218,7 @@ body::before {
   }
   .text-trail .trail-word.is-lit,
   .text-trail .trail-word.is-lit:hover {
-    color: var(--hover-pink) !important;
+    color: var(--trail-lit, var(--hover-pink)) !important;
     transition: color 0.05s linear;
   }
 

@@ -1,7 +1,14 @@
 (function () {
   const mq = window.matchMedia('(min-width: 769px) and (hover: hover)');
 
-  function wrapWords(el) {
+  function trailPalette() {
+    const raw = document.body?.dataset?.trailColors;
+    if (!raw) return null;
+    const colors = raw.split(',').map((c) => c.trim()).filter(Boolean);
+    return colors.length ? colors : null;
+  }
+
+  function wrapWords(el, palette, counter) {
     const nodes = [...el.childNodes];
     for (const node of nodes) {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -15,35 +22,27 @@
             const span = document.createElement('span');
             span.className = 'trail-word';
             span.textContent = part;
+            if (palette) {
+              span.style.setProperty('--trail-lit', palette[counter.i % palette.length]);
+              counter.i += 1;
+            }
             frag.appendChild(span);
           }
         }
         node.replaceWith(frag);
       } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'BR') {
-        wrapWords(node);
+        wrapWords(node, palette, counter);
       }
     }
   }
 
-  function bindTrail(block) {
-    if (block.dataset.trailReady) return;
-    wrapWords(block);
-    block.dataset.trailReady = '1';
-    block.addEventListener('mouseover', (e) => {
-      const word = e.target.closest('.trail-word');
-      if (!word || !block.contains(word)) return;
-      word.classList.add('is-lit');
-    });
-    block.addEventListener('mouseout', (e) => {
-      const word = e.target.closest('.trail-word');
-      if (!word || !block.contains(word)) return;
-      if (e.relatedTarget && word.contains(e.relatedTarget)) return;
-      word.classList.remove('is-lit');
-    });
-  }
-
   function markProjectCopy() {
-    document.querySelectorAll('.copy p:not(.no-trail), .copy-lede .meta').forEach((el) => {
+    document.querySelectorAll([
+      '.copy p:not(.no-trail)',
+      '.copy-lede .meta',
+      '.project-masthead__title',
+      '.project-masthead__meta p',
+    ].join(', ')).forEach((el) => {
       el.classList.add('text-trail');
     });
   }
@@ -51,7 +50,24 @@
   function initTrail() {
     if (!mq.matches) return;
     markProjectCopy();
-    document.querySelectorAll('.text-trail').forEach(bindTrail);
+    const palette = trailPalette();
+    const counter = { i: 0 };
+    document.querySelectorAll('.text-trail').forEach((block) => {
+      if (block.dataset.trailReady) return;
+      wrapWords(block, palette, counter);
+      block.dataset.trailReady = '1';
+      block.addEventListener('mouseover', (e) => {
+        const word = e.target.closest('.trail-word');
+        if (!word || !block.contains(word)) return;
+        word.classList.add('is-lit');
+      });
+      block.addEventListener('mouseout', (e) => {
+        const word = e.target.closest('.trail-word');
+        if (!word || !block.contains(word)) return;
+        if (e.relatedTarget && word.contains(e.relatedTarget)) return;
+        word.classList.remove('is-lit');
+      });
+    });
   }
 
   window.initTextTrail = initTrail;
