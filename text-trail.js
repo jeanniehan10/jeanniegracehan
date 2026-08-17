@@ -30,7 +30,7 @@
           }
         }
         node.replaceWith(frag);
-      } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'BR') {
+      } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'BR' && node.tagName !== 'A') {
         wrapWords(node, palette, counter);
       }
     }

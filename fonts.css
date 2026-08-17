@@ -221,6 +221,11 @@ body::before {
     color: var(--trail-lit, var(--hover-pink)) !important;
     transition: color 0.05s linear;
   }
+  /* Palette pages: lit color wins over the generic span:hover inherit */
+  body[data-trail-colors] .text-trail .trail-word.is-lit,
+  body[data-trail-colors] .text-trail .trail-word.is-lit:hover {
+    color: var(--trail-lit, var(--hover-pink)) !important;
+  }
 
   .word,
   .word__label {
@@ -265,12 +270,12 @@ body::before {
 }
 
 a.link-project {
-  --link-blink: #E20000;
+  --link-blink: #8F9903;
   color: var(--link-blink);
   animation: link-project-blink 1s step-end infinite;
 }
 a.link-project--force {
-  --link-blink: #C0D314;
+  --link-blink: #8F9903;
 }
 @keyframes link-project-blink {
   0%, 49% { opacity: 1; }
