@@ -12,6 +12,8 @@
     if (!root || !root.hasAttribute('data-scroll-reveal')) return;
 
     const REVEAL_SELECTOR = [
+      '.project-masthead__title',
+      '.project-masthead__body',
       '.landing__grid .copy',
       '.landing > .triptych',
       '.landing-hero-stack > *',

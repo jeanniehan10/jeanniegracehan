@@ -5,7 +5,7 @@ html, body {
   color:var(--text);
   overflow-x:hidden;
   font-family:"Input Mono", monospace;
-  --text-sm:10px; /* match Information page body */
+  --text-sm:9px; /* match Information page body */
   --img-gap:7px;
   --meta-gap:4px;
   --triptych-h:clamp(280px, 50vh, 4400px);
@@ -55,6 +55,10 @@ body[data-scroll-reveal] .reveal.is-revealed {
   padding:calc(var(--topbar-h) + var(--pad)) var(--pad-x) var(--pad);
   background:var(--bg);
 }
+.landing:has(.project-masthead) {
+  /* First masthead rule sits close under the nav */
+  padding-top:calc(var(--topbar-h) + 1px);
+}
 
 .landing__grid {
   flex:0 0 auto;
@@ -94,10 +98,64 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .copy p + p { margin-top:var(--copy-para-gap); }
 
+/*
+  Detail-page masthead:
+  rule → title → rule → (equal pad) meta|copy (equal pad) → rule → images (8px).
+  Meta column ~1/3, copy ~2/3; year block then ~2-line break before specs.
+*/
+.project-masthead {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+}
+.project-masthead__rule {
+  flex:0 0 auto;
+  height:0.5px;
+  background:var(--text);
+  pointer-events:none;
+}
+.project-masthead__title {
+  margin:6px 0;
+  font-size:var(--text-sm);
+  font-weight:400;
+  line-height:1.45;
+  letter-spacing:0;
+}
+.project-masthead__body {
+  /* Same air above and below the text, matching the reference frame */
+  padding:8px 0;
+}
+.project-masthead__grid {
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
+  column-gap:clamp(24px, 4vw, 48px);
+  row-gap:24px;
+  align-items:start;
+}
+.project-masthead__meta {
+  font-size:var(--text-sm);
+  line-height:1.45;
+  letter-spacing:0;
+}
+.project-masthead__meta-block p {
+  margin:0;
+}
+.project-masthead__meta-block + .project-masthead__meta-block {
+  /* ~two lines of body leading, as in the reference */
+  margin-top:calc(var(--text-sm) * 1.45 * 2);
+}
+.project-masthead__copy.copy p + p {
+  margin-top:var(--copy-para-gap);
+}
+.project-masthead__copy.copy > p:last-child {
+  /* Extra blank line below the final paragraph */
+  margin-bottom:calc(var(--text-sm) * 1.45);
+}
+
 .landing-hero {
   flex:0 0 auto;
   width:100%;
-  margin:0;
+  margin:2;
 }
 .landing-hero-stack {
   display:flex;
@@ -105,6 +163,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
   gap:var(--hero-offset);
   width:100%;
   margin-top:56px;
+}
+.landing-hero-stack.landing-hero-stack--after-masthead,
+.project-masthead + .landing-hero-stack,
+.project-masthead + .triptych {
+  margin-top:10px;
 }
 .landing-hero-stack > .landing-hero:first-child {
   margin-top:0;
@@ -288,6 +351,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
     grid-template-columns:1fr;
   }
   .landing__grid { grid-template-columns:1fr; }
+  .project-masthead__grid {
+    grid-template-columns:1fr;
+    /* Two blank lines between meta and description when stacked */
+    row-gap:calc(var(--text-sm) * 1.45 * 3);
+  }
 
   .triptych {
     display:block;

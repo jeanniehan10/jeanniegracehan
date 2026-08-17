@@ -867,6 +867,7 @@
           wordTop,
           bh,
           bw,
+          slotH,
           cy,
           composeLeft,
           wordLeft: composeLeft,
@@ -886,8 +887,8 @@
       });
       if (closerMeta && rows.length) {
         const last = rows[rows.length - 1];
-        // Same gap under a title as the rule that opens the next project
-        const y = Math.round((last.wordTop + last.bh + COMPOSE_META.wordToNext) * dpr) / dpr;
+        // Match inter-title rules: gap from the shared slot bottom, not FORCE's shorter box
+        const y = Math.round((last.wordTop + last.slotH + COMPOSE_META.wordToNext) * dpr) / dpr;
         closerMeta.style.transform = `translate3d(0, ${y}px, 0)`;
       }
     }

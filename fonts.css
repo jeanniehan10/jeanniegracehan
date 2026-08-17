@@ -259,14 +259,18 @@ body::before {
 
   a.link-project,
   a.link-project:hover {
-    color: #E20000 !important;
+    color: var(--link-blink, #E20000) !important;
     transition: none !important;
   }
 }
 
 a.link-project {
-  color: #E20000;
+  --link-blink: #E20000;
+  color: var(--link-blink);
   animation: link-project-blink 1s step-end infinite;
+}
+a.link-project--force {
+  --link-blink: #C0D314;
 }
 @keyframes link-project-blink {
   0%, 49% { opacity: 1; }
