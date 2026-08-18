@@ -1,6 +1,4 @@
 (function () {
-  const mq = window.matchMedia('(min-width: 769px) and (hover: hover)');
-
   function trailPalette() {
     const raw = document.body?.dataset?.trailColors;
     if (!raw) return null;
@@ -47,30 +45,83 @@
     });
   }
 
+  function lightWord(word) {
+    if (!word) return;
+    word.classList.add('is-lit');
+  }
+
+  function unlightWord(word) {
+    if (!word) return;
+    word.classList.remove('is-lit');
+  }
+
+  function wordFromPoint(clientX, clientY) {
+    const el = document.elementFromPoint(clientX, clientY);
+    return el?.closest?.('.trail-word') || null;
+  }
+
+  function bindTrail(block) {
+    if (block.dataset.trailReady) return;
+    block.dataset.trailReady = '1';
+
+    block.addEventListener('mouseover', (e) => {
+      const word = e.target.closest('.trail-word');
+      if (!word || !block.contains(word)) return;
+      lightWord(word);
+    });
+    block.addEventListener('mouseout', (e) => {
+      const word = e.target.closest('.trail-word');
+      if (!word || !block.contains(word)) return;
+      if (e.relatedTarget && word.contains(e.relatedTarget)) return;
+      unlightWord(word);
+    });
+  }
+
+  function initTouchTrail() {
+    if (document.documentElement.dataset.trailTouchReady) return;
+    document.documentElement.dataset.trailTouchReady = '1';
+
+    let active = null;
+
+    function syncFromTouch(touch) {
+      if (!touch) return;
+      const word = wordFromPoint(touch.clientX, touch.clientY);
+      if (word === active) return;
+      if (active) unlightWord(active);
+      active = word;
+      if (active) lightWord(active);
+    }
+
+    document.addEventListener('touchstart', (e) => {
+      syncFromTouch(e.touches[0]);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      syncFromTouch(e.touches[0]);
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      if (active) unlightWord(active);
+      active = null;
+    });
+    document.addEventListener('touchcancel', () => {
+      if (active) unlightWord(active);
+      active = null;
+    });
+  }
+
   function initTrail() {
-    if (!mq.matches) return;
     markProjectCopy();
     const palette = trailPalette();
     const counter = { i: 0 };
     document.querySelectorAll('.text-trail').forEach((block) => {
       if (block.dataset.trailReady) return;
       wrapWords(block, palette, counter);
-      block.dataset.trailReady = '1';
-      block.addEventListener('mouseover', (e) => {
-        const word = e.target.closest('.trail-word');
-        if (!word || !block.contains(word)) return;
-        word.classList.add('is-lit');
-      });
-      block.addEventListener('mouseout', (e) => {
-        const word = e.target.closest('.trail-word');
-        if (!word || !block.contains(word)) return;
-        if (e.relatedTarget && word.contains(e.relatedTarget)) return;
-        word.classList.remove('is-lit');
-      });
+      bindTrail(block);
     });
+    initTouchTrail();
   }
 
   window.initTextTrail = initTrail;
   initTrail();
-  mq.addEventListener('change', initTrail);
 })();

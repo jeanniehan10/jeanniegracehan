@@ -166,13 +166,31 @@ body::before {
   }
 }
 
-/* Word-trail transitions (color only applied on desktop) */
+/* Word-trail: instant lit color, slow fade back (desktop + mobile) */
 .text-trail .trail-word {
   color: inherit;
   transition: color 6s ease;
 }
+.text-trail .trail-word.is-lit {
+  color: var(--trail-lit, var(--hover-pink)) !important;
+  transition: color 0.05s linear;
+}
+body[data-trail-colors] .text-trail .trail-word.is-lit {
+  color: var(--trail-lit, var(--hover-pink)) !important;
+}
 
-/* Desktop: pink hover + word-trail (not on touch/mobile) */
+/* COP: words vanish on press/hover, then fade back in very slowly */
+body[data-trail-vanish] .text-trail .trail-word {
+  transition: opacity 10s ease, color 6s ease;
+  opacity: 1;
+}
+body[data-trail-vanish] .text-trail .trail-word.is-lit {
+  color: inherit !important;
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+
+/* Desktop: pink hover + word-trail hover guards (not on touch/mobile) */
 @media (min-width: 769px) and (hover: hover) {
   :where(
     a,
@@ -216,13 +234,9 @@ body::before {
   .text-trail span:hover {
     color: inherit !important;
   }
-  .text-trail .trail-word.is-lit,
   .text-trail .trail-word.is-lit:hover {
     color: var(--trail-lit, var(--hover-pink)) !important;
-    transition: color 0.05s linear;
   }
-  /* Palette pages: lit color wins over the generic span:hover inherit */
-  body[data-trail-colors] .text-trail .trail-word.is-lit,
   body[data-trail-colors] .text-trail .trail-word.is-lit:hover {
     color: var(--trail-lit, var(--hover-pink)) !important;
   }
@@ -267,6 +281,11 @@ body::before {
     color: var(--link-blink, #E20000) !important;
     transition: none !important;
   }
+
+  body[data-trail-vanish] .text-trail .trail-word.is-lit:hover {
+    color: inherit !important;
+    opacity: 0;
+  }
 }
 
 a.link-project {
@@ -285,19 +304,5 @@ a.link-project--force {
   a.link-project {
     animation: none;
     opacity: 1;
-  }
-}
-
-/* COP: words vanish on hover, then fade back in very slowly — no pink flash */
-@media (min-width: 769px) and (hover: hover) {
-  body[data-trail-vanish] .text-trail .trail-word {
-    transition: opacity 10s ease;
-    opacity: 1;
-  }
-  body[data-trail-vanish] .text-trail .trail-word.is-lit,
-  body[data-trail-vanish] .text-trail .trail-word.is-lit:hover {
-    color: inherit !important;
-    opacity: 0;
-    transition: opacity 0.05s linear;
   }
 }
