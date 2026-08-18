@@ -16,6 +16,7 @@
       '.project-masthead__body',
       '.landing__grid .copy',
       '.landing > .triptych',
+      '.nsnb-media-stack > *',
       '.landing-hero-stack > *',
       '.triptych-rows > .triptych',
       '.below__stack > *',

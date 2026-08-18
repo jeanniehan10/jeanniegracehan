@@ -166,8 +166,37 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .landing-hero-stack.landing-hero-stack--after-masthead,
 .project-masthead + .landing-hero-stack,
-.project-masthead + .triptych {
+.project-masthead + .triptych,
+.project-masthead + .nsnb-media-stack {
   margin-top:10px;
+}
+
+/* NSNB: photo then slideshow on mobile; slideshow then photo on desktop */
+.nsnb-media-stack {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+}
+.nsnb-media-stack__lead {
+  width:var(--hero-width);
+  align-self:center;
+  margin:0;
+}
+.nsnb-media-stack__lead img {
+  display:block;
+  width:100%;
+  height:auto;
+  cursor:zoom-in;
+}
+@media (min-width: 769px) {
+  .nsnb-media-stack__lead {
+    order:2;
+    margin-top:var(--hero-offset);
+  }
+  .nsnb-media-stack .triptych {
+    order:1;
+    margin-top:0;
+  }
 }
 .landing-hero-stack > .landing-hero:first-child {
   margin-top:0;
@@ -316,17 +345,20 @@ body[data-scroll-reveal] .reveal.is-revealed {
     gap:var(--img-gap);
   }
   /* Full-bleed (minus page pad) side-by-side — height follows the images, no crop */
-  .landing > .triptych {
+  .landing > .triptych,
+  .nsnb-media-stack > .triptych {
     height:auto;
     align-self:stretch;
     width:100%;
   }
-  .landing > .triptych figure {
+  .landing > .triptych figure,
+  .nsnb-media-stack > .triptych figure {
     height:auto;
     align-items:stretch;
     overflow:visible;
   }
-  .landing > .triptych img {
+  .landing > .triptych img,
+  .nsnb-media-stack > .triptych img {
     width:100%;
     height:auto;
     max-width:100%;
@@ -345,6 +377,31 @@ body[data-scroll-reveal] .reveal.is-revealed {
   .landing-hero--sequence.landing-hero--narrow {
     width:min(82%, 560px);
   }
+  /* Mobile full-bleed heroes (COP gif, CLUTTER lead, etc.) */
+  .landing-hero--mobile-bleed,
+  .landing-hero--mobile-bleed.landing-hero--narrow,
+  .landing-hero--mobile-bleed.landing-hero--sequence {
+    width:100%;
+    align-self:stretch;
+  }
+
+  .nsnb-media-stack {
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    margin-top:10px;
+  }
+  .nsnb-media-stack__lead {
+    order:1;
+    width:100%;
+    align-self:stretch;
+    margin:0;
+  }
+  .nsnb-media-stack .triptych {
+    order:2;
+    margin-top:var(--hero-offset);
+  }
+
   .landing-hero-pair,
   .landing-hero-quad {
     width:100%;

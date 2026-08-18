@@ -289,20 +289,10 @@ body[data-trail-vanish] .text-trail .trail-word.is-lit {
 }
 
 a.link-project {
-  --link-blink: #8F9903;
+  --link-blink: #E20000;
   color: var(--link-blink);
-  animation: link-project-blink 1s step-end infinite;
+  animation: none;
 }
 a.link-project--force {
   --link-blink: #8F9903;
-}
-@keyframes link-project-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  a.link-project {
-    animation: none;
-    opacity: 1;
-  }
 }
