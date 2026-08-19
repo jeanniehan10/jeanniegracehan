@@ -27,13 +27,16 @@
 
     const showAll = () => targets.forEach((el) => el.classList.add('is-revealed'));
 
-    targets.forEach((el) => el.classList.add('reveal'));
-
-    if (!('IntersectionObserver' in window)
-      || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Mobile / touch: skip motion — transforms mid-scroll make iOS scrolling feel stuck
+    if (MOBILE_MQ.matches
+      || window.matchMedia('(hover: none), (pointer: coarse)').matches
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      || !('IntersectionObserver' in window)) {
       showAll();
       return;
     }
+
+    targets.forEach((el) => el.classList.add('reveal'));
 
     const observer = new IntersectionObserver((entries) => {
       // Everything arriving in one batch gets walked in, rather than snapping
@@ -58,14 +61,15 @@
 
   /*
     Smooth scroll. Wheel and trackpad input set a target; the page eases toward
-    it each frame instead of moving 1:1 with the gesture. Touch and keyboard
-    stay native — only desktop wheel is softened.
+    it each frame instead of moving 1:1 with the gesture. Touch devices and
+    mobile widths stay fully native — custom wheel scrolling feels stuck there.
   */
   function initSmoothScroll() {
     const root = document.body;
     if (!root?.hasAttribute('data-scroll-reveal')) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (MOBILE_MQ.matches) return;
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
     const EASE = 0.095;
     const WHEEL_SCALE = 0.92;
@@ -73,6 +77,7 @@
     let current = window.scrollY;
     let target = current;
     let rafId = null;
+    let active = true;
 
     function clampY(y) {
       return Math.max(0, Math.min(y, maxScroll));
@@ -85,6 +90,10 @@
     }
 
     function tick() {
+      if (!active) {
+        rafId = null;
+        return;
+      }
       const delta = target - current;
       if (Math.abs(delta) < 0.35) {
         current = target;
@@ -105,16 +114,40 @@
       return document.body.style.overflow === 'hidden';
     }
 
-    window.addEventListener('wheel', (e) => {
-      if (isScrollLocked()) return;
+    function onWheel(e) {
+      if (!active || isScrollLocked()) return;
       e.preventDefault();
       refreshMax();
       target = clampY(target + e.deltaY * WHEEL_SCALE);
       queueTick();
-    }, { passive: false });
+    }
 
+    function syncFromNative() {
+      if (!active || rafId != null) return;
+      current = window.scrollY;
+      target = current;
+    }
+
+    function teardown() {
+      active = false;
+      if (rafId != null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('scroll', syncFromNative);
+      window.removeEventListener('resize', refreshMax);
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    // Keep internal position in sync if anything else moves the page
+    window.addEventListener('scroll', syncFromNative, { passive: true });
     window.addEventListener('resize', refreshMax);
     refreshMax();
+
+    MOBILE_MQ.addEventListener('change', (e) => {
+      if (e.matches) teardown();
+    });
   }
 
   try {
