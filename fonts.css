@@ -31,14 +31,6 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica Regular";
-  src: url("Neue/NeueHaasUnica-Regular.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: "Neue Haas Unica Light";
   src: url("Neue/Linotype - Neue Haas Unica Pro Light.woff") format("woff");
   font-weight: normal;
@@ -76,9 +68,6 @@
   /* --bg minus --text: what the difference-blended chrome must be painted so it
      reads as --text over the page and still inverts over artwork */
   --blend-ink: #D6D7D9;
-  --pit: #c2bbc5;
-  --asterisk: #75908b;
-  --compose-num: #66807b;
   --col-gap: 8px;
   --pad: 12px;
   --pad-x: 14px;
@@ -87,7 +76,7 @@
 }
 
 html, body {
-  font-family: "Nimbus Sans L Regular Condensed", sans-serif;
+  font-family: "Input Mono", monospace;
   font-weight: normal;
   font-style: normal;
   background: var(--bg);

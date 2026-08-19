@@ -37,7 +37,6 @@
   function markProjectCopy() {
     document.querySelectorAll([
       '.copy p:not(.no-trail)',
-      '.copy-lede .meta',
       '.project-masthead__title',
       '.project-masthead__meta p',
     ].join(', ')).forEach((el) => {

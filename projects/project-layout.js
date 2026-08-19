@@ -14,7 +14,6 @@
     const REVEAL_SELECTOR = [
       '.project-masthead__title',
       '.project-masthead__body',
-      '.landing__grid .copy',
       '.landing > .triptych',
       '.nsnb-media-stack > *',
       '.landing-hero-stack > *',
