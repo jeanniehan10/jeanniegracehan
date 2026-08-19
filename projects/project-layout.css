@@ -56,8 +56,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
   background:var(--bg);
 }
 .landing:has(.project-masthead) {
-  /* First masthead rule sits close under the nav */
-  padding-top:calc(var(--topbar-h) + 1px);
+  /* First masthead rule sits under the nav */
+  padding-top:calc(var(--topbar-h) + 8px);
 }
 
 .landing__grid {

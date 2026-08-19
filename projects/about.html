@@ -21,11 +21,8 @@
 
   /*
     Top structure (matches index chrome):
-      12px → line → 9px → nav text → 9px → 9px → ABOUT
+      topbar → hairline → ABOUT
   */
-  .topbar {
-    padding-bottom:9px;
-  }
 
   /* Matches landing compose-btn bottom hairline */
   .chrome-rule--bottom {
@@ -41,12 +38,8 @@
 
   .wrap {
     --line:calc(10px * 1.45);
-    /*
-      Top chrome: 12px → hairline → 11px → name (11px tall).
-      Under the name: 11px → hairline → 4px → ABOUT
-      (4px = same line-to-heading gap as Experience / Education / Contact)
-    */
-    padding:calc(12px + 0.5px + 11px + 11px + 11px + 0.5px + 4px) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
+    /* Rule sits 4px above ABOUT; clear the fixed nav first */
+    padding:calc(var(--topbar-h) + 4px) var(--pad-x) calc(12px + 0.5px + 9px + 40px);
   }
 
   /* Shared section lead-ins — same size, all caps, hairline tucked just above */
@@ -136,7 +129,7 @@
 
   @media (max-width:768px) {
     .wrap {
-      padding-top:calc(12px + 0.5px + 11px + 11px + 11px + 0.5px + 4px);
+      padding-top:calc(var(--topbar-h) + 4px);
     }
   }
 </style>

@@ -82,7 +82,7 @@
   --col-gap: 8px;
   --pad: 12px;
   --pad-x: 14px;
-  --topbar-h: calc(12px + 0.5px + 11px + 12px + var(--pad));
+  --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad));
   --hover-pink: #E63462;
 }
 
@@ -147,6 +147,10 @@ body::before {
 }
 
 @media (max-width: 768px) {
+  :root {
+    /* Extra clearance under the fixed nav before page rules / content */
+    --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad) + 14px);
+  }
   .topbar {
     grid-template-columns: 1fr 1fr;
     align-items: start;
@@ -161,7 +165,7 @@ body::before {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-end;
-    gap: 2.75em;
+    gap: 1.35em;
     width: 100%;
   }
 }
