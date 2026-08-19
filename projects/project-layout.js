@@ -18,6 +18,7 @@
       '.landing > .triptych',
       '.nsnb-media-stack > *',
       '.landing-hero-stack > *',
+      '.landing-hero-group > *',
       '.triptych-rows > .triptych',
       '.below__stack > *',
     ].join(', ');

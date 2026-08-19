@@ -278,7 +278,7 @@
       subToWord: 17,
     },
     {
-      name: 'New School New Books 2025',
+      name: 'An Incomplete* Listing of Libraries, Reading Rooms, and Archives',
       url: 'projects/NSNB/new-school-new-books.html',
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
       imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
@@ -306,8 +306,9 @@
       imgHi: 'projects/GESTALT/GESTALT_HOVER.jpg',
       imgMobile: 'projects/GESTALT/GESTALT_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/GESTALT/GESTALT_HOVER(MOBILE).jpg',
-      previewFit: 'contain',
-      previewBg: '#000',
+      // Scattered cards: contain + black on mobile only; desktop hover stays full-bleed cover
+      previewFitMobile: 'contain',
+      previewBgMobile: '#000',
       fontFamily: '"Neue Haas Unica Medium", sans-serif',
       fontStyle: 'normal',
       subhead: 'Trading Card Identity',
@@ -622,8 +623,14 @@
     // Only ever runs on the way in. Resetting on hide would re-crop the image
     // mid fade-out, which reads as a size jump.
     function syncPreviewChrome(project) {
-      heroBg.classList.toggle('is-contain', project?.previewFit === 'contain');
-      heroBg.classList.toggle('is-dark', !!project?.previewBg);
+      const fit = MOBILE_MQ.matches
+        ? (project?.previewFitMobile || project?.previewFit)
+        : project?.previewFit;
+      const bg = MOBILE_MQ.matches
+        ? (project?.previewBgMobile || project?.previewBg)
+        : project?.previewBg;
+      heroBg.classList.toggle('is-contain', fit === 'contain');
+      heroBg.classList.toggle('is-dark', !!bg);
     }
 
     function setPreview(body) {
