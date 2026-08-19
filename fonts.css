@@ -148,8 +148,11 @@ body::before {
 
 @media (max-width: 768px) {
   :root {
-    /* Extra clearance under the fixed nav before page rules / content */
-    --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad) + 14px);
+    /*
+      Fixed topbar box + air before the first page rule.
+      (pad-top + nav line + pad-bottom + clearance)
+    */
+    --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad) + 22px);
   }
   .topbar {
     grid-template-columns: 1fr 1fr;
@@ -162,11 +165,12 @@ body::before {
   .topbar-nav {
     grid-column: 2;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: baseline;
     justify-content: flex-end;
-    gap: 1.35em;
+    gap: 0.7em;
     width: 100%;
+    white-space: nowrap;
   }
 }
 
