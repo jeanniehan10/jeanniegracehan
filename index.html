@@ -279,6 +279,7 @@
     },
     {
       name: 'An Incomplete* Listing of Libraries, Reading Rooms, and Archives',
+      nameMobile: 'An Incomplete* Listing',
       url: 'projects/NSNB/new-school-new-books.html',
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
       imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
@@ -467,6 +468,19 @@
 
     let settleWideAfterScatter = false;
 
+    function projectName(project) {
+      if (!project || typeof project === 'string') return project || '';
+      if (MOBILE_MQ.matches && project.nameMobile) return project.nameMobile;
+      return project.name;
+    }
+
+    function applyWordLabel(el, name) {
+      const blur = el.querySelector('.word__blur');
+      const label = el.querySelector('.word__label');
+      if (blur) blur.dataset.word = name;
+      if (label) label.dataset.word = name;
+    }
+
     function wordLabel(el) {
       const label = el.querySelector('.word__label');
       return label?.dataset.word || label?.textContent || el.textContent || '';
@@ -479,7 +493,7 @@
     }
 
     function createWordElement(project) {
-      const name = typeof project === 'string' ? project : project.name;
+      const name = typeof project === 'string' ? project : projectName(project);
       const el = document.createElement('div');
       el.className = 'word';
       if (typeof project === 'object') applyWordFont(el, project);
@@ -1538,6 +1552,7 @@
       bodies.forEach((b) => {
         b.previewImg = projectImg(b.project);
         b.previewImgHi = projectImgHi(b.project);
+        if (b.project) applyWordLabel(b.el, projectName(b.project));
       });
       if (bodies.length) {
         if (mode === 'composed' || mode === 'composing') {
