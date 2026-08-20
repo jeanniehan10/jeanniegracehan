@@ -140,11 +140,17 @@ body::before {
 
 @media (max-width: 768px) {
   :root {
+    --topbar-nav-size: 10px;
+    --topbar-nav-gap: 6px;
     /*
-      Fixed topbar box + air before the first page rule.
-      (pad-top + nav line + pad-bottom + clearance)
+      Fixed topbar box must clear the stacked Index / Information / Contact
+      column so the first page rule never runs through the menus.
     */
-    --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad) + 22px);
+    --topbar-h: calc(
+      12px + 0.5px + 11px
+      + (3 * var(--topbar-nav-size) + 2 * var(--topbar-nav-gap))
+      + var(--pad)
+    );
   }
   .topbar {
     grid-template-columns: 1fr 1fr;
@@ -156,10 +162,16 @@ body::before {
   }
   .topbar-nav {
     grid-column: 2;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--topbar-nav-gap);
     width: 100%;
     white-space: nowrap;
-    font-size: 10px;
+    font-size: var(--topbar-nav-size);
+  }
+  .topbar-nav a:nth-child(1),
+  .topbar-nav a:nth-child(2),
+  .topbar-nav a:nth-child(3) {
+    justify-self: end;
   }
 }
 
