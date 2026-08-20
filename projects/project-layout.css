@@ -87,7 +87,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-size:var(--text-sm);
   font-weight:400;
   line-height:1.45;
-  letter-spacing:0;
+  letter-spacing:1;
 }
 .project-masthead__body {
   /* Same air above and below the text, matching the reference frame */

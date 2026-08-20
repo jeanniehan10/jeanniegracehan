@@ -236,6 +236,11 @@
     background-position:center;
     opacity:0.42;
     mix-blend-mode:overlay;
+    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Grain reads as scan lines on hover photos — drop it while previewing */
+  body:has(.hero.is-previewing) .print-overlay {
+    opacity:0;
   }
 
 </style>
@@ -245,8 +250,9 @@
   <header class="topbar">
     <span class="name">Jeannie Han</span>
     <nav class="topbar-nav">
+      <a href="archive.html">Index</a>
       <a href="projects/about.html">Information</a>
-      <a href="mailto:jeanniehan10@gmail.com">Let's Connect!</a>
+      <a href="mailto:jeanniehan10@gmail.com">Contact</a>
     </nav>
   </header>
 
@@ -363,7 +369,7 @@
   (function initWords() {
     if (!window.Matter) return;
 
-    const { Engine, Runner, Bodies, Body, Composite, Mouse, Sleeping, Events } = Matter;
+    const { Engine, Runner, Bodies, Body, Composite, Mouse, Sleeping, Events, Collision } = Matter;
 
     const hero = document.querySelector('.hero');
     const layer = document.getElementById('words');
@@ -533,7 +539,8 @@
       Body.setAngularVelocity(b, 0);
     }
 
-    const WORD_GAP = 10;
+    // Extra physics padding beyond the glyph box so stacked titles keep a readable gap
+    const WORD_GAP = 14;
     const COMPOSE_META = {
       lineH: 0.25,
       lineToSub: 4, // .compose-meta__label margin-top
@@ -682,11 +689,7 @@
       }
     }
 
-    const engine = Engine.create({
-      enableSleeping: true,
-      positionIterations: 10,
-      velocityIterations: 8,
-    });
+    const engine = Engine.create({ enableSleeping: true });
     engine.gravity.y = 1;
     const world = engine.world;
 
@@ -1019,6 +1022,30 @@
       };
     }
 
+    // Sensor-drag can leave a title nested inside another. One SAT nudge on release
+    // only — never every frame (that fights the solver and looks like spasms).
+    function unstickIfNested(thrown) {
+      if (!thrown || thrown.isStatic) return;
+      for (const other of bodies) {
+        if (other === thrown || other.isStatic) continue;
+        const hit = Collision.collides(thrown, other);
+        if (!hit || !hit.collided) continue;
+        const depth = hit.depth || 0;
+        // Only when clearly nested, not ordinary resting contact
+        if (depth < 4) continue;
+        const push = depth * 0.5 + 2;
+        const nx = hit.normal.x;
+        const ny = hit.normal.y;
+        Body.translate(thrown, { x: -nx * push, y: -ny * push });
+        Sleeping.set(thrown, false);
+        Sleeping.set(other, false);
+        Body.setVelocity(thrown, {
+          x: thrown.velocity.x - nx * 1.2,
+          y: thrown.velocity.y - ny * 1.2,
+        });
+      }
+    }
+
     function setJumblePhysics(on) {
       if (on) {
         engine.gravity.y = 1;
@@ -1268,17 +1295,19 @@
 
     function endDrag() {
       if (!drag) return;
-      Body.set(drag.body, { isSensor: drag.wasSensor });
+      const thrown = drag.body;
+      Body.set(thrown, { isSensor: drag.wasSensor });
       if (canDrag()) {
-        Body.setVelocity(drag.body, { x: drag.vx, y: drag.vy });
+        Body.setVelocity(thrown, { x: drag.vx, y: drag.vy });
         Body.setAngularVelocity(
-          drag.body,
+          thrown,
           drag.vx * 0.004 + (Math.random() - 0.5) * 0.04,
         );
         const moved = down ? Math.hypot(drag.lastX - down.x, drag.lastY - down.y) : 999;
-        if (down?.body === drag.body && moved < 6 && Date.now() - down.t < 400) {
-          window.location.href = drag.body.url;
+        if (down?.body === thrown && moved < 6 && Date.now() - down.t < 400) {
+          window.location.href = thrown.url;
         }
+        unstickIfNested(thrown);
       }
       drag = null;
       down = null;

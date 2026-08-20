@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="fonts.css">
+<meta charset="UTF-8">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeannie Han — Index</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Input Mono", monospace;
+    overflow-x:hidden;
+  }
+
+  a { color:inherit; text-decoration:none; }
+
+  /*
+    Same clearance + hairline placement as Information (ABOUT rule):
+    padding to title line, hairline 4px above content.
+  */
+  .wrap {
+    padding:calc(var(--topbar-h) + 12px) var(--pad-x) calc(12px + 0.5px + 40px);
+  }
+
+  .index-top-rule {
+    height:0.5px;
+    background:var(--text);
+    margin:-4px 0 0;
+    pointer-events:none;
+  }
+
+  /*
+    Equal image-to-image spacing (row === column). Titles hang above each
+    crop so they don't inflate the vertical gap between media boxes.
+  */
+  .index-grid {
+    --index-gap:clamp(28px, 4vw, 48px);
+    --title-room:calc(9px * 1.35 * 2 + 10px);
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:var(--index-gap);
+    width:100%;
+    padding-top:var(--title-room);
+  }
+
+  .index-card {
+    position:relative;
+    min-width:0;
+  }
+
+  .index-card__title {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:100%;
+    margin:0 0 10px;
+    font-family:"Input Mono", monospace;
+    font-size:9px;
+    font-weight:400;
+    line-height:1.35;
+    letter-spacing:0;
+    max-width:100%;
+  }
+
+  .index-card__media {
+    display:block;
+    width:100%;
+    aspect-ratio:3 / 2;
+    overflow:hidden;
+    background:var(--bg);
+  }
+  .index-card__media img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center center;
+  }
+
+  @media (max-width:768px) {
+    .index-grid {
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="name" href="index.html">Jeannie Han</a>
+    <nav class="topbar-nav">
+      <a href="archive.html">Index</a>
+      <a href="projects/about.html">Information</a>
+      <a href="mailto:jeanniehan10@gmail.com">Contact</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="index-top-rule" aria-hidden="true"></div>
+    <div class="index-grid">
+      <article class="index-card">
+        <h2 class="index-card__title">
+          <a href="projects/CLUTTER/clutter.html">CLUTTER as a T(  )L: [An Index for Messy Pedagogy]</a>
+        </h2>
+        <a class="index-card__media" href="projects/CLUTTER/clutter.html">
+          <img src="projects/CLUTTER/CLUTTER_4.jpg" data-mobile-src="projects/CLUTTER/CLUTTER_4(MOBILE).jpg" alt="CLUTTER as a T(  )L">
+        </a>
+      </article>
+
+      <article class="index-card">
+        <h2 class="index-card__title">
+          <a href="projects/NSNB/new-school-new-books.html">An Incomplete* Listing of Libraries, Reading Rooms, and Archives</a>
+        </h2>
+        <a class="index-card__media" href="projects/NSNB/new-school-new-books.html">
+          <img src="projects/NSNB/NSNB_EXHIBIT.jpg" data-mobile-src="projects/NSNB/NSNB_HOVER(MOBILE).jpg" alt="An Incomplete* Listing">
+        </a>
+      </article>
+
+      <article class="index-card">
+        <h2 class="index-card__title">
+          <a href="projects/COP/pomegranates.html">The C*lour of Pomegranates</a>
+        </h2>
+        <a class="index-card__media" href="projects/COP/pomegranates.html">
+          <img src="projects/COP/COP_Editorial_2.jpg" data-mobile-src="projects/COP/COP_HOVER(MOBILE).jpg" alt="The C*lour of Pomegranates">
+        </a>
+      </article>
+
+      <article class="index-card">
+        <h2 class="index-card__title">
+          <a href="projects/GESTALT/gestalt.html">The Gestalt Series</a>
+        </h2>
+        <a class="index-card__media" href="projects/GESTALT/gestalt.html">
+          <img src="projects/GESTALT/GESTALT_EDITED.jpg" data-mobile-src="projects/GESTALT/GESTALT_EDITED(MOBILE).jpg" alt="The Gestalt Series">
+        </a>
+      </article>
+
+      <article class="index-card">
+        <h2 class="index-card__title">
+          <a href="projects/FORCE!/force.html">FORCE! An Opera of Three Acts</a>
+        </h2>
+        <a class="index-card__media" href="projects/FORCE!/force.html">
+          <img src="projects/FORCE!/FORCE!_HOVER.jpg" data-mobile-src="projects/FORCE!/FORCE!_HOVER(MOBILE).jpg" alt="FORCE! An Opera of Three Acts">
+        </a>
+      </article>
+    </div>
+  </main>
+
+<script>
+  (function () {
+    const mq = window.matchMedia('(max-width: 768px)');
+    function apply() {
+      document.querySelectorAll('img[data-mobile-src]').forEach((img) => {
+        if (!img.dataset.desktopSrc) img.dataset.desktopSrc = img.getAttribute('src') || '';
+        const next = mq.matches && img.dataset.mobileSrc ? img.dataset.mobileSrc : img.dataset.desktopSrc;
+        if (img.getAttribute('src') !== next) img.setAttribute('src', next);
+      });
+    }
+    apply();
+    mq.addEventListener('change', apply);
+  })();
+</script>
+</body>
+</html>
