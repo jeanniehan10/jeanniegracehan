@@ -21,8 +21,8 @@
   a { color:inherit; text-decoration:none; }
 
   /*
-    Same clearance + hairline placement as Information (ABOUT rule):
-    padding to title line, hairline 4px above content.
+    Same clearance + hairline placement as Information:
+    wrap padding clears the topbar; rule sits 4px above first content.
   */
   .wrap {
     padding:calc(var(--topbar-h) + 12px) var(--pad-x) calc(12px + 0.5px + 40px);
@@ -36,36 +36,23 @@
   }
 
   /*
-    Equal image-to-image spacing (row === column). Titles hang above each
-    crop so they don't inflate the vertical gap between media boxes.
+    Equal image-to-image spacing. Titles sit under each crop and hang into
+    the row gap so they don't stretch the vertical distance between media.
   */
   .index-grid {
-    --index-gap:clamp(28px, 4vw, 48px);
-    --title-room:calc(9px * 1.35 * 2 + 10px);
+    --index-gap:clamp(10px, 1.6vw, 18px);
+    --title-space:calc(9px * 1.35 * 2 + 8px);
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:var(--index-gap);
+    column-gap:var(--index-gap);
+    row-gap:calc(var(--index-gap) + var(--title-space));
     width:100%;
-    padding-top:var(--title-room);
+    padding-bottom:var(--title-space);
   }
 
   .index-card {
     position:relative;
     min-width:0;
-  }
-
-  .index-card__title {
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:100%;
-    margin:0 0 10px;
-    font-family:"Input Mono", monospace;
-    font-size:9px;
-    font-weight:400;
-    line-height:1.35;
-    letter-spacing:0;
-    max-width:100%;
   }
 
   .index-card__media {
@@ -81,6 +68,20 @@
     height:100%;
     object-fit:cover;
     object-position:center center;
+  }
+
+  .index-card__title {
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    margin:8px 0 0;
+    font-family:"Input Mono", monospace;
+    font-size:9px;
+    font-weight:400;
+    line-height:1.35;
+    letter-spacing:0;
+    max-width:100%;
   }
 
   @media (max-width:768px) {
@@ -104,48 +105,48 @@
     <div class="index-top-rule" aria-hidden="true"></div>
     <div class="index-grid">
       <article class="index-card">
-        <h2 class="index-card__title">
-          <a href="projects/CLUTTER/clutter.html">CLUTTER as a T(  )L: [An Index for Messy Pedagogy]</a>
-        </h2>
         <a class="index-card__media" href="projects/CLUTTER/clutter.html">
           <img src="projects/CLUTTER/CLUTTER_4.jpg" data-mobile-src="projects/CLUTTER/CLUTTER_4(MOBILE).jpg" alt="CLUTTER as a T(  )L">
         </a>
+        <h2 class="index-card__title">
+          <a href="projects/CLUTTER/clutter.html">CLUTTER as a T(  )L: [An Index for Messy Pedagogy]</a>
+        </h2>
       </article>
 
       <article class="index-card">
-        <h2 class="index-card__title">
-          <a href="projects/NSNB/new-school-new-books.html">An Incomplete* Listing of Libraries, Reading Rooms, and Archives</a>
-        </h2>
         <a class="index-card__media" href="projects/NSNB/new-school-new-books.html">
           <img src="projects/NSNB/NSNB_EXHIBIT.jpg" data-mobile-src="projects/NSNB/NSNB_HOVER(MOBILE).jpg" alt="An Incomplete* Listing">
         </a>
+        <h2 class="index-card__title">
+          <a href="projects/NSNB/new-school-new-books.html">An Incomplete* Listing of Libraries, Reading Rooms, and Archives</a>
+        </h2>
       </article>
 
       <article class="index-card">
-        <h2 class="index-card__title">
-          <a href="projects/COP/pomegranates.html">The C*lour of Pomegranates</a>
-        </h2>
         <a class="index-card__media" href="projects/COP/pomegranates.html">
           <img src="projects/COP/COP_Editorial_2.jpg" data-mobile-src="projects/COP/COP_HOVER(MOBILE).jpg" alt="The C*lour of Pomegranates">
         </a>
+        <h2 class="index-card__title">
+          <a href="projects/COP/pomegranates.html">The C*lour of Pomegranates</a>
+        </h2>
       </article>
 
       <article class="index-card">
-        <h2 class="index-card__title">
-          <a href="projects/GESTALT/gestalt.html">The Gestalt Series</a>
-        </h2>
         <a class="index-card__media" href="projects/GESTALT/gestalt.html">
           <img src="projects/GESTALT/GESTALT_EDITED.jpg" data-mobile-src="projects/GESTALT/GESTALT_EDITED(MOBILE).jpg" alt="The Gestalt Series">
         </a>
+        <h2 class="index-card__title">
+          <a href="projects/GESTALT/gestalt.html">The Gestalt Series</a>
+        </h2>
       </article>
 
       <article class="index-card">
-        <h2 class="index-card__title">
-          <a href="projects/FORCE!/force.html">FORCE! An Opera of Three Acts</a>
-        </h2>
         <a class="index-card__media" href="projects/FORCE!/force.html">
           <img src="projects/FORCE!/FORCE!_HOVER.jpg" data-mobile-src="projects/FORCE!/FORCE!_HOVER(MOBILE).jpg" alt="FORCE! An Opera of Three Acts">
         </a>
+        <h2 class="index-card__title">
+          <a href="projects/FORCE!/force.html">FORCE! An Opera of Three Acts</a>
+        </h2>
       </article>
     </div>
   </main>
