@@ -53,8 +53,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
   background:var(--bg);
 }
 .landing:has(.project-masthead) {
-  /* First masthead rule sits fully under the nav links */
-  padding-top:calc(var(--topbar-h) + 12px);
+  /* Align first masthead rule with Information / Index (topbar-h + 8px) */
+  padding-top:calc(var(--topbar-h) + 8px);
 }
 
 .copy {
