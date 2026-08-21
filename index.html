@@ -987,11 +987,8 @@
       });
 
       layoutComposeMeta();
-      if (!runner) {
-        // Fixed step + start after spawn so the first fall isn't a load-time delta spike
-        runner = Runner.create({ isFixed: true, delta: 1000 / 60 });
-        Runner.run(runner, engine);
-      }
+      // Start after the next paint so the first physics step isn't a load hitch
+      requestAnimationFrame(() => startPhysics());
       return true;
     }
 
@@ -1027,6 +1024,47 @@
         density: 0.002,
         sleepThreshold: 30,
       };
+    }
+
+    /*
+      Matter's Runner with isFixed still does one step per rAF — so 120Hz screens
+      run ~2× fast and janky frames run slow. Drive a real fixed 60Hz step with
+      catch-up instead; clamp hitches so a refresh never rockets the cascade.
+    */
+    function startPhysics() {
+      if (runner) return;
+      const STEP = 1000 / 60;
+      const MAX_FRAME_DT = 48;
+      const MAX_STEPS = 4;
+      let last = 0;
+      let acc = 0;
+      let rafId = 0;
+
+      runner = { enabled: true };
+
+      function frame(now) {
+        rafId = requestAnimationFrame(frame);
+        if (!runner.enabled) return;
+        if (!last) {
+          last = now;
+          return;
+        }
+        let dt = now - last;
+        last = now;
+        if (dt > MAX_FRAME_DT) dt = MAX_FRAME_DT;
+        acc += dt;
+        let steps = 0;
+        while (acc >= STEP && steps < MAX_STEPS) {
+          Engine.update(engine, STEP);
+          acc -= STEP;
+          steps += 1;
+        }
+        // Drop backlog after a hitch so we don't "catch up" into a speed burst
+        if (steps === MAX_STEPS) acc = 0;
+      }
+
+      rafId = requestAnimationFrame(frame);
+      runner._rafId = rafId;
     }
 
     // Sensor-drag can leave a title nested inside another. One SAT nudge on release
@@ -1448,7 +1486,7 @@
       }
     });
 
-    // Runner starts in spawnWords (fixed timestep) once titles are ready
+    // Physics loop starts in spawnWords via startPhysics()
     let lastHovered = null;
     let hoverEnabled = false;
     hero.addEventListener('mouseenter', () => { hoverEnabled = true; });
