@@ -985,6 +985,11 @@
       });
 
       layoutComposeMeta();
+      if (!runner) {
+        // Fixed step + start after spawn so the first fall isn't a load-time delta spike
+        runner = Runner.create({ isFixed: true, delta: 1000 / 60 });
+        Runner.run(runner, engine);
+      }
       return true;
     }
 
@@ -1441,8 +1446,7 @@
       }
     });
 
-    runner = Runner.create();
-    Runner.run(runner, engine);
+    // Runner starts in spawnWords (fixed timestep) once titles are ready
     let lastHovered = null;
     let hoverEnabled = false;
     hero.addEventListener('mouseenter', () => { hoverEnabled = true; });
