@@ -236,11 +236,13 @@
     background-position:center;
     opacity:0.42;
     mix-blend-mode:overlay;
-    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Delay return so grain doesn't flash over the fading hover image */
+    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
   }
-  /* Grain reads as scan lines on hover photos — drop it while previewing */
+  /* Hide immediately while previewing; match .hero-bg fade (0.5s) before grain returns */
   body:has(.hero.is-previewing) .print-overlay {
     opacity:0;
+    transition:opacity 0.1s linear 0s;
   }
 
 </style>
