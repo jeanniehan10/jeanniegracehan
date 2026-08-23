@@ -97,6 +97,20 @@ body::before {
   pointer-events: none;
 }
 
+/* Bottom hairline — same inset as the top rule */
+body::after {
+  content: "";
+  position: fixed;
+  bottom: 12px;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  height: 0.5px;
+  background: var(--blend-ink);
+  mix-blend-mode: difference;
+  z-index: 101;
+  pointer-events: none;
+}
+
 /* Shared topbar (matches index) */
 .topbar {
   position: fixed;
@@ -215,7 +229,6 @@ body[data-trail-vanish] .text-trail .trail-word.is-lit {
     .name,
     .word,
     .word__label,
-    .compose-btn,
     .compose-meta,
     .k,
     .v,

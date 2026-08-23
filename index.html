@@ -156,11 +156,34 @@
   .hero.is-previewing .word.hot .word__label,
   .hero.is-previewing .word.hot .word__label::before { color:var(--hover-pink); }
 
-  /* Preview: image only — every rule and subhead drops away */
+  /* Preview: image + hot title; only that project's subtitle stays (pink) */
   .compose-meta {
     transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .hero.is-previewing .compose-meta { opacity:0; }
+  .hero.is-previewing .compose-meta__row {
+    opacity:0;
+    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hero.is-previewing .compose-meta__row.is-preview-sub {
+    opacity:1;
+  }
+  .hero.is-previewing .compose-meta__row.is-preview-sub .compose-meta__line {
+    opacity:0;
+  }
+  .hero.is-previewing .compose-meta__row.is-preview-sub .compose-meta__label {
+    color:var(--hover-pink);
+  }
+  .hero.is-previewing .compose-meta__row--closer {
+    opacity:0;
+  }
+  body:has(.hero.is-previewing) .compose-btn {
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      -webkit-text-fill-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
   /* Wrap only when fully settled — not during flight (prevents click shift) */
   .hero.is-composed .word {
@@ -172,20 +195,32 @@
 
   .compose-btn {
     position:fixed;
-    bottom:calc(12px + 0.5px + 0pt);
+    /* Vertical position set in JS to the closing compose hairline under FORCE */
+    top:auto;
+    bottom:calc(12px + 0.5px + 11px);
     right:var(--pad-x);
     left:auto;
     z-index:101;
-    font-size:14pt;
-    font-family:"Terminal Grotesque", "Input Mono Medium", monospace;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    margin:0;
+    border:none;
+    border-radius:0;
+    background:none;
+    box-shadow:none;
+    font-family:"Input Mono Medium", "Input Mono", monospace;
+    font-size:11px;
     font-weight:bold;
     letter-spacing:0;
     line-height:1;
-    padding:12px 0 12px 16px;
-    margin:0;
-    border:none;
-    background:none;
-    color:var(--text);
+    text-transform:uppercase;
+    color:var(--blend-ink);
+    -webkit-text-fill-color:var(--blend-ink);
+    -webkit-text-stroke:0;
+    text-shadow:none;
+    mix-blend-mode:difference;
     cursor:pointer;
     text-align:right;
     pointer-events:auto;
@@ -193,35 +228,40 @@
     -webkit-tap-highlight-color:transparent;
     -webkit-user-select:none;
     user-select:none;
-    animation:compose-btn-rainbow 3s linear infinite;
+    transform-origin:right center;
+    transform:scale(1);
+    transition:
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      -webkit-text-fill-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* Starts and ends on the same hue so the loop never visibly restarts.
-     text-fill-color also wins over the global :hover pink, so the fade never stalls. */
-  @keyframes compose-btn-rainbow {
-    0%   { color:#e63462; -webkit-text-fill-color:#e63462; }
-    16%  { color:#ff7a18; -webkit-text-fill-color:#ff7a18; }
-    33%  { color:#f2c200; -webkit-text-fill-color:#f2c200; }
-    50%  { color:#28c76f; -webkit-text-fill-color:#28c76f; }
-    66%  { color:#1e9bff; -webkit-text-fill-color:#1e9bff; }
-    83%  { color:#b026ff; -webkit-text-fill-color:#b026ff; }
-    100% { color:#e63462; -webkit-text-fill-color:#e63462; }
+  .compose-btn:hover,
+  .compose-btn.is-disrupt:hover {
+    background:none;
+    color:var(--hover-pink) !important;
+    -webkit-text-fill-color:var(--hover-pink) !important;
+    mix-blend-mode:normal;
+    transform:scale(1.12);
+  }
+  .compose-btn.is-disrupt {
+    background:none;
+    color:var(--blend-ink);
+    -webkit-text-fill-color:var(--blend-ink);
+  }
+  @media (max-width:768px) {
+    .compose-btn {
+      font-size:10px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .compose-btn {
-      animation:none;
-      color:var(--hover-pink);
-      -webkit-text-fill-color:var(--hover-pink);
+      transition:color 0.2s ease, -webkit-text-fill-color 0.2s ease;
     }
-  }
-  .compose-btn::after {
-    content:"";
-    position:fixed;
-    bottom:12px;
-    left:var(--pad-x);
-    right:var(--pad-x);
-    height:0.5px;
-    background:var(--text);
-    pointer-events:none;
+    .compose-btn:hover,
+    .compose-btn.is-disrupt:hover {
+      transform:none;
+    }
   }
 
   /* photocopy grain — texture only */
@@ -267,7 +307,7 @@
     <div id="words"></div>
   </section>
 
-  <button class="compose-btn" id="composeBtn" type="button" tabindex="0">Revert!</button>
+  <button class="compose-btn is-disrupt" id="composeBtn" type="button" tabindex="0">DISRUPT</button>
 
   <div class="print-overlay" aria-hidden="true"></div>
 
@@ -385,7 +425,7 @@
 
     const COMPOSE_MS = 2000;
     const SCATTER_PAUSE_MS = 50;
-    let mode = 'jumble';
+    let mode = 'composed';
     let scatterTimer = null;
     let composeStart = 0;
     let runner = null;
@@ -657,6 +697,8 @@
     }
 
     function setPreview(body) {
+      metaRows.forEach((row) => row.classList.remove('is-preview-sub'));
+
       if (!body) {
         previewBody = null;
         heroBg.classList.remove('is-visible');
@@ -664,6 +706,9 @@
         hero.classList.remove('is-previewing');
         return;
       }
+
+      const idx = bodies.indexOf(body);
+      if (idx >= 0 && metaRows[idx]) metaRows[idx].classList.add('is-preview-sub');
 
       const already = body === previewBody && hero.classList.contains('is-previewing');
       previewBody = body;
@@ -920,6 +965,19 @@
         const y = Math.round((last.wordTop + last.slotH + COMPOSE_META.wordToNext) * dpr) / dpr;
         closerMeta.style.transform = `translate3d(0, ${y}px, 0)`;
       }
+      syncComposeBtnToCloserLine();
+    }
+
+    // Sit DISRUPT/REVERT just under the closing hairline under the last title
+    function syncComposeBtnToCloserLine() {
+      if (!composeBtn || !closerMeta) return;
+      const line = closerMeta.querySelector('.compose-meta__line') || closerMeta;
+      const rect = line.getBoundingClientRect();
+      if (rect.height < 0.1 && rect.top < 1) return;
+      // Same air as topbar under its hairline (11px)
+      const top = Math.round(rect.bottom + 11);
+      composeBtn.style.top = `${top}px`;
+      composeBtn.style.bottom = 'auto';
     }
 
     function layoutComposeMeta() {
@@ -960,21 +1018,24 @@
 
       // Closing rule under FORCE! — line only, same gap as between titles
       closerMeta = document.createElement('div');
-      closerMeta.className = 'compose-meta__row';
+      closerMeta.className = 'compose-meta__row compose-meta__row--closer';
       closerMeta.innerHTML = '<span class="compose-meta__line" aria-hidden="true"></span>';
       composeMeta.appendChild(closerMeta);
 
       uniformWordSize(els);
 
-      const spawnXs = spreadWordXs(els, (el) => el);
-
       PROJECTS.forEach((p, i) => {
         const el = els[i];
         const { w, h, elW, elH } = bodyDims(el);
 
-        const body = Bodies.rectangle(spawnXs[i], dropPositionY(i), w, h, wordPhysicsOpts());
-        Body.setAngle(body, (Math.random() - 0.5) * 0.7);
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        // Spawn already at rest — layout snapped into composed list below
+        const body = Bodies.rectangle(W / 2, H / 2, w, h, {
+          ...wordPhysicsOpts(),
+          isStatic: true,
+        });
+        Body.setAngle(body, 0);
+        Body.setVelocity(body, { x: 0, y: 0 });
+        Body.setAngularVelocity(body, 0);
         body._hitW = elW;
         body._hitH = elH;
         body.el = el;
@@ -986,9 +1047,14 @@
         Composite.add(world, body);
       });
 
-      layoutComposeMeta();
-      // Start after the next paint so the first physics step isn't a load hitch
-      requestAnimationFrame(() => startPhysics());
+      engine.gravity.y = 0;
+      mode = 'composed';
+      hero.classList.add('is-composed');
+      composeBtn.textContent = 'DISRUPT';
+      composeBtn.classList.add('is-disrupt');
+      lockWordSizeFromEls(els);
+      snapComposedLayout();
+      // Physics starts on first Disrupt (see startScatter)
       return true;
     }
 
@@ -1181,7 +1247,8 @@
       mode = 'composing';
       hero.classList.add('is-composing');
       hero.classList.remove('is-composed');
-      composeBtn.textContent = 'Revert!';
+      composeBtn.textContent = 'REVERT';
+      composeBtn.classList.remove('is-disrupt');
       composeStart = performance.now();
 
       bodies.forEach((b, i) => {
@@ -1200,7 +1267,8 @@
       previewBody = null;
       drag = null;
       mode = 'scattering';
-      composeBtn.textContent = 'Revert!';
+      composeBtn.textContent = 'REVERT';
+      composeBtn.classList.remove('is-disrupt');
       engine.gravity.y = 0;
 
       const snapshots = bodies.map((b) => {
@@ -1252,6 +1320,7 @@
 
         mode = 'jumble';
         settleWideAfterScatter = true;
+        startPhysics();
         engine.gravity.y = 1;
       }, SCATTER_PAUSE_MS);
     }
@@ -1555,7 +1624,8 @@
           mode = 'composed';
           hero.classList.remove('is-composing');
           hero.classList.add('is-composed');
-          composeBtn.textContent = 'Disrupt!';
+          composeBtn.textContent = 'DISRUPT';
+          composeBtn.classList.add('is-disrupt');
         }
       } else if (mode === 'jumble' && settleWideAfterScatter) {
         let clutterSettled = true;
@@ -1677,7 +1747,9 @@
       } else if (bodies.length) {
         layoutComposeMeta();
       }
+      syncComposeBtnToCloserLine();
     });
+    window.addEventListener('scroll', syncComposeBtnToCloserLine, { passive: true });
   })();
 </script>
 
