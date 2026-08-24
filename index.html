@@ -160,15 +160,17 @@
   .compose-meta {
     transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* No fade on rows — a transition here flashes every subtitle when switching titles */
   .hero.is-previewing .compose-meta__row {
     opacity:0;
-    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:none;
   }
   .hero.is-previewing .compose-meta__row.is-preview-sub {
     opacity:1;
   }
-  .hero.is-previewing .compose-meta__row.is-preview-sub .compose-meta__line {
-    opacity:0;
+  .hero.is-previewing .compose-meta__line {
+    opacity:0 !important;
+    visibility:hidden;
   }
   .hero.is-previewing .compose-meta__row.is-preview-sub .compose-meta__label {
     color:var(--hover-pink);
@@ -696,17 +698,54 @@
       heroBg.classList.toggle('is-dark', !!bg);
     }
 
-    function setPreview(body) {
+    let previewClearTimer = null;
+
+    function clearPreviewNow() {
       metaRows.forEach((row) => row.classList.remove('is-preview-sub'));
+      previewBody = null;
+      heroBg.classList.remove('is-visible');
+      heroBg.setAttribute('aria-hidden', 'true');
+      // Keep is-previewing until the image fade finishes so every subtitle
+      // doesn't flash back while the photo is still disappearing.
+      const finish = () => {
+        if (previewBody) return;
+        hero.classList.remove('is-previewing');
+      };
+      const onDone = (e) => {
+        if (e.target !== heroBg || e.propertyName !== 'opacity') return;
+        heroBg.removeEventListener('transitionend', onDone);
+        finish();
+      };
+      heroBg.addEventListener('transitionend', onDone);
+      clearTimeout(clearPreviewNow._hideT);
+      clearPreviewNow._hideT = setTimeout(finish, 520);
+    }
+
+    function setPreview(body, opts) {
+      const immediate = !!(opts && opts.immediate);
+
+      if (previewClearTimer) {
+        clearTimeout(previewClearTimer);
+        previewClearTimer = null;
+      }
 
       if (!body) {
-        previewBody = null;
-        heroBg.classList.remove('is-visible');
-        heroBg.setAttribute('aria-hidden', 'true');
-        hero.classList.remove('is-previewing');
+        // Cursor often skips through empty space between titles — don't tear
+        // down preview (and flash every subtitle line) unless it stays clear.
+        if (!immediate) {
+          if (!previewBody && !hero.classList.contains('is-previewing')) return;
+          previewClearTimer = setTimeout(() => {
+            previewClearTimer = null;
+            clearPreviewNow();
+          }, 140);
+          return;
+        }
+        clearPreviewNow();
         return;
       }
 
+      clearTimeout(clearPreviewNow._hideT);
+      metaRows.forEach((row) => row.classList.remove('is-preview-sub'));
       const idx = bodies.indexOf(body);
       if (idx >= 0 && metaRows[idx]) metaRows[idx].classList.add('is-preview-sub');
 
@@ -724,6 +763,8 @@
         heroBg.classList.add('is-visible');
         heroBg.setAttribute('aria-hidden', 'false');
         hero.classList.add('is-previewing');
+      } else if (heroBgImg.getAttribute('src') !== lo && heroBgImg.getAttribute('src') !== hi) {
+        heroBgImg.src = lo;
       }
 
       if (hi && hi !== lo) {
@@ -1220,8 +1261,7 @@
       const els = bodies.map((b) => b.el);
       lockWordSizeFromEls(els);
 
-      setPreview(null);
-      previewBody = null;
+      setPreview(null, { immediate: true });
       setJumblePhysics(false);
 
       if (document.fonts && document.fonts.load) {
@@ -1263,8 +1303,7 @@
     function startScatter() {
       if (mode !== 'composed' || !bodies.length) return;
       clearTimeout(scatterTimer);
-      setPreview(null);
-      previewBody = null;
+      setPreview(null, { immediate: true });
       drag = null;
       mode = 'scattering';
       composeBtn.textContent = 'REVERT';
@@ -1500,9 +1539,7 @@
         clearTimeout(holdTimer);
         if (touchState.holding) {
           touchState.holding = false;
-          setPreview(null);
-        }
-        if (canDrag() && touchState.hit && !touchState.dragging) {
+          setPreview(null, { immediate: true });
           touchState.dragging = true;
           beginDrag(touchState.hit, pos);
         }
@@ -1523,7 +1560,7 @@
       if (touchState?.dragging) {
         endDrag();
       } else if (touchState?.holding) {
-        setPreview(null);
+        setPreview(null, { immediate: true });
       } else if (touchState?.hit && !touchState.moved && (canDrag() || mode === 'composed')) {
         window.location.href = touchState.hit.url;
       }
@@ -1561,7 +1598,7 @@
     hero.addEventListener('mouseenter', () => { hoverEnabled = true; });
     hero.addEventListener('mouseleave', () => {
       hoverEnabled = false;
-      setPreview(null);
+      setPreview(null, { immediate: true });
       lastHovered = null;
     });
 
@@ -1654,12 +1691,16 @@
         if (clutterSettled) settleWideAfterScatter = false;
       }
 
-      // Mouse follows cursor; touch only shows the active hold
+      // Mouse follows cursor; touch only shows the active hold.
+      // While preview is held across a gap between titles, keep the last title hot.
       const hovered = allowsPreview()
         ? (usingTouch ? previewBody : hitWord(mouse.position))
         : null;
+      const previewHot = hovered || (
+        hero.classList.contains('is-previewing') && previewClearTimer ? previewBody : null
+      );
       for (const b of bodies) {
-        b.el.classList.toggle('hot', b === hovered);
+        b.el.classList.toggle('hot', b === previewHot);
         b.el.style.transform =
           `translate3d(${b.position.x}px, ${b.position.y}px, 0) translate(-50%, -50%) rotate(${b.angle}rad)`;
       }
@@ -1674,7 +1715,9 @@
           }
         }
       } else if (!allowsPreview()) {
-        if (previewBody) setPreview(null);
+        if (previewBody || hero.classList.contains('is-previewing')) {
+          setPreview(null, { immediate: true });
+        }
         lastHovered = null;
       }
 
