@@ -54,6 +54,12 @@
     visibility:visible;
     transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s;
   }
+  /* Leave preview: snap off so home returns without a blank in-between */
+  .hero-bg.is-leaving {
+    opacity:0 !important;
+    visibility:hidden !important;
+    transition:none !important;
+  }
   /* Keep the bitmap out of paint until the layer is intentionally shown */
   .hero-bg:not(.is-visible) img {
     visibility:hidden;
@@ -191,9 +197,7 @@
     opacity:0;
     pointer-events:none;
     transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      -webkit-text-fill-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Wrap only when fully settled — not during flight (prevents click shift) */
@@ -241,11 +245,10 @@
     user-select:none;
     transform-origin:right center;
     transform:scale(1);
+    /* No color transition — difference blend + pink interpolates into a muddy third hue */
     transition:
       opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      -webkit-text-fill-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .compose-btn:hover,
   .compose-btn.is-disrupt:hover {
@@ -267,7 +270,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .compose-btn {
-      transition:color 0.2s ease, -webkit-text-fill-color 0.2s ease;
+      transition:none;
     }
     .compose-btn:hover,
     .compose-btn.is-disrupt:hover {
@@ -287,10 +290,9 @@
     background-position:center;
     opacity:0.42;
     mix-blend-mode:overlay;
-    /* Delay return so grain doesn't flash over the fading hover image */
-    transition:opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+    transition:opacity 0.15s linear;
   }
-  /* Hide immediately while previewing; match .hero-bg fade (0.5s) before grain returns */
+  /* Hide immediately while previewing; return with home (no blank gap) */
   body:has(.hero.is-previewing) .print-overlay {
     opacity:0;
     transition:opacity 0.1s linear 0s;
@@ -318,7 +320,7 @@
     <div id="words"></div>
   </section>
 
-  <button class="compose-btn is-disrupt" id="composeBtn" type="button" tabindex="0">DISRUPT</button>
+  <button class="compose-btn is-disrupt" id="composeBtn" type="button" tabindex="0">DISRUPT!</button>
 
   <div class="print-overlay" aria-hidden="true"></div>
 
@@ -445,7 +447,7 @@
     let hoverEnabled = false;
 
     function hardResetPreview() {
-      heroBg.classList.remove('is-visible', 'is-contain', 'is-dark');
+      heroBg.classList.remove('is-visible', 'is-contain', 'is-dark', 'is-leaving');
       heroBg.setAttribute('aria-hidden', 'true');
       heroBg.style.opacity = '0';
       heroBg.style.visibility = 'hidden';
@@ -738,27 +740,17 @@
     function clearPreviewNow() {
       metaRows.forEach((row) => row.classList.remove('is-preview-sub'));
       previewBody = null;
+      // Home restores immediately — no fade-through-blank while titles are still hidden
+      hero.classList.remove('is-previewing');
+      heroBg.classList.add('is-leaving');
       heroBg.classList.remove('is-visible');
       heroBg.setAttribute('aria-hidden', 'true');
-      // Keep is-previewing until the image fade finishes so every subtitle
-      // doesn't flash back while the photo is still disappearing.
-      const finish = () => {
-        if (previewBody) return;
-        hero.classList.remove('is-previewing');
-        // Drop the bitmap after fade so refresh / bfcache can't briefly paint it
-        if (!heroBg.classList.contains('is-visible')) {
-          heroBgImg.removeAttribute('src');
-          heroBgImg.alt = '';
-        }
-      };
-      const onDone = (e) => {
-        if (e.target !== heroBg || e.propertyName !== 'opacity') return;
-        heroBg.removeEventListener('transitionend', onDone);
-        finish();
-      };
-      heroBg.addEventListener('transitionend', onDone);
+      heroBgImg.removeAttribute('src');
+      heroBgImg.alt = '';
       clearTimeout(clearPreviewNow._hideT);
-      clearPreviewNow._hideT = setTimeout(finish, 520);
+      clearPreviewNow._hideT = setTimeout(() => {
+        heroBg.classList.remove('is-leaving', 'is-contain', 'is-dark');
+      }, 40);
     }
 
     function setPreview(body, opts) {
@@ -799,6 +791,7 @@
 
       if (!already) {
         // Instant soft image first (already tiny / likely cached)
+        heroBg.classList.remove('is-leaving');
         heroBgImg.src = lo;
         heroBg.style.opacity = '';
         heroBg.style.visibility = '';
@@ -1133,8 +1126,8 @@
       engine.gravity.y = 0;
       mode = 'composed';
       hero.classList.add('is-composed');
-      composeBtn.textContent = 'DISRUPT';
-      composeBtn.classList.add('is-disrupt');
+      composeBtn.textContent = 'DISRUPT!';
+      composeBtn.classList.add('is-disrupt!');
       lockWordSizeFromEls(els);
       snapComposedLayout();
       // Physics starts on first Disrupt (see startScatter)
@@ -1329,8 +1322,8 @@
       mode = 'composing';
       hero.classList.add('is-composing');
       hero.classList.remove('is-composed');
-      composeBtn.textContent = 'REVERT';
-      composeBtn.classList.remove('is-disrupt');
+      composeBtn.textContent = 'REVERT.';
+      composeBtn.classList.remove('is-disrupt!');
       composeStart = performance.now();
 
       bodies.forEach((b, i) => {
@@ -1348,8 +1341,8 @@
       setPreview(null, { immediate: true });
       drag = null;
       mode = 'scattering';
-      composeBtn.textContent = 'REVERT';
-      composeBtn.classList.remove('is-disrupt');
+      composeBtn.textContent = 'REVERT.';
+      composeBtn.classList.remove('is-disrupt!');
       engine.gravity.y = 0;
 
       const snapshots = bodies.map((b) => {
