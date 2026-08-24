@@ -45,10 +45,19 @@
     inset:0;
     z-index:0;
     opacity:0;
+    visibility:hidden;
     pointer-events:none;
-    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.5s;
   }
-  .hero-bg.is-visible { opacity:1; }
+  .hero-bg.is-visible {
+    opacity:1;
+    visibility:visible;
+    transition:opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s;
+  }
+  /* Keep the bitmap out of paint until the layer is intentionally shown */
+  .hero-bg:not(.is-visible) img {
+    visibility:hidden;
+  }
   .hero-bg img {
     display:block;
     width:100%;
@@ -302,7 +311,7 @@
 
   <!-- screen 1: falling / draggable word jumble -->
   <section class="hero">
-    <div class="hero-bg" id="heroBg" aria-hidden="true">
+    <div class="hero-bg" id="heroBg" aria-hidden="true" style="opacity:0;visibility:hidden">
       <img id="heroBgImg" alt="" decoding="async">
     </div>
     <div class="compose-meta" id="composeMeta" aria-hidden="true"></div>
@@ -332,8 +341,8 @@
       nameMobile: 'An Incomplete* Listing',
       url: 'projects/NSNB/new-school-new-books.html',
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
-      imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
-      imgMobileHi: 'projects/NSNB/NSNB_HOVER.jpg',
+      imgMobile: 'projects/NSNB/NSNB_EXHIBIT.jpg',
+      imgMobileHi: 'projects/NSNB/NSNB_EXHIBIT.jpg',
       fontFamily: '"Neue Haas Unica Heavy", sans-serif',
       fontStyle: 'normal',
       subhead: 'Broadsheet Publication',
@@ -370,11 +379,13 @@
       url: 'projects/FORCE!/force.html',
       img: 'projects/FORCE!/FORCE!_HOVER.jpg',
       imgHi: 'projects/FORCE!/FORCE!_HOVER.jpg',
-      // Portrait cover — contain + black keeps the same desktop stage size as before.
+      // Same cover as desktop; mobile asset only adds black for portrait — contain + black stage
       imgMobile: 'projects/FORCE!/FORCE!_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/FORCE!/FORCE!_HOVER(MOBILE).jpg',
       previewFit: 'contain',
       previewBg: '#000',
+      previewFitMobile: 'contain',
+      previewBgMobile: '#000',
       fontFamily: '"Neue Haas Unica Light", sans-serif',
       fontStyle: 'normal',
       subhead: 'Libretto Design',
@@ -424,6 +435,30 @@
     // Live input mode — don't freeze touch vs mouse at page load (breaks DevTools)
     let usingTouch = false;
     let lastTouchAt = 0;
+    // Browsers often fire a synthetic mousemove on refresh with the cursor still
+    // over a title (FORCE sits under a common rest position). Don't arm hover
+    // until the pointer actually moves.
+    let previewArmed = false;
+    let armMouseOrigin = null;
+    let previewBody = null;
+    let lastHovered = null;
+    let hoverEnabled = false;
+
+    function hardResetPreview() {
+      heroBg.classList.remove('is-visible', 'is-contain', 'is-dark');
+      heroBg.setAttribute('aria-hidden', 'true');
+      heroBg.style.opacity = '0';
+      heroBg.style.visibility = 'hidden';
+      heroBgImg.removeAttribute('src');
+      heroBgImg.alt = '';
+      hero.classList.remove('is-previewing');
+      previewBody = null;
+      lastHovered = null;
+      previewArmed = false;
+      armMouseOrigin = null;
+      hoverEnabled = false;
+    }
+    hardResetPreview();
 
     const COMPOSE_MS = 2000;
     const SCATTER_PAUSE_MS = 50;
@@ -710,6 +745,11 @@
       const finish = () => {
         if (previewBody) return;
         hero.classList.remove('is-previewing');
+        // Drop the bitmap after fade so refresh / bfcache can't briefly paint it
+        if (!heroBg.classList.contains('is-visible')) {
+          heroBgImg.removeAttribute('src');
+          heroBgImg.alt = '';
+        }
       };
       const onDone = (e) => {
         if (e.target !== heroBg || e.propertyName !== 'opacity') return;
@@ -760,6 +800,8 @@
       if (!already) {
         // Instant soft image first (already tiny / likely cached)
         heroBgImg.src = lo;
+        heroBg.style.opacity = '';
+        heroBg.style.visibility = '';
         heroBg.classList.add('is-visible');
         heroBg.setAttribute('aria-hidden', 'false');
         hero.classList.add('is-previewing');
@@ -1401,7 +1443,6 @@
 
     let down = null;
     let drag = null;
-    let previewBody = null;
     let holdTimer = null;
     let touchState = null;
 
@@ -1488,6 +1529,18 @@
       const pos = heroPoint(e.clientX, e.clientY);
       mouse.position.x = pos.x;
       mouse.position.y = pos.y;
+      // Ignore the frozen "cursor still here" event browsers fire on refresh —
+      // only arm hover after a real pointer move.
+      if (!previewArmed) {
+        if (!armMouseOrigin) {
+          armMouseOrigin = { x: e.clientX, y: e.clientY };
+          return;
+        }
+        if (Math.hypot(e.clientX - armMouseOrigin.x, e.clientY - armMouseOrigin.y) < 6) {
+          return;
+        }
+        previewArmed = true;
+      }
       // Safari may never fire mouseenter if the cursor starts over the hero
       if (pos.x >= 0 && pos.y >= 0 && pos.x <= W && pos.y <= H) hoverEnabled = true;
       moveDrag(pos);
@@ -1593,13 +1646,22 @@
     });
 
     // Physics loop starts in spawnWords via startPhysics()
-    let lastHovered = null;
-    let hoverEnabled = false;
-    hero.addEventListener('mouseenter', () => { hoverEnabled = true; });
+    hero.addEventListener('mouseenter', () => {
+      if (previewArmed) hoverEnabled = true;
+    });
     hero.addEventListener('mouseleave', () => {
       hoverEnabled = false;
       setPreview(null, { immediate: true });
       lastHovered = null;
+    });
+
+    window.addEventListener('pageshow', () => {
+      hardResetPreview();
+    });
+    // Clear before unload so the browser's reload snapshot isn't a stuck FORCE frame
+    window.addEventListener('pagehide', () => {
+      hardResetPreview();
+      void heroBg.offsetHeight;
     });
 
     function updateWordDepth() {
@@ -1693,7 +1755,7 @@
 
       // Mouse follows cursor; touch only shows the active hold.
       // While preview is held across a gap between titles, keep the last title hot.
-      const hovered = allowsPreview()
+      const hovered = (allowsPreview() && (usingTouch || previewArmed))
         ? (usingTouch ? previewBody : hitWord(mouse.position))
         : null;
       const previewHot = hovered || (
@@ -1706,7 +1768,7 @@
       }
       updateWordDepth();
 
-      if (!usingTouch && allowsPreview()) {
+      if (!usingTouch && allowsPreview() && previewArmed) {
         // Clear as soon as the cursor leaves a title (Safari can miss mouseleave quirks)
         if (hoverEnabled || hovered || lastHovered) {
           if (hovered !== lastHovered) {
