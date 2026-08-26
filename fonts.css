@@ -83,6 +83,68 @@ html, body {
   color: var(--text);
 }
 
+/* Site-wide cursor: OS draws the grey circle immediately (no mousemove wait).
+   HTML bubble is only for the landing “Play With Me!” state. */
+@media (hover: hover) and (pointer: fine) {
+  html:not(.site-cursor-touch):not(.site-cursor-play),
+  html:not(.site-cursor-touch):not(.site-cursor-play) * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23C8C8C8'/%3E%3C/svg%3E") 8 8, none !important;
+  }
+  html.site-cursor-play:not(.site-cursor-touch),
+  html.site-cursor-play:not(.site-cursor-touch) * {
+    cursor: none !important;
+  }
+  html.site-cursor-play:not(.site-cursor-touch) .site-cursor {
+    display: flex;
+  }
+}
+
+.site-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10001;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform;
+}
+.site-cursor__bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #C8C8C8;
+  overflow: hidden;
+  transition:
+    width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.site-cursor.is-play .site-cursor__bubble {
+  width: 90px;
+  height: 90px;
+}
+.site-cursor__label {
+  font-family: "Input Mono", monospace;
+  font-weight: 300;
+  font-size: 8px;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--text);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.34s ease;
+}
+.site-cursor.is-play .site-cursor__label {
+  opacity: 1;
+}
+
 /* Top hairline — outside topbar so hover blend changes don't affect it */
 body::before {
   content: "";

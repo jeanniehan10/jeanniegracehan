@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<style>@media (hover:hover) and (pointer:fine){html:not(.site-cursor-touch):not(.site-cursor-play),html:not(.site-cursor-touch):not(.site-cursor-play) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23C8C8C8'/%3E%3C/svg%3E") 8 8, none !important}html.site-cursor-play,html.site-cursor-play *{cursor:none !important}}</style>
 <link rel="stylesheet" href="fonts.css">
+<script src="site-cursor.js"></script>
 <script src="matter.min.js"></script>
 <meta charset="UTF-8">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
@@ -226,7 +228,7 @@
     background:none;
     box-shadow:none;
     font-family:"Input Mono Medium", "Input Mono", monospace;
-    font-size:11px;
+    font-size:15px;
     font-weight:bold;
     letter-spacing:0;
     line-height:1;
@@ -265,7 +267,7 @@
   }
   @media (max-width:768px) {
     .compose-btn {
-      font-size:10px;
+      font-size:13px;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -434,6 +436,7 @@
     const heroBg = document.getElementById('heroBg');
     const heroBgImg = document.getElementById('heroBgImg');
     const composeBtn = document.getElementById('composeBtn');
+    const siteCursor = window.siteCursor || document.getElementById('siteCursor');
     // Live input mode — don't freeze touch vs mouse at page load (breaks DevTools)
     let usingTouch = false;
     let lastTouchAt = 0;
@@ -1583,9 +1586,13 @@
       if (Math.hypot(pos.x - touchState.x, pos.y - touchState.y) > 16) {
         touchState.moved = true;
         clearTimeout(holdTimer);
+        // Cancel a hold-preview if one already opened
         if (touchState.holding) {
           touchState.holding = false;
           setPreview(null, { immediate: true });
+        }
+        // Drag as soon as the finger moves — don't wait for a long-press
+        if (!touchState.dragging && touchState.hit && canDrag()) {
           touchState.dragging = true;
           beginDrag(touchState.hit, pos);
         }
@@ -1776,15 +1783,13 @@
         lastHovered = null;
       }
 
-      if (!usingTouch && mode === 'jumble') {
-        if (drag) hero.style.cursor = 'grabbing';
-        else if (hovered) hero.style.cursor = 'pointer';
-        else if (hitWord(mouse.position)) hero.style.cursor = 'grab';
-        else hero.style.cursor = 'default';
-      } else if (!usingTouch && allowsPreview() && hovered) {
-        hero.style.cursor = 'pointer';
-      } else {
-        hero.style.cursor = 'default';
+      if (siteCursor) {
+        // Grey “Play With Me!” chip only after Disrupt, while over a title
+        const playHit = !usingTouch && mode === 'jumble' && (
+          !!drag || !!hovered || !!hitWord(mouse.position)
+        );
+        if (window.setSiteCursorPlay) window.setSiteCursorPlay(playHit);
+        else siteCursor.classList.toggle('is-play', playHit);
       }
       requestAnimationFrame(sync);
     })();
