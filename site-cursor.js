@@ -24,7 +24,7 @@
     el.setAttribute('aria-hidden', 'true');
     el.innerHTML =
       '<span class="site-cursor__bubble">' +
-      '<span class="site-cursor__label">Play With Me!</span>' +
+      '<span class="site-cursor__label">Drag.</span>' +
       '</span>';
   }
 
