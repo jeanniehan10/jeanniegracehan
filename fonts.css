@@ -47,6 +47,14 @@
 }
 
 @font-face {
+  font-family: "Input Mono";
+  src: url("InputMono/InputMono-Italic.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Input Mono Medium";
   src: url("InputMono/InputMono-Medium.woff") format("woff");
   font-weight: normal;
@@ -81,6 +89,13 @@ html, body {
   font-style: normal;
   background: var(--bg);
   color: var(--text);
+  font-synthesis: none;
+}
+
+em, i {
+  font-family: "Input Mono", monospace;
+  font-style: italic;
+  font-synthesis: none;
 }
 
 /* Site-wide cursor: OS draws the grey circle immediately (no mousemove wait).
