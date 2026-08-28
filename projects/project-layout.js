@@ -157,13 +157,15 @@
   }
 
   function fullSrc(img) {
-    return img.dataset.fullSrc || img.dataset.desktopSrc || img.getAttribute('src') || '';
+    // Use the asset currently intended for this viewport so lightbox
+    // keeps mobile orientation (e.g. COP hero stays portrait on phones).
+    if (MOBILE_MQ.matches && img.dataset.mobileSrc) return img.dataset.mobileSrc;
+    return img.dataset.desktopSrc || img.getAttribute('src') || '';
   }
 
   function applyResponsiveImages(root) {
     (root || document).querySelectorAll('img[data-mobile-src]').forEach((img) => {
       if (!img.dataset.desktopSrc) img.dataset.desktopSrc = img.getAttribute('src') || '';
-      if (!img.dataset.fullSrc) img.dataset.fullSrc = img.dataset.desktopSrc;
       const next = MOBILE_MQ.matches && img.dataset.mobileSrc ? img.dataset.mobileSrc : img.dataset.desktopSrc;
       if (img.getAttribute('src') !== next) img.setAttribute('src', next);
     });

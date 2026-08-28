@@ -139,6 +139,9 @@
   }
 
   function initTrail() {
+    // No word-trail / asterisk hover on phones — touch was stacking both layers
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+
     markProjectCopy();
     const palette = trailPalette();
     const counter = { i: 0 };

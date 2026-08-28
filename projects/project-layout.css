@@ -382,10 +382,15 @@ body[data-scroll-reveal] .reveal.is-revealed {
     margin-top:var(--hero-offset);
   }
 
-  .landing-hero-pair,
-  .landing-hero-quad {
+  .landing-hero-pair {
     width:100%;
     grid-template-columns:1fr;
+  }
+  /* FORCE / CLUTTER grouped shots stay 2-up with equal gaps on mobile */
+  .landing-hero-quad {
+    width:100%;
+    grid-template-columns:1fr 1fr;
+    gap:var(--img-gap);
   }
   .landing-hero-group--mobile-tight {
     gap:var(--img-gap);
