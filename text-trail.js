@@ -6,7 +6,12 @@
     return colors.length ? colors : null;
   }
 
+  function asterisksMode() {
+    return document.body?.hasAttribute('data-trail-asterisks');
+  }
+
   function wrapWords(el, palette, counter) {
+    const useAsterisks = asterisksMode();
     const nodes = [...el.childNodes];
     for (const node of nodes) {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -19,7 +24,18 @@
           } else {
             const span = document.createElement('span');
             span.className = 'trail-word';
-            span.textContent = part;
+            if (useAsterisks) {
+              const text = document.createElement('span');
+              text.className = 'trail-word__text';
+              text.textContent = part;
+              const mask = document.createElement('span');
+              mask.className = 'trail-word__mask';
+              mask.setAttribute('aria-hidden', 'true');
+              mask.textContent = '*'.repeat([...part].length);
+              span.append(text, mask);
+            } else {
+              span.textContent = part;
+            }
             if (palette) {
               span.style.setProperty('--trail-lit', palette[counter.i % palette.length]);
               counter.i += 1;
@@ -46,11 +62,24 @@
 
   function lightWord(word) {
     if (!word) return;
+    if (word._asteriskRestoreTimer) {
+      clearTimeout(word._asteriskRestoreTimer);
+      word._asteriskRestoreTimer = null;
+    }
     word.classList.add('is-lit');
   }
 
   function unlightWord(word) {
     if (!word) return;
+    if (asterisksMode()) {
+      if (word._asteriskRestoreTimer) clearTimeout(word._asteriskRestoreTimer);
+      // Hold asterisks, then snap the whole word back (no fade)
+      word._asteriskRestoreTimer = setTimeout(() => {
+        word._asteriskRestoreTimer = null;
+        word.classList.remove('is-lit');
+      }, 2000);
+      return;
+    }
     word.classList.remove('is-lit');
   }
 

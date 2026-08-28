@@ -290,6 +290,31 @@ body[data-trail-vanish] .text-trail .trail-word.is-lit {
   transition: opacity 0.05s linear;
 }
 
+/* COP: stacked word + asterisks — same box (no reflow); snap back after delay via JS */
+body[data-trail-asterisks] .text-trail .trail-word {
+  display: inline-grid;
+  justify-items: start;
+  color: inherit !important;
+}
+body[data-trail-asterisks] .text-trail .trail-word__text,
+body[data-trail-asterisks] .text-trail .trail-word__mask {
+  grid-area: 1 / 1;
+}
+body[data-trail-asterisks] .text-trail .trail-word__mask {
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+body[data-trail-asterisks] .text-trail .trail-word.is-lit .trail-word__text {
+  opacity: 0;
+}
+body[data-trail-asterisks] .text-trail .trail-word.is-lit .trail-word__mask {
+  opacity: 1;
+}
+body[data-trail-asterisks] .text-trail .trail-word.is-lit {
+  color: inherit !important;
+}
+
 /* Desktop: pink hover + word-trail hover guards (not on touch/mobile) */
 @media (min-width: 769px) and (hover: hover) {
   :where(
@@ -384,6 +409,11 @@ body[data-trail-vanish] .text-trail .trail-word.is-lit {
   body[data-trail-vanish] .text-trail .trail-word.is-lit:hover {
     color: inherit !important;
     opacity: 0;
+  }
+  body[data-trail-asterisks] .text-trail .trail-word.is-lit:hover,
+  body[data-trail-asterisks] .text-trail .trail-word.is-lit:hover .trail-word__text,
+  body[data-trail-asterisks] .text-trail .trail-word.is-lit:hover .trail-word__mask {
+    color: inherit !important;
   }
 }
 
