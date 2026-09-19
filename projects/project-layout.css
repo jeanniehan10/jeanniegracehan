@@ -571,5 +571,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   margin:auto;
   object-fit:contain;
   object-position:center center;
-  cursor:zoom-out;
+  cursor:ew-resize;
+  user-select:none;
+  -webkit-user-select:none;
 }

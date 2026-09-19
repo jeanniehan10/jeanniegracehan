@@ -199,9 +199,35 @@
   const lightboxImg = document.getElementById('lightboxImg');
 
   if (lightbox && lightboxImg) {
-    function openLightbox(src, alt) {
-      lightboxImg.src = src;
-      lightboxImg.alt = alt || '';
+    let gallery = [];
+    let galleryIndex = 0;
+
+    function zoomableGallery() {
+      return [...document.querySelectorAll('[data-zoomable]')].filter(
+        (img) => !img.closest('.triptych__clone')
+      );
+    }
+
+    function isLightboxOpen() {
+      return lightbox.classList.contains('is-open');
+    }
+
+    function showGalleryAt(i) {
+      if (!gallery.length) return;
+      galleryIndex = ((i % gallery.length) + gallery.length) % gallery.length;
+      const img = gallery[galleryIndex];
+      lightboxImg.src = fullSrc(img);
+      lightboxImg.alt = img.alt || '';
+    }
+
+    function openLightbox(img) {
+      gallery = zoomableGallery();
+      galleryIndex = gallery.indexOf(img);
+      if (galleryIndex < 0) {
+        gallery = [img];
+        galleryIndex = 0;
+      }
+      showGalleryAt(galleryIndex);
       lightbox.classList.add('is-open');
       lightbox.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -212,15 +238,55 @@
       lightbox.setAttribute('aria-hidden', 'true');
       lightboxImg.removeAttribute('src');
       document.body.style.overflow = '';
+      gallery = [];
+      galleryIndex = 0;
+    }
+
+    function stepGallery(delta) {
+      if (!isLightboxOpen() || gallery.length < 2) return;
+      showGalleryAt(galleryIndex + delta);
     }
 
     document.querySelectorAll('[data-zoomable]').forEach((img) => {
-      img.addEventListener('click', () => openLightbox(fullSrc(img), img.alt));
+      img.addEventListener('click', () => openLightbox(img));
     });
 
-    lightbox.addEventListener('click', () => closeLightbox());
+    // Backdrop click closes; left/right half of the lightbox steps the gallery
+    lightbox.addEventListener('click', (e) => {
+      if (!isLightboxOpen()) return;
+      if (e.target === lightbox) {
+        closeLightbox();
+        return;
+      }
+      if (gallery.length < 2) {
+        closeLightbox();
+        return;
+      }
+      const rect = lightbox.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      stepGallery(x < rect.width / 2 ? -1 : 1);
+    });
+
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+      if (!isLightboxOpen()) return;
+      if (e.key === 'Escape') {
+        closeLightbox();
+        return;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        stepGallery(-1);
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || (e.key === ' ' && !e.shiftKey)) {
+        e.preventDefault();
+        stepGallery(1);
+        return;
+      }
+      if (e.key === ' ' && e.shiftKey) {
+        e.preventDefault();
+        stepGallery(-1);
+      }
     });
   }
 
