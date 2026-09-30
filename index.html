@@ -103,10 +103,10 @@
   }
   .compose-meta__label {
     margin-top:4px;
-    font-family:"Input Mono", monospace;
-    font-size:9px;
+    font-family:"Neue Haas Unica", sans-serif;
+    font-size:11px;
     line-height:1;
-    letter-spacing:0;
+    letter-spacing:normal;
     color:var(--text);
     white-space:nowrap;
   }
@@ -118,7 +118,7 @@
     white-space:nowrap;
     font-family:"Neue Haas Unica Bold", sans-serif;
     font-size:var(--word-size);
-    letter-spacing:-0.08em;
+    letter-spacing:normal;
     line-height:1.15;
     padding:0 2px;
     color:var(--text);
@@ -214,7 +214,7 @@
     position:fixed;
     /* Vertical position set in JS to the closing compose hairline under FORCE */
     top:auto;
-    bottom:calc(12px + 0.5px + 11px);
+    bottom:calc(12px + 0.5px + 13px);
     right:var(--pad-x);
     left:auto;
     z-index:101;
@@ -227,10 +227,10 @@
     border-radius:0;
     background:none;
     box-shadow:none;
-    font-family:"Input Mono Medium", "Input Mono", monospace;
-    font-size:15px;
-    font-weight:bold;
-    letter-spacing:0;
+    font-family:"Neue Haas Unica Medium", "Neue Haas Unica", sans-serif;
+    font-size:17px;
+    font-weight:normal;
+    letter-spacing:normal;
     line-height:1;
     text-transform:uppercase;
     color:var(--blend-ink);
@@ -267,7 +267,7 @@
   }
   @media (max-width:768px) {
     .compose-btn {
-      font-size:13px;
+      font-size:15px;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -404,8 +404,8 @@
     'normal 12px "Neue Haas Unica Bold"',
     'normal 12px "Neue Haas Unica Medium"',
     'normal 12px "Neue Haas Unica Light"',
-    'normal 9px "Input Mono"',
-    'normal 9px "Terminal Grotesque"',
+    'normal 11px "Neue Haas Unica"',
+    'italic 11px "Neue Haas Unica"',
   ];
 
   function projectImg(project) {
@@ -629,7 +629,7 @@
     const COMPOSE_META = {
       lineH: 0.25,
       lineToSub: 4, // .compose-meta__label margin-top
-      subH: 9,      // .compose-meta__label font-size
+      subH: 11,     // .compose-meta__label font-size
       subToWord: 20,
       wordToNext: 16,
     };
@@ -1054,7 +1054,7 @@
       const line = closerMeta.querySelector('.compose-meta__line') || closerMeta;
       const rect = line.getBoundingClientRect();
       if (rect.height < 0.1 && rect.top < 1) return;
-      // Same air as topbar under its hairline (11px)
+      // Same air as topbar under its hairline (13px)
       const top = Math.round(rect.bottom + 11);
       composeBtn.style.top = `${top}px`;
       composeBtn.style.bottom = 'auto';

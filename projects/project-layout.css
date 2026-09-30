@@ -4,8 +4,10 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Input Mono", monospace;
-  --text-sm:9px; /* match Information page body */
+  font-family:"Neue Haas Unica", sans-serif;
+  letter-spacing:normal;
+  font-kerning:normal;
+  --text-sm:11px; /* match Information page body */
   --img-gap:7px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);
@@ -59,7 +61,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 
 .copy {
   font-size:var(--text-sm);
-  letter-spacing:0;
+  letter-spacing:normal;
   line-height:1.45;
   font-variant-ligatures:none;
   font-feature-settings:"liga" 0, "calt" 0;
@@ -87,7 +89,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-size:var(--text-sm);
   font-weight:400;
   line-height:1.45;
-  letter-spacing:1;
+  letter-spacing:normal;
 }
 .project-masthead__body {
   /* Same air above and below the text, matching the reference frame */
@@ -103,7 +105,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .project-masthead__meta {
   font-size:var(--text-sm);
   line-height:1.45;
-  letter-spacing:0;
+  letter-spacing:normal;
 }
 .project-masthead__meta-block p {
   margin:0;
