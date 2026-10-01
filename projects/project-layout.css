@@ -4,11 +4,11 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Input Mono", monospace;
+  font-family:"Monument Grotesk", sans-serif;
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
   font-kerning:normal;
-  --text-sm:9px; /* match Information page body */
+  --text-sm:11px; /* match Information page body */
   --img-gap:6px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);
@@ -143,6 +143,51 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .project-masthead + .triptych,
 .project-masthead + .nsnb-media-stack {
   margin-top:10px;
+}
+.landing-copy {
+  width:100%;
+  margin:var(--hero-offset) 0;
+  /* Match .landing-hero--sequence.landing-hero--narrow (CLUTTER gif) */
+  --sequence-w:min(52%, 780px);
+}
+.landing-copy__row {
+  display:grid;
+  /* Gutter = same inset as the centered gif, so labels share its left edge */
+  grid-template-columns:calc((100% - var(--sequence-w)) / 2) max-content 1fr;
+  column-gap:clamp(24px, 4vw, 48px);
+  align-items:start;
+}
+.landing-copy__row + .landing-copy__row {
+  margin-top:calc(var(--copy-para-gap) * 3);
+}
+.landing-copy__label {
+  grid-column:2;
+  margin:0;
+}
+.landing-copy__body {
+  grid-column:3;
+  margin:0;
+}
+.landing-copy__body > p {
+  margin:0;
+}
+.landing-copy__body > p + p {
+  margin-top:var(--copy-para-gap);
+}
+@media (max-width: 768px) {
+  .landing-copy {
+    --sequence-w:min(82%, 560px);
+  }
+  .landing-copy__row {
+    grid-template-columns:1fr;
+  }
+  .landing-copy__label,
+  .landing-copy__body {
+    grid-column:1;
+  }
+  .landing-copy__label {
+    margin-bottom:calc(var(--text-sm) * 1.45);
+  }
 }
 
 /* NSNB: photo then slideshow on mobile; slideshow then photo on desktop */

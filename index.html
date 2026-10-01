@@ -103,8 +103,8 @@
   }
   .compose-meta__label {
     margin-top:4px;
-    font-family:"Input Mono", monospace;
-    font-size:9px;
+    font-family:"Monument Grotesk", sans-serif;
+    font-size:11px;
     line-height:1;
     letter-spacing:var(--tracking);
     word-spacing:var(--word-gap);
@@ -117,9 +117,9 @@
     left:0;
     display:grid;
     white-space:nowrap;
-    font-family:"Neue Haas Grotesk Bold", sans-serif;
+    font-family:"Monument Grotesk Heavy", sans-serif;
     font-size:var(--word-size);
-    letter-spacing:-0.025em;
+    letter-spacing:-0.05em;
     word-spacing:normal;
     line-height:1.15;
     padding:0 2px;
@@ -229,7 +229,7 @@
     border-radius:0;
     background:none;
     box-shadow:none;
-    font-family:"Input Mono Medium", "Input Mono", monospace;
+    font-family:"Monument Grotesk", sans-serif;
     font-size:15px;
     font-weight:normal;
     letter-spacing:var(--tracking);
@@ -339,7 +339,7 @@
       img: 'projects/CLUTTER/CLUTTER_4.jpg',
       imgMobile: 'projects/CLUTTER/CLUTTER_4(MOBILE).jpg',
       imgMobileHi: 'projects/CLUTTER/CLUTTER_4.jpg',
-      fontFamily: '"Neue Haas Grotesk Bold", sans-serif',
+      fontFamily: '"Monument Grotesk Heavy", sans-serif',
       fontStyle: 'normal',
       subhead: 'Thesis',
       subToWord: 17,
@@ -351,7 +351,7 @@
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
       imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/NSNB/NSNB_HOVER.jpg',
-      fontFamily: '"Neue Haas Grotesk Medium", sans-serif',
+      fontFamily: '"Monument Grotesk Bold", sans-serif',
       fontStyle: 'normal',
       subhead: 'Broadsheet Publication',
       subToWord: 17,
@@ -362,7 +362,7 @@
       img: 'projects/COP/COP_Editorial_2.jpg',
       imgMobile: 'projects/COP/COP_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/COP/COP_HOVER.jpg',
-      fontFamily: '"Neue Haas Grotesk", sans-serif',
+      fontFamily: '"Monument Grotesk Medium", sans-serif',
       fontStyle: 'normal',
       subhead: 'Editorial Book Design',
       subToWord: 17,
@@ -377,7 +377,7 @@
       // Scattered cards: contain + black on mobile only; desktop hover stays full-bleed cover
       previewFitMobile: 'contain',
       previewBgMobile: '#000',
-      fontFamily: '"Neue Haas Grotesk Light", sans-serif',
+      fontFamily: '"Monument Grotesk", sans-serif',
       fontStyle: 'normal',
       subhead: 'Trading Card Identity',
       subToWord: 22,
@@ -394,7 +394,7 @@
       previewBg: '#000',
       previewFitMobile: 'contain',
       previewBgMobile: '#000',
-      fontFamily: '"Neue Haas Grotesk Thin", sans-serif',
+      fontFamily: '"Monument Grotesk Light", sans-serif',
       fontStyle: 'normal',
       subhead: 'Libretto Design',
       subToWord: 20,
@@ -402,14 +402,12 @@
   ];
 
   const WORD_FONT_LOADS = [
-    'normal 12px "Neue Haas Grotesk Bold"',
-    'normal 12px "Neue Haas Grotesk Medium"',
-    'normal 12px "Neue Haas Grotesk"',
-    'normal 12px "Neue Haas Grotesk Light"',
-    'normal 12px "Neue Haas Grotesk Thin"',
-    'normal 9px "Input Mono"',
-    'italic 9px "Input Mono"',
-    'normal 9px "Input Mono Medium"',
+    'normal 12px "Monument Grotesk Heavy"',
+    'normal 12px "Monument Grotesk Bold"',
+    'normal 12px "Monument Grotesk Medium"',
+    'normal 12px "Monument Grotesk"',
+    'normal 12px "Monument Grotesk Light"',
+    'italic 11px "Monument Grotesk"',
   ];
 
   function projectImg(project) {
@@ -633,7 +631,7 @@
     const COMPOSE_META = {
       lineH: 0.25,
       lineToSub: 4, // .compose-meta__label margin-top
-      subH: 9,      // .compose-meta__label font-size
+      subH: 11,     // .compose-meta__label font-size
       subToWord: 20,
       wordToNext: 16,
     };

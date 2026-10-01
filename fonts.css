@@ -1,88 +1,48 @@
 @font-face {
-  font-family: "Input Mono";
-  src: url("InputMono/InputMono-Regular.woff") format("woff");
+  font-family: "Monument Grotesk";
+  src: url("MonumentGrotesk/Regular.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Input Mono";
-  src: url("InputMono/InputMono-Italic.woff2") format("woff2");
+  font-family: "Monument Grotesk";
+  src: url("MonumentGrotesk/RegularItalic.otf") format("opentype");
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Input Mono Medium";
-  src: url("InputMono/InputMono-Medium.woff") format("woff");
+  font-family: "Monument Grotesk Heavy";
+  src: url("MonumentGrotesk/Heavy.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Neue Haas Grotesk Black";
-  src: url("NeueHaasGrotesk/Black.otf") format("opentype");
+  font-family: "Monument Grotesk Bold";
+  src: url("MonumentGrotesk/Bold.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Neue Haas Grotesk Heavy";
-  src: url("NeueHaasGrotesk/Bold.otf") format("opentype");
+  font-family: "Monument Grotesk Medium";
+  src: url("MonumentGrotesk/Medium.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Neue Haas Grotesk Bold";
-  src: url("NeueHaasGrotesk/Bold.otf") format("opentype");
+  font-family: "Monument Grotesk Light";
+  src: url("MonumentGrotesk/Light.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Medium";
-  src: url("NeueHaasGrotesk/Medium.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Light";
-  src: url("NeueHaasGrotesk/Light.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk Thin";
-  src: url("NeueHaasGrotesk/Thin.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk";
-  src: url("NeueHaasGrotesk/Roman.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue Haas Grotesk";
-  src: url("NeueHaasGrotesk/Italic.otf") format("opentype");
-  font-weight: normal;
-  font-style: italic;
   font-display: swap;
 }
 
@@ -103,7 +63,7 @@
 }
 
 html, body {
-  font-family: "Input Mono", monospace;
+  font-family: "Monument Grotesk", sans-serif;
   font-weight: normal;
   font-style: normal;
   letter-spacing: var(--tracking);
@@ -115,7 +75,7 @@ html, body {
 }
 
 em, i {
-  font-family: "Input Mono", monospace;
+  font-family: "Monument Grotesk", sans-serif;
   font-style: italic;
   font-synthesis: none;
 }
@@ -166,7 +126,7 @@ em, i {
   height: 90px;
 }
 .site-cursor__label {
-  font-family: "Input Mono", monospace;
+  font-family: "Monument Grotesk", sans-serif;
   font-size: 11px;
   white-space: nowrap;
   color: var(--text);
@@ -213,7 +173,7 @@ body::after {
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
   padding: calc(12px + 0.5px + 11px) var(--pad-x) var(--pad);
-  font-family: "Input Mono", monospace;
+  font-family: "Monument Grotesk", sans-serif;
   font-size: 11px;
   letter-spacing: var(--tracking);
   word-spacing: var(--word-gap);
@@ -225,7 +185,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Input Mono Medium", "Input Mono", monospace;
+  font-family: "Monument Grotesk", sans-serif;
   font-weight: normal;
 }
 .topbar a {
