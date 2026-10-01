@@ -206,25 +206,49 @@ body[data-scroll-reveal] .reveal.is-revealed {
   }
 }
 
-/* NSNB: slideshow first, then photo — same order on mobile and desktop */
+/* NSNB: slideshow first, then photo + impact copy — same order on mobile and desktop */
 .nsnb-media-stack {
   display:flex;
   flex-direction:column;
   width:100%;
 }
-.nsnb-media-stack__lead {
-  width:var(--hero-width);
-  align-self:center;
+.nsnb-lead-row {
   order:2;
+  display:grid;
+  /*
+    Left column = first triptych cell + gap, so the photo’s left edge
+    lines up with the middle triptych image.
+  */
+  grid-template-columns:calc((100% - 2 * var(--img-gap)) / 3 + var(--img-gap)) minmax(0, 1fr);
+  column-gap:0;
+  align-items:start;
+  width:100%;
   /* Same air as above/below GIFs / frame sequences */
   margin-top:var(--hero-offset);
   margin-bottom:var(--hero-offset);
+}
+.nsnb-media-stack__lead {
+  width:100%;
+  margin:0;
 }
 .nsnb-media-stack__lead img {
   display:block;
   width:100%;
   height:auto;
   cursor:zoom-in;
+}
+.nsnb-impact {
+  margin:0;
+  max-width:none;
+  padding-right:clamp(16px, 2.5vw, 36px);
+  padding-top:0.2em;
+}
+.nsnb-impact__heading {
+  margin:0 0 var(--copy-para-gap);
+  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+}
+.nsnb-impact > p + p {
+  margin-top:var(--copy-para-gap);
 }
 .nsnb-media-stack .triptych {
   order:1;
@@ -234,6 +258,10 @@ body[data-scroll-reveal] .reveal.is-revealed {
 body:has(.nsnb-media-stack) .below {
   border-top:0;
   padding-bottom:6px;
+}
+/* Match “View the project page here” red for hover / word-trail */
+body:has(.nsnb-media-stack) {
+  --hover-pink:#E20000;
 }
 .landing-hero-stack > .landing-hero:first-child {
   margin-top:0;
@@ -455,12 +483,18 @@ body:has(.nsnb-media-stack) .below {
     width:100%;
     margin-top:10px;
   }
-  .nsnb-media-stack__lead {
+  .nsnb-lead-row {
     order:2;
-    width:100%;
-    align-self:stretch;
+    grid-template-columns:1fr;
+    row-gap:calc(var(--copy-para-gap) * 2);
     margin-top:var(--hero-offset);
     margin-bottom:var(--hero-offset);
+  }
+  .nsnb-media-stack__lead {
+    width:100%;
+  }
+  .nsnb-impact {
+    max-width:none;
   }
   .nsnb-media-stack .triptych {
     order:1;

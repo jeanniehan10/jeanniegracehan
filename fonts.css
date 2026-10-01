@@ -209,7 +209,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
   font-weight: normal;
 }
 .topbar a {
@@ -250,7 +250,7 @@ body::after {
   }
   .topbar .name {
     grid-column: 1;
-    font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+    font-family: "Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
     font-weight: normal;
   }
   .topbar-nav {
