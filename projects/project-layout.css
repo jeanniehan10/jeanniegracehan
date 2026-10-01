@@ -4,11 +4,11 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Nimbus Sans Condensed", sans-serif;
+  font-family:"Input Mono", monospace;
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
   font-kerning:normal;
-  --text-sm:11px; /* match Information page body */
+  --text-sm:9px; /* match Information page body */
   --img-gap:6px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);

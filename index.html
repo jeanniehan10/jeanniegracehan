@@ -103,7 +103,7 @@
   }
   .compose-meta__label {
     margin-top:4px;
-    font-family:"Nimbus Sans Condensed", sans-serif;
+    font-family:"Input Mono", monospace;
     font-size:9px;
     line-height:1;
     letter-spacing:var(--tracking);
@@ -216,7 +216,7 @@
     position:fixed;
     /* Vertical position set in JS to the closing compose hairline under FORCE */
     top:auto;
-    bottom:calc(12px + 0.5px + 13px);
+    bottom:calc(12px + 0.5px + 11px);
     right:var(--pad-x);
     left:auto;
     z-index:101;
@@ -229,8 +229,8 @@
     border-radius:0;
     background:none;
     box-shadow:none;
-    font-family:"Nimbus Sans Condensed Medium", "Nimbus Sans Condensed", sans-serif;
-    font-size:17px;
+    font-family:"Input Mono Medium", "Input Mono", monospace;
+    font-size:15px;
     font-weight:normal;
     letter-spacing:var(--tracking);
     word-spacing:normal;
@@ -270,7 +270,7 @@
   }
   @media (max-width:768px) {
     .compose-btn {
-      font-size:15px;
+      font-size:13px;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -407,9 +407,9 @@
     'normal 12px "Neue Haas Grotesk"',
     'normal 12px "Neue Haas Grotesk Light"',
     'normal 12px "Neue Haas Grotesk Thin"',
-    'normal 11px "Nimbus Sans Condensed"',
-    'italic 11px "Nimbus Sans Condensed"',
-    'normal 11px "Nimbus Sans Condensed Medium"',
+    'normal 9px "Input Mono"',
+    'italic 9px "Input Mono"',
+    'normal 9px "Input Mono Medium"',
   ];
 
   function projectImg(project) {
@@ -1058,7 +1058,7 @@
       const line = closerMeta.querySelector('.compose-meta__line') || closerMeta;
       const rect = line.getBoundingClientRect();
       if (rect.height < 0.1 && rect.top < 1) return;
-      // Same air as topbar under its hairline (13px)
+      // Same air as topbar under its hairline (11px)
       const top = Math.round(rect.bottom + 11);
       composeBtn.style.top = `${top}px`;
       composeBtn.style.bottom = 'auto';

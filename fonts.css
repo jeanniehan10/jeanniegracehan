@@ -1,30 +1,22 @@
 @font-face {
-  font-family: "Nimbus Sans Condensed";
-  src: url("NimbusSans/RegularCondensed.ttf") format("truetype");
+  font-family: "Input Mono";
+  src: url("InputMono/InputMono-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Nimbus Sans Condensed";
-  src: url("NimbusSans/Italic.ttf") format("truetype");
+  font-family: "Input Mono";
+  src: url("InputMono/InputMono-Italic.woff2") format("woff2");
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Nimbus Sans Condensed Medium";
-  src: url("NimbusSans/BoldCondensed.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Nimbus Sans Condensed Bold";
-  src: url("NimbusSans/BoldCondensed.ttf") format("truetype");
+  font-family: "Input Mono Medium";
+  src: url("InputMono/InputMono-Medium.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -104,14 +96,14 @@
   --col-gap: 8px;
   --pad: 12px;
   --pad-x: 14px;
-  --topbar-h: calc(12px + 0.5px + 13px + 13px + var(--pad));
+  --topbar-h: calc(12px + 0.5px + 11px + 11px + var(--pad));
   --hover-pink: #E63462;
   --tracking: 0.02em;
-  --word-gap: 0.07em;
+  --word-gap: 0.06em;
 }
 
 html, body {
-  font-family: "Nimbus Sans Condensed", sans-serif;
+  font-family: "Input Mono", monospace;
   font-weight: normal;
   font-style: normal;
   letter-spacing: var(--tracking);
@@ -123,7 +115,7 @@ html, body {
 }
 
 em, i {
-  font-family: "Nimbus Sans Condensed", sans-serif;
+  font-family: "Input Mono", monospace;
   font-style: italic;
   font-synthesis: none;
 }
@@ -174,10 +166,8 @@ em, i {
   height: 90px;
 }
 .site-cursor__label {
-  font-family: "Nimbus Sans Condensed", sans-serif;
-  font-size: 13px;
-  line-height: 1;
-  text-align: center;
+  font-family: "Input Mono", monospace;
+  font-size: 11px;
   white-space: nowrap;
   color: var(--text);
   pointer-events: none;
@@ -222,9 +212,9 @@ body::after {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
-  padding: calc(12px + 0.5px + 13px) var(--pad-x) var(--pad);
-  font-family: "Nimbus Sans Condensed", sans-serif;
-  font-size: 13px;
+  padding: calc(12px + 0.5px + 11px) var(--pad-x) var(--pad);
+  font-family: "Input Mono", monospace;
+  font-size: 11px;
   letter-spacing: var(--tracking);
   word-spacing: var(--word-gap);
   pointer-events: none;
@@ -235,7 +225,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Nimbus Sans Condensed Medium", "Nimbus Sans Condensed", sans-serif;
+  font-family: "Input Mono Medium", "Input Mono", monospace;
   font-weight: normal;
 }
 .topbar a {
@@ -257,14 +247,14 @@ body::after {
 
 @media (max-width: 768px) {
   :root {
-    --topbar-nav-size: 12px;
+    --topbar-nav-size: 10px;
     --topbar-nav-gap: 6px;
     /*
       Fixed topbar box must clear the stacked Index / Information / Contact
       column so the first page rule never runs through the menus.
     */
     --topbar-h: calc(
-      12px + 0.5px + 13px
+      12px + 0.5px + 11px
       + (3 * var(--topbar-nav-size) + 2 * var(--topbar-nav-gap))
       + var(--pad)
     );
