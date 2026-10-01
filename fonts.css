@@ -46,6 +46,30 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Monument Grotesk Mono";
+  src: url("MonumentGroteskMono/Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Monument Grotesk Mono";
+  src: url("MonumentGroteskMono/RegularItalic.otf") format("opentype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Monument Grotesk Mono Bold";
+  src: url("MonumentGroteskMono/Bold.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #ffffff;
   --text: #1d1d1d;
@@ -63,7 +87,7 @@
 }
 
 html, body {
-  font-family: "Monument Grotesk", sans-serif;
+  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
   font-weight: normal;
   font-style: normal;
   letter-spacing: var(--tracking);
@@ -75,7 +99,7 @@ html, body {
 }
 
 em, i {
-  font-family: "Monument Grotesk", sans-serif;
+  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
   font-style: italic;
   font-synthesis: none;
 }
@@ -126,7 +150,7 @@ em, i {
   height: 90px;
 }
 .site-cursor__label {
-  font-family: "Monument Grotesk", sans-serif;
+  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
   font-size: 11px;
   white-space: nowrap;
   color: var(--text);
@@ -173,7 +197,7 @@ body::after {
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
   padding: calc(12px + 0.5px + 12px) var(--pad-x) var(--pad);
-  font-family: "Monument Grotesk", sans-serif;
+  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: var(--tracking);
   word-spacing: var(--word-gap);
@@ -185,7 +209,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Monument Grotesk Bold", "Monument Grotesk", sans-serif;
+  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
   font-weight: normal;
 }
 .topbar a {
@@ -226,7 +250,7 @@ body::after {
   }
   .topbar .name {
     grid-column: 1;
-    font-family: "Monument Grotesk Bold", "Monument Grotesk", sans-serif;
+    font-family: "Monument Grotesk Mono", ui-monospace, monospace;
     font-weight: normal;
   }
   .topbar-nav {

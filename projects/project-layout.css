@@ -4,7 +4,7 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Monument Grotesk", sans-serif;
+  font-family:"Monument Grotesk Mono", ui-monospace, monospace;
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
   font-kerning:normal;
@@ -69,6 +69,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-feature-settings:"liga" 0, "calt" 0;
 }
 .copy p + p { margin-top:var(--copy-para-gap); }
+
+/* Landing copy: Mono for all text including title */
+.landing {
+  font-family:"Monument Grotesk Mono", ui-monospace, monospace;
+}
 
 /*
   Detail-page masthead:
@@ -165,6 +170,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing-copy__label {
   grid-column:1;
   margin:0;
+  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
 }
 .landing-copy__body {
   grid-column:2;
