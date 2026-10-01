@@ -146,7 +146,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .landing-copy {
   width:100%;
-  margin:var(--hero-offset) 0;
+  /* Equal air above/below; stack gap is shared on both sides */
+  margin-block:calc(var(--hero-offset) - var(--img-gap));
   /* Match .landing-hero--sequence.landing-hero--narrow (CLUTTER gif) */
   --sequence-w:min(52%, 780px);
 }
@@ -177,9 +178,13 @@ body[data-scroll-reveal] .reveal.is-revealed {
 @media (max-width: 768px) {
   .landing-copy {
     --sequence-w:min(82%, 560px);
+    width:var(--sequence-w);
+    max-width:100%;
+    align-self:center;
   }
   .landing-copy__row {
     grid-template-columns:1fr;
+    column-gap:0;
   }
   .landing-copy__label,
   .landing-copy__body {
@@ -188,9 +193,12 @@ body[data-scroll-reveal] .reveal.is-revealed {
   .landing-copy__label {
     margin-bottom:calc(var(--text-sm) * 1.45);
   }
+  .landing-copy__row + .landing-copy__row {
+    margin-top:calc(var(--copy-para-gap) * 2.5);
+  }
 }
 
-/* NSNB: photo then slideshow on mobile; slideshow then photo on desktop */
+/* NSNB: slideshow first, then photo — same order on mobile and desktop */
 .nsnb-media-stack {
   display:flex;
   flex-direction:column;
@@ -199,7 +207,10 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .nsnb-media-stack__lead {
   width:var(--hero-width);
   align-self:center;
-  margin:0;
+  order:2;
+  /* Same air as above/below GIFs / frame sequences */
+  margin-top:var(--hero-offset);
+  margin-bottom:var(--hero-offset);
 }
 .nsnb-media-stack__lead img {
   display:block;
@@ -207,27 +218,14 @@ body[data-scroll-reveal] .reveal.is-revealed {
   height:auto;
   cursor:zoom-in;
 }
-@media (min-width: 769px) {
-  .nsnb-media-stack__lead {
-    order:2;
-    /* Same air as above/below GIFs / frame sequences */
-    margin-top:var(--hero-offset);
-    margin-bottom:var(--hero-offset);
-  }
-  .nsnb-media-stack .triptych {
-    order:1;
-    margin-top:0;
-  }
+.nsnb-media-stack .triptych {
+  order:1;
+  margin-top:0;
 }
 /* Lead margin already sets the air into .below — don't add another gap */
 body:has(.nsnb-media-stack) .below {
   border-top:0;
   padding-bottom:6px;
-}
-@media (max-width: 768px) {
-  body:has(.nsnb-media-stack) .below {
-    border-top:var(--img-gap) solid var(--bg);
-  }
 }
 .landing-hero-stack > .landing-hero:first-child {
   margin-top:0;
@@ -253,6 +251,10 @@ body:has(.nsnb-media-stack) .below {
 .landing-hero-stack > .landing-hero--sequence {
   margin-top:calc(var(--hero-offset) - var(--img-gap));
   margin-bottom:calc(var(--hero-offset) - var(--img-gap));
+}
+/* Landing-copy already supplies the gap above the gif */
+.landing-hero-stack > .landing-copy + .landing-hero--sequence {
+  margin-top:0;
 }
 .landing-hero-stack > .landing-hero--sequence:first-child {
   margin-top:0;
@@ -446,14 +448,15 @@ body:has(.nsnb-media-stack) .below {
     margin-top:10px;
   }
   .nsnb-media-stack__lead {
-    order:1;
+    order:2;
     width:100%;
     align-self:stretch;
-    margin:0;
+    margin-top:var(--hero-offset);
+    margin-bottom:var(--hero-offset);
   }
   .nsnb-media-stack .triptych {
-    order:2;
-    margin-top:var(--img-gap);
+    order:1;
+    margin-top:0;
   }
 
   .landing-hero-pair {
