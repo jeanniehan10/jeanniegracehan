@@ -226,6 +226,8 @@ body::after {
   }
   .topbar .name {
     grid-column: 1;
+    font-family: "Monument Grotesk Bold", "Monument Grotesk", sans-serif;
+    font-weight: normal;
   }
   .topbar-nav {
     grid-column: 2;
