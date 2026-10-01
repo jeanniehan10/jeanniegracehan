@@ -153,20 +153,21 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .landing-copy__row {
   display:grid;
-  /* Gutter = same inset as the centered gif, so labels share its left edge */
-  grid-template-columns:calc((100% - var(--sequence-w)) / 2) max-content 1fr;
+  /* Inset matches centered gif left edge; gap only between label and body */
+  grid-template-columns:max-content 1fr;
   column-gap:clamp(24px, 4vw, 48px);
+  padding-left:calc((100% - var(--sequence-w)) / 2);
   align-items:start;
 }
 .landing-copy__row + .landing-copy__row {
   margin-top:calc(var(--copy-para-gap) * 3);
 }
 .landing-copy__label {
-  grid-column:2;
+  grid-column:1;
   margin:0;
 }
 .landing-copy__body {
-  grid-column:3;
+  grid-column:2;
   margin:0;
 }
 .landing-copy__body > p {
@@ -185,6 +186,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   .landing-copy__row {
     grid-template-columns:1fr;
     column-gap:0;
+    padding-left:0;
   }
   .landing-copy__label,
   .landing-copy__body {
