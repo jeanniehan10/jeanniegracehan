@@ -470,8 +470,18 @@ body:has(.nsnb-media-stack) {
 
 @media (max-width: 768px) {
   :root {
+    --text-sm:10px;
+    --img-gap:10px;
+    --hero-offset:90px;
+    --copy-para-gap:14px;
     --hero-width:min(78%, 400px);
     --below-width:min(94%, 680px);
+  }
+  .project-masthead__title {
+    margin:10px 0;
+  }
+  .project-masthead__body {
+    padding:12px 0;
   }
   .landing-hero--sequence,
   .landing-hero--sequence.landing-hero--narrow {
