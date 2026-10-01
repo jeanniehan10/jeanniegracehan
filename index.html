@@ -216,7 +216,7 @@
     position:fixed;
     /* Vertical position set in JS to the closing compose hairline under FORCE */
     top:auto;
-    bottom:calc(12px + 0.5px + 11px);
+    bottom:calc(12px + 0.5px + 12px);
     right:var(--pad-x);
     left:auto;
     z-index:101;
@@ -1056,7 +1056,7 @@
       const line = closerMeta.querySelector('.compose-meta__line') || closerMeta;
       const rect = line.getBoundingClientRect();
       if (rect.height < 0.1 && rect.top < 1) return;
-      // Same air as topbar under its hairline (11px)
+      // Same air as topbar under its hairline (12px)
       const top = Math.round(rect.bottom + 11);
       composeBtn.style.top = `${top}px`;
       composeBtn.style.bottom = 'auto';
