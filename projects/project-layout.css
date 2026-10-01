@@ -478,7 +478,8 @@ body:has(.nsnb-media-stack) {
     --below-width:min(94%, 680px);
   }
   .project-masthead__title {
-    margin:10px 0;
+    /* Extra air above/below project titles vs other text */
+    margin:18px 0;
   }
   .project-masthead__body {
     padding:12px 0;
@@ -510,9 +511,12 @@ body:has(.nsnb-media-stack) {
   }
   .nsnb-media-stack__lead {
     width:100%;
+    order:1;
   }
   .nsnb-impact {
     max-width:none;
+    order:2;
+    padding-right:0;
   }
   .nsnb-media-stack .triptych {
     order:1;
