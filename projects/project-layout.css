@@ -4,11 +4,12 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Neue Haas Unica", sans-serif;
-  letter-spacing:normal;
+  font-family:"Nimbus Sans Condensed", sans-serif;
+  letter-spacing:var(--tracking);
+  word-spacing:var(--word-gap);
   font-kerning:normal;
   --text-sm:11px; /* match Information page body */
-  --img-gap:7px;
+  --img-gap:6px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);
   --slide-duration:0.9s;
@@ -61,7 +62,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 
 .copy {
   font-size:var(--text-sm);
-  letter-spacing:normal;
+  letter-spacing:var(--tracking);
+  word-spacing:var(--word-gap);
   line-height:1.45;
   font-variant-ligatures:none;
   font-feature-settings:"liga" 0, "calt" 0;
@@ -81,7 +83,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .project-masthead__rule {
   flex:0 0 auto;
   height:0.5px;
-  background:var(--text);
+  background:var(--hairline);
   pointer-events:none;
 }
 .project-masthead__title {
@@ -89,7 +91,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-size:var(--text-sm);
   font-weight:400;
   line-height:1.45;
-  letter-spacing:normal;
+  letter-spacing:var(--tracking);
+  word-spacing:var(--word-gap);
 }
 .project-masthead__body {
   /* Same air above and below the text, matching the reference frame */
@@ -105,7 +108,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .project-masthead__meta {
   font-size:var(--text-sm);
   line-height:1.45;
-  letter-spacing:normal;
+  letter-spacing:var(--tracking);
+  word-spacing:var(--word-gap);
 }
 .project-masthead__meta-block p {
   margin:0;
@@ -125,12 +129,12 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing-hero {
   flex:0 0 auto;
   width:100%;
-  margin:2;
+  margin:0;
 }
 .landing-hero-stack {
   display:flex;
   flex-direction:column;
-  gap:var(--hero-offset);
+  gap:var(--img-gap);
   width:100%;
   margin-top:56px;
 }
@@ -161,11 +165,23 @@ body[data-scroll-reveal] .reveal.is-revealed {
 @media (min-width: 769px) {
   .nsnb-media-stack__lead {
     order:2;
+    /* Same air as above/below GIFs / frame sequences */
     margin-top:var(--hero-offset);
+    margin-bottom:var(--hero-offset);
   }
   .nsnb-media-stack .triptych {
     order:1;
     margin-top:0;
+  }
+}
+/* Lead margin already sets the air into .below — don't add another gap */
+body:has(.nsnb-media-stack) .below {
+  border-top:0;
+  padding-bottom:6px;
+}
+@media (max-width: 768px) {
+  body:has(.nsnb-media-stack) .below {
+    border-top:var(--img-gap) solid var(--bg);
   }
 }
 .landing-hero-stack > .landing-hero:first-child {
@@ -187,6 +203,17 @@ body[data-scroll-reveal] .reveal.is-revealed {
   position:relative;
   width:min(42%, 780px);
   align-self:center;
+}
+/* Keep larger air only above/below GIFs / frame sequences */
+.landing-hero-stack > .landing-hero--sequence {
+  margin-top:calc(var(--hero-offset) - var(--img-gap));
+  margin-bottom:calc(var(--hero-offset) - var(--img-gap));
+}
+.landing-hero-stack > .landing-hero--sequence:first-child {
+  margin-top:0;
+}
+.landing-hero-stack > .landing-hero--sequence:last-child {
+  margin-bottom:0;
 }
 .landing-hero--sequence.landing-hero--narrow {
   width:min(52%, 780px);
@@ -220,11 +247,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
   width:100%;
   align-self:stretch;
 }
-/* Stacked group: desktop keeps hero spacing; mobile can tighten */
+/* Stacked group: same tight image gap as the rest of the stack */
 .landing-hero-group {
   display:flex;
   flex-direction:column;
-  gap:var(--hero-offset);
+  gap:var(--img-gap);
   width:100%;
   align-self:stretch;
 }
@@ -381,7 +408,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   }
   .nsnb-media-stack .triptych {
     order:2;
-    margin-top:var(--hero-offset);
+    margin-top:var(--img-gap);
   }
 
   .landing-hero-pair {
@@ -474,7 +501,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   display:flex;
   justify-content:center;
   /* solid border = gap that cannot collapse or paint under the landing */
-  border-top:var(--hero-offset) solid var(--bg);
+  border-top:var(--img-gap) solid var(--bg);
   padding:0 var(--pad-x) 14vh;
   background:var(--bg);
 }
@@ -482,7 +509,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:var(--hero-offset);
+  gap:var(--img-gap);
   width:100%;
 }
 .hero-shot {
@@ -553,7 +580,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   align-items:center;
   justify-content:center;
   padding:var(--pad-x);
-  background:rgba(255, 255, 255, 0.72);
+  background:rgba(255, 255, 255, 0.82);
   opacity:0;
   visibility:hidden;
   pointer-events:none;

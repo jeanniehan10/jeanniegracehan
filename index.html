@@ -96,17 +96,18 @@
     display:block;
     width:100%;
     height:1px;
-    background:#c5c1c1;
+    background:var(--hairline);
     /* Half-CSS-pixel hairline; paired with integer row snaps below */
     transform:scaleY(0.5);
     transform-origin:top left;
   }
   .compose-meta__label {
     margin-top:4px;
-    font-family:"Neue Haas Unica", sans-serif;
-    font-size:11px;
+    font-family:"Nimbus Sans Condensed", sans-serif;
+    font-size:9px;
     line-height:1;
-    letter-spacing:normal;
+    letter-spacing:var(--tracking);
+    word-spacing:var(--word-gap);
     color:var(--text);
     white-space:nowrap;
   }
@@ -116,9 +117,10 @@
     left:0;
     display:grid;
     white-space:nowrap;
-    font-family:"Neue Haas Unica Bold", sans-serif;
+    font-family:"Neue Haas Grotesk Bold", sans-serif;
     font-size:var(--word-size);
-    letter-spacing:normal;
+    letter-spacing:-0.025em;
+    word-spacing:normal;
     line-height:1.15;
     padding:0 2px;
     color:var(--text);
@@ -227,10 +229,11 @@
     border-radius:0;
     background:none;
     box-shadow:none;
-    font-family:"Neue Haas Unica Medium", "Neue Haas Unica", sans-serif;
+    font-family:"Nimbus Sans Condensed Medium", "Nimbus Sans Condensed", sans-serif;
     font-size:17px;
     font-weight:normal;
-    letter-spacing:normal;
+    letter-spacing:var(--tracking);
+    word-spacing:normal;
     line-height:1;
     text-transform:uppercase;
     color:var(--blend-ink);
@@ -336,7 +339,7 @@
       img: 'projects/CLUTTER/CLUTTER_4.jpg',
       imgMobile: 'projects/CLUTTER/CLUTTER_4(MOBILE).jpg',
       imgMobileHi: 'projects/CLUTTER/CLUTTER_4.jpg',
-      fontFamily: '"Neue Haas Unica Black", sans-serif',
+      fontFamily: '"Neue Haas Grotesk Bold", sans-serif',
       fontStyle: 'normal',
       subhead: 'Thesis',
       subToWord: 17,
@@ -348,7 +351,7 @@
       img: 'projects/NSNB/NSNB_EXHIBIT.jpg',
       imgMobile: 'projects/NSNB/NSNB_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/NSNB/NSNB_HOVER.jpg',
-      fontFamily: '"Neue Haas Unica Heavy", sans-serif',
+      fontFamily: '"Neue Haas Grotesk Medium", sans-serif',
       fontStyle: 'normal',
       subhead: 'Broadsheet Publication',
       subToWord: 17,
@@ -359,7 +362,7 @@
       img: 'projects/COP/COP_Editorial_2.jpg',
       imgMobile: 'projects/COP/COP_HOVER(MOBILE).jpg',
       imgMobileHi: 'projects/COP/COP_HOVER.jpg',
-      fontFamily: '"Neue Haas Unica Bold", sans-serif',
+      fontFamily: '"Neue Haas Grotesk", sans-serif',
       fontStyle: 'normal',
       subhead: 'Editorial Book Design',
       subToWord: 17,
@@ -374,7 +377,7 @@
       // Scattered cards: contain + black on mobile only; desktop hover stays full-bleed cover
       previewFitMobile: 'contain',
       previewBgMobile: '#000',
-      fontFamily: '"Neue Haas Unica Medium", sans-serif',
+      fontFamily: '"Neue Haas Grotesk Light", sans-serif',
       fontStyle: 'normal',
       subhead: 'Trading Card Identity',
       subToWord: 22,
@@ -391,7 +394,7 @@
       previewBg: '#000',
       previewFitMobile: 'contain',
       previewBgMobile: '#000',
-      fontFamily: '"Neue Haas Unica Light", sans-serif',
+      fontFamily: '"Neue Haas Grotesk Thin", sans-serif',
       fontStyle: 'normal',
       subhead: 'Libretto Design',
       subToWord: 20,
@@ -399,13 +402,14 @@
   ];
 
   const WORD_FONT_LOADS = [
-    'normal 12px "Neue Haas Unica Black"',
-    'normal 12px "Neue Haas Unica Heavy"',
-    'normal 12px "Neue Haas Unica Bold"',
-    'normal 12px "Neue Haas Unica Medium"',
-    'normal 12px "Neue Haas Unica Light"',
-    'normal 11px "Neue Haas Unica"',
-    'italic 11px "Neue Haas Unica"',
+    'normal 12px "Neue Haas Grotesk Bold"',
+    'normal 12px "Neue Haas Grotesk Medium"',
+    'normal 12px "Neue Haas Grotesk"',
+    'normal 12px "Neue Haas Grotesk Light"',
+    'normal 12px "Neue Haas Grotesk Thin"',
+    'normal 11px "Nimbus Sans Condensed"',
+    'italic 11px "Nimbus Sans Condensed"',
+    'normal 11px "Nimbus Sans Condensed Medium"',
   ];
 
   function projectImg(project) {
@@ -629,7 +633,7 @@
     const COMPOSE_META = {
       lineH: 0.25,
       lineToSub: 4, // .compose-meta__label margin-top
-      subH: 11,     // .compose-meta__label font-size
+      subH: 9,      // .compose-meta__label font-size
       subToWord: 20,
       wordToNext: 16,
     };

@@ -1,5 +1,37 @@
 @font-face {
-  font-family: "Neue Haas Unica Black";
+  font-family: "Nimbus Sans Condensed";
+  src: url("NimbusSans/RegularCondensed.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nimbus Sans Condensed";
+  src: url("NimbusSans/Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nimbus Sans Condensed Medium";
+  src: url("NimbusSans/BoldCondensed.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nimbus Sans Condensed Bold";
+  src: url("NimbusSans/BoldCondensed.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Grotesk Black";
   src: url("NeueHaasGrotesk/Black.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -7,7 +39,7 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica Heavy";
+  font-family: "Neue Haas Grotesk Heavy";
   src: url("NeueHaasGrotesk/Bold.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -15,7 +47,7 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica Bold";
+  font-family: "Neue Haas Grotesk Bold";
   src: url("NeueHaasGrotesk/Bold.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -23,7 +55,7 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica Medium";
+  font-family: "Neue Haas Grotesk Medium";
   src: url("NeueHaasGrotesk/Medium.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -31,7 +63,7 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica Light";
+  font-family: "Neue Haas Grotesk Light";
   src: url("NeueHaasGrotesk/Light.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -39,7 +71,15 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica";
+  font-family: "Neue Haas Grotesk Thin";
+  src: url("NeueHaasGrotesk/Thin.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Haas Grotesk";
   src: url("NeueHaasGrotesk/Roman.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
@@ -47,7 +87,7 @@
 }
 
 @font-face {
-  font-family: "Neue Haas Unica";
+  font-family: "Neue Haas Grotesk";
   src: url("NeueHaasGrotesk/Italic.otf") format("opentype");
   font-weight: normal;
   font-style: italic;
@@ -55,23 +95,27 @@
 }
 
 :root {
-  --bg: #F2F3F5;
-  --text: #1C1C1C;
-  /* --bg minus --text: what the difference-blended chrome must be painted so it
-     reads as --text over the page and still inverts over artwork */
-  --blend-ink: #D6D7D9;
+  --bg: #ffffff;
+  --text: #1d1d1d;
+  /* Hairlines: near --bg, slightly off-white */
+  --hairline: #dcdcdc;
+  /* --bg minus --text via difference: paint so chrome reads as --text over the page */
+  --blend-ink: #e2e2e2;
   --col-gap: 8px;
   --pad: 12px;
   --pad-x: 14px;
   --topbar-h: calc(12px + 0.5px + 13px + 13px + var(--pad));
   --hover-pink: #E63462;
+  --tracking: 0.02em;
+  --word-gap: 0.07em;
 }
 
 html, body {
-  font-family: "Neue Haas Unica", sans-serif;
+  font-family: "Nimbus Sans Condensed", sans-serif;
   font-weight: normal;
   font-style: normal;
-  letter-spacing: normal;
+  letter-spacing: var(--tracking);
+  word-spacing: var(--word-gap);
   font-kerning: normal;
   background: var(--bg);
   color: var(--text);
@@ -79,7 +123,7 @@ html, body {
 }
 
 em, i {
-  font-family: "Neue Haas Unica", sans-serif;
+  font-family: "Nimbus Sans Condensed", sans-serif;
   font-style: italic;
   font-synthesis: none;
 }
@@ -130,8 +174,7 @@ em, i {
   height: 90px;
 }
 .site-cursor__label {
-  font-family: "Neue Haas Unica", sans-serif;
-  font-weight: 300;
+  font-family: "Nimbus Sans Condensed", sans-serif;
   font-size: 13px;
   line-height: 1;
   text-align: center;
@@ -153,8 +196,7 @@ body::before {
   left: var(--pad-x);
   right: var(--pad-x);
   height: 0.5px;
-  background: var(--blend-ink);
-  mix-blend-mode: difference;
+  background: var(--hairline);
   z-index: 101;
   pointer-events: none;
 }
@@ -167,8 +209,7 @@ body::after {
   left: var(--pad-x);
   right: var(--pad-x);
   height: 0.5px;
-  background: var(--blend-ink);
-  mix-blend-mode: difference;
+  background: var(--hairline);
   z-index: 101;
   pointer-events: none;
 }
@@ -182,10 +223,10 @@ body::after {
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
   padding: calc(12px + 0.5px + 13px) var(--pad-x) var(--pad);
-  font-family: "Neue Haas Unica", sans-serif;
+  font-family: "Nimbus Sans Condensed", sans-serif;
   font-size: 13px;
-  letter-spacing: normal;
-  line-height: 1;
+  letter-spacing: var(--tracking);
+  word-spacing: var(--word-gap);
   pointer-events: none;
   background: transparent;
   mix-blend-mode: difference;
@@ -194,7 +235,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Neue Haas Unica Medium", "Neue Haas Unica", sans-serif;
+  font-family: "Nimbus Sans Condensed Medium", "Nimbus Sans Condensed", sans-serif;
   font-weight: normal;
 }
 .topbar a {
