@@ -29,7 +29,8 @@
   .wrap {
     --line:calc(11px * 1.45);
     /* Rule sits 4px above ABOUT; clear the fixed nav first */
-    padding:calc(var(--topbar-h) + 12px) var(--pad-x) calc(12px + 0.5px + 11px + 40px);
+    /* Bottom clears fixed credits + bottom hairline */
+    padding:calc(var(--topbar-h) + 12px) var(--pad-x) calc(12px + 0.5px + 11px * 1.45 * 2 + 24px);
   }
 
   /* Shared section lead-ins — same size, all caps, hairline tucked just above */
@@ -117,9 +118,23 @@
     background:var(--hairline);
   }
 
+  .site-credits {
+    position:fixed;
+    left:var(--pad-x);
+    right:var(--pad-x);
+    bottom:calc(12px + 0.5px + 8px);
+    z-index:100;
+    margin:0;
+    font-size:11px;
+    line-height:1.45;
+    color:#9a9a9a;
+    pointer-events:none;
+  }
+
   @media (max-width:768px) {
     .wrap {
       padding-top:calc(var(--topbar-h) + 12px);
+      padding-bottom:calc(12px + 0.5px + 11px * 1.45 * 2 + 24px);
     }
   }
 </style>
@@ -176,6 +191,11 @@
       </p>
     </section>
   </main>
+
+  <p class="site-credits">
+    Coded by Jeannie Han with the help of Cursor.<br>
+    Photographed by Evan Wu and Jeannie Han, Art Directed and Edited by Jeannie Han.
+  </p>
 
 <script src="../text-trail.js"></script>
 </body>
