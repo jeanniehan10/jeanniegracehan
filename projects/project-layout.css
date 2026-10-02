@@ -477,10 +477,6 @@ body:has(.nsnb-media-stack) {
     --hero-width:min(78%, 400px);
     --below-width:min(94%, 680px);
   }
-  .project-masthead__title {
-    /* Extra air above/below project titles vs other text */
-    margin:18px 0;
-  }
   .project-masthead__body {
     padding:12px 0;
   }
