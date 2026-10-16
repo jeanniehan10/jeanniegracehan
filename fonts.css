@@ -233,26 +233,25 @@ body::after {
 .topbar-nav {
   grid-column: 2;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: baseline;
   width: 100%;
   column-gap: 0;
 }
 .topbar-nav a:nth-child(1) { justify-self: start; }
-.topbar-nav a:nth-child(2) { justify-self: center; }
-.topbar-nav a:nth-child(3) { justify-self: end; }
+.topbar-nav a:nth-child(2) { justify-self: end; }
 
 @media (max-width: 768px) {
   :root {
     --topbar-nav-size: 11px;
     --topbar-nav-gap: 6px;
     /*
-      Fixed topbar box must clear the stacked Index / Information / Contact
+      Fixed topbar box must clear the stacked Index / Information
       column so the first page rule never runs through the menus.
     */
     --topbar-h: calc(
       12px + 0.5px + 12px
-      + (3 * var(--topbar-nav-size) + 2 * var(--topbar-nav-gap))
+      + (2 * var(--topbar-nav-size) + 1 * var(--topbar-nav-gap))
       + var(--pad)
     );
   }
@@ -275,8 +274,7 @@ body::after {
     font-size: var(--topbar-nav-size);
   }
   .topbar-nav a:nth-child(1),
-  .topbar-nav a:nth-child(2),
-  .topbar-nav a:nth-child(3) {
+  .topbar-nav a:nth-child(2) {
     justify-self: end;
   }
 }
