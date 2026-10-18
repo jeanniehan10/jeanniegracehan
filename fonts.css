@@ -1,70 +1,22 @@
+/* Neue Haas Grotesk Display — 55 Roman is the site typeface.
+   56 Italic and 75 Bold are only used where text was already italic / bold. */
 @font-face {
-  font-family: "Monument Grotesk";
-  src: url("MonumentGrotesk/Regular.otf") format("opentype");
+  font-family: "Neue Haas Grotesk Display";
+  src: url("fonts/NeueHaasGroteskDisplay-55Roman.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
-  font-family: "Monument Grotesk";
-  src: url("MonumentGrotesk/RegularItalic.otf") format("opentype");
+  font-family: "Neue Haas Grotesk Display";
+  src: url("fonts/NeueHaasGroteskDisplay-56Italic.otf") format("opentype");
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
-
 @font-face {
-  font-family: "Monument Grotesk Heavy";
-  src: url("MonumentGrotesk/Heavy.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Bold";
-  src: url("MonumentGrotesk/Bold.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Medium";
-  src: url("MonumentGrotesk/Medium.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Light";
-  src: url("MonumentGrotesk/Light.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Mono";
-  src: url("MonumentGroteskMono/Regular.otf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Mono";
-  src: url("MonumentGroteskMono/RegularItalic.otf") format("opentype");
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Monument Grotesk Mono Bold";
-  src: url("MonumentGroteskMono/Bold.otf") format("opentype");
+  font-family: "Neue Haas Grotesk Display Bold";
+  src: url("fonts/NeueHaasGroteskDisplay-75Bold.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -82,12 +34,20 @@
   --pad-x: 14px;
   --topbar-h: calc(12px + 0.5px + 12px + 12px + var(--pad));
   --hover-pink: #E63462;
-  --tracking: 0.02em;
-  --word-gap: 0.06em;
+  --tracking: 0.01em;
+  --word-gap: 0;
 }
+/* Dark mode — set by the logo toggle on the home page (saved in localStorage "theme") */
+html[data-theme="dark"] {
+  --bg: #080808;
+  --text: #efefee;
+  --hairline: #2a2a2a;
+  --blend-ink: #e2e2e2;
+}
+html { background: var(--bg); }
 
 html, body {
-  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   letter-spacing: var(--tracking);
@@ -99,7 +59,7 @@ html, body {
 }
 
 em, i {
-  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
   font-style: italic;
   font-synthesis: none;
 }
@@ -163,7 +123,7 @@ em, i {
   height: 90px;
 }
 .site-cursor__label {
-  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
   font-size: 11px;
   white-space: nowrap;
   color: var(--text);
@@ -210,7 +170,7 @@ body::after {
   grid-template-columns: 1fr 1fr;
   column-gap: var(--col-gap);
   padding: calc(12px + 0.5px + 12px) var(--pad-x) var(--pad);
-  font-family: "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
   font-size: 12px;
   letter-spacing: var(--tracking);
   word-spacing: var(--word-gap);
@@ -222,7 +182,7 @@ body::after {
   grid-column: 1;
   color: var(--blend-ink);
   pointer-events: auto;
-  font-family: "Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family: "Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
   font-weight: normal;
 }
 .topbar a {
@@ -262,7 +222,7 @@ body::after {
   }
   .topbar .name {
     grid-column: 1;
-    font-family: "Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+    font-family: "Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
     font-weight: normal;
   }
   .topbar-nav {
