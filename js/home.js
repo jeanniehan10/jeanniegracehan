@@ -12,6 +12,35 @@
     try { localStorage.setItem("theme", next); } catch (e) { /* ignore */ }
   });
 
+  /* in-page links: start slow for a moment, then zoom to the section */
+  function easeScroll(targetY, duration) {
+    var startY = window.scrollY, dist = targetY - startY, t0 = null;
+    if (reduce || Math.abs(dist) < 2) { window.scrollTo(0, targetY); return; }
+    function ease(t) { // ease-in-out expo: barely moves at first, then zooms, then snaps in
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      return t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2;
+    }
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / duration);
+      window.scrollTo(0, startY + dist * ease(p));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute("href").slice(1);
+    var target = id ? document.getElementById(id) : document.body;
+    if (!target) return;
+    e.preventDefault();
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    easeScroll(Math.min(max, id === "top" ? 0 : target.offsetTop), 1500);
+    if (history.replaceState) history.replaceState(null, "", "#" + id);
+  });
+
   /* nav: grey out the section you are in */
   var links = Array.prototype.slice.call(document.querySelectorAll(".hdr-nav a"));
   var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });

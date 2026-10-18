@@ -4,11 +4,12 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:300; /* Helvetica Neue LT Pro 45 Light */
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
   font-kerning:normal;
-  --text-sm:11px; /* match Information page body */
+  --text-sm:14px; /* body text: 14px, leading 16px, 45 Light */
   --img-gap:6px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);
@@ -64,7 +65,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-size:var(--text-sm);
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
-  line-height:1.45;
+  line-height:calc(16 / 14);
   font-variant-ligatures:none;
   font-feature-settings:"liga" 0, "calt" 0;
 }
@@ -72,7 +73,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 
 /* Landing copy: Mono for all text including title */
 .landing {
-  font-family:"Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /*
@@ -93,10 +94,10 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .project-masthead__title {
   margin:6px 0;
-  font-family:"Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
-  font-size:var(--text-sm);
-  font-weight:400;
-  line-height:1.45;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size:30px;
+  font-weight:500; /* Helvetica Neue LT Pro 65 Medium */
+  line-height:1.1;
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
 }
@@ -104,8 +105,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing b,
 .copy strong,
 .copy b {
-  font-family:"Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
-  font-weight:normal;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .project-masthead__body {
   /* Same air above and below the text, matching the reference frame */
@@ -120,7 +121,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .project-masthead__meta {
   font-size:var(--text-sm);
-  line-height:1.45;
+  line-height:calc(16 / 14);
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
 }
@@ -129,14 +130,14 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .project-masthead__meta-block + .project-masthead__meta-block {
   /* ~two lines of body leading, as in the reference */
-  margin-top:calc(var(--text-sm) * 1.45 * 2);
+  margin-top:calc(var(--text-sm) * calc(16 / 14) * 2);
 }
 .project-masthead__copy.copy p + p {
   margin-top:var(--copy-para-gap);
 }
 .project-masthead__copy.copy > p:last-child {
   /* Extra blank line below the final paragraph */
-  margin-bottom:calc(var(--text-sm) * 1.45);
+  margin-bottom:calc(var(--text-sm) * calc(16 / 14));
 }
 
 .landing-hero {
@@ -178,7 +179,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing-copy__label {
   grid-column:1;
   margin:0;
-  font-family:"Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .landing-copy__body {
   grid-column:2;
@@ -207,7 +209,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
     grid-column:1;
   }
   .landing-copy__label {
-    margin-bottom:calc(var(--text-sm) * 1.45);
+    margin-bottom:calc(var(--text-sm) * calc(16 / 14));
   }
   .landing-copy__row + .landing-copy__row {
     margin-top:calc(var(--copy-para-gap) * 2.5);
@@ -253,7 +255,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .nsnb-impact__heading {
   margin:0 0 var(--copy-para-gap);
-  font-family:"Neue Haas Grotesk Display Bold", "Neue Haas Grotesk Display", Helvetica, Arial, sans-serif;
+  font-family:"helvetica-neue-lt-pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .nsnb-impact > p + p {
   margin-top:var(--copy-para-gap);
@@ -470,7 +473,7 @@ body:has(.nsnb-media-stack) {
 
 @media (max-width: 768px) {
   :root {
-    --text-sm:10px;
+    --text-sm:13px;
     --img-gap:10px;
     --hero-offset:90px;
     --copy-para-gap:14px;
@@ -535,7 +538,7 @@ body:has(.nsnb-media-stack) {
   .project-masthead__grid {
     grid-template-columns:1fr;
     /* Two blank lines between meta and description when stacked */
-    row-gap:calc(var(--text-sm) * 1.45 * 3);
+    row-gap:calc(var(--text-sm) * calc(16 / 14) * 3);
   }
 
   .triptych {
