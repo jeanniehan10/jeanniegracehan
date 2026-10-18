@@ -6,7 +6,7 @@
 
   /* theme toggle (logo) — remembered across pages in localStorage */
   var logo = document.getElementById("logo");
-  logo.addEventListener("click", function () {
+  if (logo) logo.addEventListener("click", function () {
     var next = doc.dataset.theme === "light" ? "dark" : "light";
     doc.dataset.theme = next;
     try { localStorage.setItem("theme", next); } catch (e) { /* ignore */ }
@@ -41,9 +41,13 @@
     if (history.replaceState) history.replaceState(null, "", "#" + id);
   });
 
-  /* nav: grey out the section you are in */
-  var links = Array.prototype.slice.call(document.querySelectorAll(".hdr-nav a"));
-  var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+  /* nav: grey out in-page sections you are in (external pages are skipped) */
+  var allLinks = Array.prototype.slice.call(document.querySelectorAll(".hdr-nav a"));
+  var links = allLinks.filter(function (a) { return (a.getAttribute("href") || "").indexOf("#") !== -1; });
+  var sections = links.map(function (a) {
+    var h = a.getAttribute("href");
+    try { return h.charAt(0) === "#" ? document.querySelector(h) : null; } catch (e) { return null; }
+  });
   function setActive() {
     var y = window.scrollY + window.innerHeight * 0.4;
     var current = null;
