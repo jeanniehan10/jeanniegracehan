@@ -179,9 +179,6 @@ html, body {
 .info,
 .masthead,
 .skills-marquee,
-.hover-img,
-.plist,
-.prow,
 .info-foot {
   background-color: var(--bg);
   color: var(--ink);
@@ -441,8 +438,8 @@ html.home-reveal .masthead,
 html.home-reveal .skills-marquee,
 html.home-reveal .rail,
 html.home-reveal .manifesto,
-html.home-reveal .index-side,
-html.home-reveal .prow,
+html.home-reveal .index-title,
+html.home-reveal .work,
 html.home-reveal .info-about,
 html.home-reveal .info-exp,
 html.home-reveal .info-logo,
@@ -455,8 +452,8 @@ html.home-reveal .masthead.is-revealed,
 html.home-reveal .skills-marquee.is-revealed,
 html.home-reveal .rail.is-revealed,
 html.home-reveal .manifesto.is-revealed,
-html.home-reveal .index-side.is-revealed,
-html.home-reveal .prow.is-revealed,
+html.home-reveal .index-title.is-revealed,
+html.home-reveal .work.is-revealed,
 html.home-reveal .info-about.is-revealed,
 html.home-reveal .info-exp.is-revealed,
 html.home-reveal .info-logo.is-revealed,
@@ -469,8 +466,8 @@ html.home-reveal .info-status.is-revealed,
   html.home-reveal .skills-marquee,
   html.home-reveal .rail,
   html.home-reveal .manifesto,
-  html.home-reveal .index-side,
-  html.home-reveal .prow,
+  html.home-reveal .index-title,
+  html.home-reveal .work,
   html.home-reveal .info-about,
   html.home-reveal .info-exp,
   html.home-reveal .info-logo,
@@ -487,13 +484,18 @@ html.home-reveal .info-status.is-revealed,
   background: var(--bg);
 }
 .manifesto p {
-  max-width: 60%;
+  max-width: none;
   margin: 0;
   text-align: left;
   font-size: clamp(22px, 2.55vw, 36px);
   line-height: 1.05;
   letter-spacing: -.025em;
   font-weight: 500;
+}
+@media (min-width: 821px) {
+  .manifesto p {
+    max-width: 60%;
+  }
 }
 .manifesto p + p {
   margin-top: 1.05em;
@@ -504,98 +506,58 @@ html.home-reveal .info-status.is-revealed,
 .index {
   position: relative;
   z-index: 8;
-  display: grid;
-  grid-template-columns: minmax(180px, 28%) minmax(0, 1fr);
-  column-gap: 4vw;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding: 72px var(--gutter) 48px;
+  padding: 28px 14px 22vh;
   background: var(--bg);
 }
-.index-side {
-  position: sticky;
-  top: calc(var(--bar-h) + 24px);
-  align-self: start;
-  padding-top: 4px;
-}
 .index-title {
+  margin: 0 0 22px;
   font-family: var(--unica);
   font-weight: 500;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1.15;
   letter-spacing: -.02em;
   color: var(--ink);
 }
-.index-side .all {
-  display: inline-block;
-  margin-top: 10px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.index-side .all:hover { color: var(--ink); }
-.index-main { min-width: 0; }
-
-.plist {
-  font-size: 14px;
-  line-height: 1.2;
-  border-top: 1px solid var(--rule);
-}
-.prow {
+.works {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1.4fr) minmax(120px, 0.7fr) 52px;
-  column-gap: 18px;
-  align-items: baseline;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--rule);
-  color: var(--muted);
-  cursor: pointer;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12px;
+  row-gap: 22px;
 }
-.prow:hover,
-.prow.is-on { color: var(--ink); }
-.prow .num {
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  opacity: .7;
-}
-.prow:hover .num,
-.prow.is-on .num { color: var(--ink); opacity: 1; }
-.prow .ttl {
+.work {
+  display: block;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: inherit;
 }
-.prow .cat {
-  text-align: left;
-  white-space: nowrap;
+.work__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  background: #bdbdbd;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
-.prow .yr {
+.work__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.work__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.work__ttl {
+  min-width: 0;
+}
+.work__tags {
+  flex: 0 0 auto;
   text-align: right;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-.hover-img {
-  position: fixed;
-  right: 20px;
-  bottom: 16px;
-  z-index: 9;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .28s ease, transform .28s ease;
-}
-.hover-img.is-on {
-  opacity: 1;
-  transform: none;
-}
-.hover-img img {
-  width: auto;
-  height: auto;
-  max-width: 52vw;
-  max-height: 62vh;
+  color: #8a8a8a;
 }
 
 /* ---- information --------------------------------------------------------- */
@@ -604,10 +566,9 @@ html.home-reveal .info-status.is-revealed,
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding: 12vh 0 12px;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 0 0 12px;
   background: var(--bg);
 }
 .info-anchor {
@@ -807,30 +768,21 @@ html.home-reveal .info-status.is-revealed,
   }
 
   .manifesto { padding: 36px var(--gutter) 56px; }
-  .manifesto p {
-    max-width: 60%;
-    font-size: 20px;
-  }
+  .manifesto p { font-size: 20px; }
   .index {
+    padding: 28px 12px 64px;
+  }
+  .works {
     grid-template-columns: 1fr;
-    row-gap: 28px;
-    padding-top: 48px;
+    row-gap: 18px;
   }
-  .index-side { position: static; }
-  .index-title { font-size: 18px; }
-  .prow {
-    grid-template-columns: 36px 1fr auto;
-    column-gap: 10px;
-    padding: 12px 0;
+  .work__meta {
+    font-size: 11px;
   }
-  .prow .ttl { white-space: normal; }
-  .prow .cat {
-    grid-column: 2;
-    font-size: 12px;
-    opacity: .75;
+  .work__tags {
+    white-space: normal;
+    text-align: right;
   }
-  .prow .yr { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
-  .hover-img img { max-width: 72vw; max-height: 42vh; }
   /*
     Menu bar: bottom 16px + ~52px tall → status sits 10px above it.
     Logo + status stack at the bottom; 25px between copy and logo (copy moves up).

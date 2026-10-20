@@ -176,32 +176,6 @@
     rail.addEventListener("pointercancel", endDrag);
   }
 
-  /* ---- hover images ------------------------------------------------------ */
-  var list = document.getElementById("plist");
-  var hover = document.getElementById("hoverImg");
-  var hoverPic = hover && hover.querySelector("img");
-  if (list && hoverPic) {
-    list.querySelectorAll(".prow").forEach(function (row) {
-      var src = row.getAttribute("data-img");
-      if (!src) return;
-      var pre = new Image();
-      pre.src = src;
-    });
-    list.addEventListener("mouseover", function (e) {
-      var row = e.target.closest(".prow");
-      if (!row) return;
-      list.querySelectorAll(".prow.is-on").forEach(function (r) { r.classList.remove("is-on"); });
-      row.classList.add("is-on");
-      var src = row.getAttribute("data-img");
-      if (src) hoverPic.src = src;
-      hover.classList.add("is-on");
-    });
-    list.addEventListener("mouseleave", function () {
-      list.querySelectorAll(".prow.is-on").forEach(function (r) { r.classList.remove("is-on"); });
-      hover.classList.remove("is-on");
-    });
-  }
-
   /* ---- keep menu bar pinned once it reaches the top ---------------------- */
   var bar = document.getElementById("bar");
   var barSpacer = null;
@@ -371,8 +345,8 @@
       ".skills-marquee",
       ".rail",
       ".manifesto",
-      ".index-side",
-      ".prow",
+      ".index-title",
+      ".work",
       ".info-about",
       ".info-exp",
       ".info-logo",
