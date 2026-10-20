@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" class="no-js">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jeannie Han — Graphic Designer</title>
-<meta name="description" content="Jeannie Han is a graphic designer that specializes in editorial design, identities, and strategy. Based in New York / New Jersey.">
+<meta name="description" content="Jeannie Han is a graphic designer based in New Jersey/New York specializing in editorial design, brand identity and strategy.">
 <link rel="canonical" href="https://jeanniehan.com/">
 <link rel="icon" href="favicon-32.png?v=3" type="image/png" sizes="32x32">
 <link rel="icon" href="favicon.png?v=3" type="image/png" sizes="194x194">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jeanniehan.com/">
 <meta property="og:title" content="Jeannie Han — Graphic Designer">
-<meta property="og:description" content="Jeannie Han is a graphic designer that specializes in editorial design, identities, and strategy.">
+<meta property="og:description" content="Jeannie Han is a graphic designer based in New Jersey/New York specializing in editorial design, brand identity and strategy.">
 <meta property="og:image" content="https://jeanniehan.com/projects/CLUTTER/CLUTTER_4.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
@@ -31,88 +31,167 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="https://use.typekit.net/lum5ogq.css">
-<link rel="stylesheet" href="css/home.css?v=5">
-<script>(function(d){d.classList.remove("no-js");try{var t=localStorage.getItem("theme");if(t)d.dataset.theme=t}catch(e){}})(document.documentElement)</script>
+<script>
+(function (d) {
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark" || t === "bsod") d.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+  /* First-paint hide for scroll reveal (removed if reduced-motion) */
+  try {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      d.documentElement.classList.add("home-reveal");
+    }
+  } catch (e) {}
+})(document);
+</script>
+<link rel="stylesheet" href="css/home.css?v=68">
 </head>
 <body>
 
-  <header class="hdr">
-    <a class="hdr-name" href="#top">Jeannie Han</a>
-    <nav class="hdr-nav" aria-label="Sections">
-      <a href="#work">Work</a>
-      <a href="information.html">Information</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <button class="logo" id="logo" type="button" aria-label="Switch between black and white mode">
-      <img src="favicon.png?v=3" alt="">
-    </button>
-  </header>
+  <main>
+    <section class="viewport" id="top" aria-label="Introduction">
+      <h1 class="masthead">
+        <a href="#top"><img src="assets/logo.svg" alt="Jeannie Han"></a>
+      </h1>
 
-  <main id="top">
-
-    <!-- LANDING — Cadre style, text only (no hero image yet) -->
-    <section class="landing" aria-label="Introduction">
-      <p class="landing-bottom">
-        <span>I design the human experience with intentionality.</span>
-        <span>Editorial Design, Brand Identity and Strategy.</span>
+      <p class="skills-marquee reveal" aria-label="Editorial Design, Brand Design, Brand Strategy, Print and Bookmaking, UI/UX, Web Designer, Illustrator">
+        <span class="skills-marquee__viewport">
+          <span class="skills-marquee__track" aria-hidden="true">
+            <span class="skills-marquee__chunk"><span class="skills-marquee__item">Editorial Design</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Brand Design</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Brand Strategy</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Print and Bookmaking</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">UI/UX</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Web Designer</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Illustrator</span><img class="skills-marquee__star" src="assets/star.svg" alt=""></span>
+            <span class="skills-marquee__chunk"><span class="skills-marquee__item">Editorial Design</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Brand Design</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Brand Strategy</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Print and Bookmaking</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">UI/UX</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Web Designer</span><img class="skills-marquee__star" src="assets/star.svg" alt=""><span class="skills-marquee__item">Illustrator</span><img class="skills-marquee__star" src="assets/star.svg" alt=""></span>
+          </span>
+        </span>
       </p>
-    </section>
 
-    <!-- SELECTED WORKS -->
-    <section class="works" id="work" aria-label="Selected Works">
-      <p class="works-caption">Selected Works</p>
-
-      <!-- 01 Clutter — full bleed -->
-      <article class="work reveal">
-        <a class="work-media--full" href="projects/CLUTTER/clutter.html" aria-label="Open Clutter">
-          <picture>
-            <source media="(max-width: 767px)" srcset="projects/CLUTTER/CLUTTER_4(MOBILE).jpg">
-            <img src="projects/CLUTTER/CLUTTER_4.jpg" alt="Clutter as a T( )L open on the floor" width="2000" height="1333" loading="lazy" decoding="async">
-          </picture>
-        </a>
-        <div class="work-text">
-          <div>
-            <h2 class="work-title"><a href="projects/CLUTTER/clutter.html">Clutter</a></h2>
-            <p class="work-sub">Thesis Exploration</p>
-          </div>
-          <p class="work-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <header class="bar" id="bar">
+        <nav class="bar-nav" aria-label="Sections">
+          <a href="#index">WORK,</a>
+          <a href="#information">INFORMATION,</a>
+          <a href="#contact">CONTACT</a>
+        </nav>
+        <div class="themes" role="group" aria-label="Color modes">
+          <button type="button" class="theme-btn" data-theme="light" aria-label="Light Mode" aria-pressed="true">
+            <span class="theme-dot theme-dot--light"><img src="assets/BUTTON.svg?v=2" alt=""></span>
+          </button>
+          <button type="button" class="theme-btn" data-theme="dark" aria-label="Dark Mode" aria-pressed="false">
+            <span class="theme-dot theme-dot--dark"><img src="assets/BUTTON2.svg?v=2" alt=""></span>
+          </button>
+          <button type="button" class="theme-btn" data-theme="bsod" aria-label="Blue Screen of Death Mode" aria-pressed="false">
+            <span class="theme-dot theme-dot--bsod"><img src="assets/BUTTON3.svg?v=2" alt=""></span>
+          </button>
         </div>
-      </article>
+      </header>
 
-      <!-- 02 New School New Books — right aligned, 40% width -->
-      <article class="work reveal">
-        <a class="work-media--right" href="projects/NSNB/new-school-new-books.html" aria-label="Open New School New Books">
-          <img src="projects/NSNB/NSNB_EXHIBIT.jpg" alt="New School New Books 2025 exhibition" width="2000" height="1333" loading="lazy" decoding="async">
-        </a>
-        <div class="work-text">
-          <div>
-            <h2 class="work-title"><a href="projects/NSNB/new-school-new-books.html">New School New Books</a></h2>
-            <p class="work-sub">Exhibition Exploration</p>
-          </div>
-          <p class="work-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <div class="rail" id="rail" aria-label="Selected work slideshow">
+        <div class="rail-track" id="railTrack">
+          <figure class="rail-item"><img src="projects/CLUTTER/CLUTTER_4.jpg" alt="CLUTTER as a T( )L" draggable="false"></figure>
+          <figure class="rail-item"><img src="projects/NSNB/NSNB_HOVER.jpg" alt="Incomplete Listing of Libraries" draggable="false"></figure>
+          <figure class="rail-item"><img src="projects/COP/COP_HOVER.jpg" alt="The C*lour of Pomegranates" draggable="false"></figure>
+          <figure class="rail-item"><img src="projects/GESTALT/GESTALT_HOVER.jpg" alt="The Gestalt Series" draggable="false"></figure>
+          <figure class="rail-item"><img src="projects/FORCE!/FORCE!_HOVER.jpg" alt="FORCE! an opera in three acts" draggable="false"></figure>
         </div>
-      </article>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="contact" id="contact" aria-label="Contact">
-      <p class="contact-caption">Contact</p>
-      <p class="contact-big"><a href="mailto:jeanniehan10@gmail.com">jeanniehan10@gmail.com</a></p>
-      <div class="contact-links">
-        <a href="https://instagram.com/jeandotworks" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.linkedin.com/in/jeanniehan/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="projects/JeannieHan_Resume.pdf">Resume</a>
       </div>
     </section>
 
+    <section class="manifesto" aria-label="About">
+      <p>My practice explores the intersections of art, systems, and learning. I’m interested in how these relationships shape the way we understand and experience the world.</p>
+      <p>How can the human experience be translated into publications and brands?</p>
+    </section>
+
+    <section class="index" id="index" aria-label="Selected Works">
+      <aside class="index-side">
+        <h2 class="index-title">Selected Works</h2>
+        <a class="all" href="#index">View all →</a>
+      </aside>
+
+      <div class="index-main">
+        <div class="plist" id="plist">
+          <a class="prow" href="projects/CLUTTER/clutter.html" data-img="projects/CLUTTER/CLUTTER_4.jpg">
+            <span class="num">01</span>
+            <span class="ttl">CLUTTER as a T( )L: [An Index for Messy Pedagogy]</span>
+            <span class="cat">Thesis Design</span>
+            <span class="yr">2026</span>
+          </a>
+          <a class="prow" href="projects/NSNB/new-school-new-books.html" data-img="projects/NSNB/NSNB_HOVER.jpg">
+            <span class="num">02</span>
+            <span class="ttl">Incomplete* Listing of Libraries, Reading Rooms, and Archives</span>
+            <span class="cat">Broadsheet Publication</span>
+            <span class="yr">2025</span>
+          </a>
+          <a class="prow" href="projects/COP/pomegranates.html" data-img="projects/COP/COP_HOVER.jpg">
+            <span class="num">03</span>
+            <span class="ttl">The C*lour of Pomegranates</span>
+            <span class="cat">Book Design and Making</span>
+            <span class="yr">2026</span>
+          </a>
+          <a class="prow" href="projects/GESTALT/gestalt.html" data-img="projects/GESTALT/GESTALT_HOVER.jpg">
+            <span class="num">04</span>
+            <span class="ttl">The Gestalt Series</span>
+            <span class="cat">Trading Card Design</span>
+            <span class="yr">2025</span>
+          </a>
+          <a class="prow" href="projects/FORCE!/force.html" data-img="projects/FORCE!/FORCE!_HOVER.jpg">
+            <span class="num">05</span>
+            <span class="ttl">FORCE! an opera in three acts</span>
+            <span class="cat">Libretto Design</span>
+            <span class="yr">2025</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="hover-img" id="hoverImg" aria-hidden="true"><img alt=""></div>
+
+    <section class="info" id="information" aria-label="Information">
+      <span class="info-anchor" id="contact"></span>
+      <div class="info-copy">
+        <div class="info-about">
+          <p class="info-k">ABOUT</p>
+          <p>Jeannie Han is a graphic designer based in New York/New Jersey. She imagines design to be one of many ways to implement simplistic thinking into creating systems for complex/abstract ideas.</p>
+          <p>The intersection of art and systems produces what is, to her, deemed functional and successful work. Her keen interests in art created through typography supports her ideas conceptually, while her passion for form-making creates multi-dimensional networks of interpretation.</p>
+          <p class="info-cv"><a href="mailto:jeanniehan10@gmail.com?subject=CV%20request">CV AVAILABLE UPON REQUEST.</a></p>
+          <p class="info-read">READ: <a href="projects/JeannieHan_Resume.pdf">RESUMÉ</a></p>
+        </div>
+        <div class="info-exp">
+          <p class="info-k">EXPERIENCE</p>
+          <div class="jobs">
+            <div class="job">
+              <p>The Vera List Center for Art and Politics, Graphic Designer and Research Assistant</p>
+              <p class="when">October 2024–May 2026.</p>
+            </div>
+            <div class="job">
+              <p>HvA Design, Graphic Designer</p>
+              <p class="when">January–April 2024.</p>
+            </div>
+            <div class="job">
+              <p>Lines New York, Marketing Intern</p>
+              <p class="when">October–November 2023.</p>
+            </div>
+          </div>
+          <div class="edu">
+            <p class="info-k">EDUCATION</p>
+            <p>Parsons School of Design, BFA Communication Design</p>
+            <p class="when">2022–2026.</p>
+          </div>
+        </div>
+      </div>
+      <div class="info-wordmark">
+        <div class="info-logo" aria-hidden="true">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="info-status">
+          <div class="info-status__left">
+            <p class="info-status__tz">NYT</p>
+            <p id="infoTime">12:00:00 AM</p>
+          </div>
+          <p class="info-status__listen">Currently Listening to: <a href="https://open.spotify.com/track/1TFOhZp3KF4zSLwMNmx4wO" target="_blank" rel="noopener">Men I Trust – Slap Pie 🥧 </a></p>
+          <p class="info-status__copy">©2026 Jeannie Han all rights reserved</p>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="ftr">
-    <span>Coded by Jeannie Han with the assistance of Cursor. Photography by Evan Wu and Jeannie Han, art directed and edited by Jeannie Han.</span>
-    <span>© 2026 Jeannie Han</span>
-  </footer>
-
-  <script src="js/home.js?v=3"></script>
+  <script src="js/home.js?v=48"></script>
 </body>
 </html>

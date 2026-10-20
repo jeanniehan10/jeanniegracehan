@@ -66,6 +66,11 @@
       clearTimeout(word._asteriskRestoreTimer);
       word._asteriskRestoreTimer = null;
     }
+    if (word._fadeTimer) {
+      clearTimeout(word._fadeTimer);
+      word._fadeTimer = null;
+    }
+    word.classList.remove('is-fading');
     word.classList.add('is-lit');
   }
 
@@ -80,7 +85,14 @@
       }, 2000);
       return;
     }
+    // Slow fade-back only after hover — not during theme changes
+    word.classList.add('is-fading');
     word.classList.remove('is-lit');
+    if (word._fadeTimer) clearTimeout(word._fadeTimer);
+    word._fadeTimer = setTimeout(() => {
+      word._fadeTimer = null;
+      word.classList.remove('is-fading');
+    }, 6000);
   }
 
   function wordFromPoint(clientX, clientY) {

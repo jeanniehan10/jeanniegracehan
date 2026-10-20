@@ -1,6 +1,52 @@
 (function () {
   const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
 
+  /* Color modes — same light / dark / bsod toggle as homepage */
+  (function initTheme() {
+    var root = document.documentElement;
+    var btns = document.querySelectorAll('.theme-btn');
+    if (!btns.length) return;
+    function setTheme(name) {
+      if (name !== 'light' && name !== 'dark' && name !== 'bsod') name = 'light';
+      root.classList.add('theme-switching');
+      root.setAttribute('data-theme', name);
+      btns.forEach(function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-theme') === name ? 'true' : 'false');
+      });
+      try { localStorage.setItem('theme', name); } catch (e) {}
+      window.setTimeout(function () {
+        root.classList.remove('theme-switching');
+      }, 50);
+    }
+    setTheme(root.getAttribute('data-theme') || 'light');
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setTheme(btn.getAttribute('data-theme'));
+      });
+    });
+  })();
+
+  /* Menu cubic hover — same roller as homepage / sensitive.work */
+  document.querySelectorAll('.bar-nav > a').forEach(function (a) {
+    if (a.querySelector('.bar-link__track')) return;
+    var label = (a.textContent || '').trim();
+    if (!label) return;
+    a.classList.add('bar-link');
+    a.textContent = '';
+    var track = document.createElement('span');
+    track.className = 'bar-link__track';
+    var faceA = document.createElement('span');
+    faceA.className = 'bar-link__face';
+    faceA.textContent = label;
+    var faceB = document.createElement('span');
+    faceB.className = 'bar-link__face';
+    faceB.setAttribute('aria-hidden', 'true');
+    faceB.textContent = label;
+    track.appendChild(faceA);
+    track.appendChild(faceB);
+    a.appendChild(track);
+  });
+
   /*
     Scroll reveal. Blocks ease up into place as they cross into view.
     The hidden state is declared in the stylesheet rather than added here, so
@@ -11,12 +57,14 @@
     const root = document.body;
     if (!root || !root.hasAttribute('data-scroll-reveal')) return;
 
+    /* Prefer leaf blocks — display:contents wrappers can't animate opacity/transform */
     const REVEAL_SELECTOR = [
       '.project-masthead__title',
-      '.project-masthead__body',
+      '.project-masthead__meta',
+      '.project-masthead__copy',
       '.landing > .triptych',
       '.nsnb-media-stack > *',
-      '.landing-hero-stack > *',
+      '.landing-hero-stack > *:not(.triptych-rows)',
       '.landing-hero-group > *',
       '.triptych-rows > .triptych',
       '.below__stack > *',
@@ -155,6 +203,48 @@
   } catch (_) {
     /* native scroll is fine */
   }
+
+  /* Top control — ease to page top using the same scroll system when available */
+  document.addEventListener('click', function (e) {
+    var topLink = e.target.closest && e.target.closest('a.to-top, a[href="#top"]');
+    if (!topLink) return;
+    e.preventDefault();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || MOBILE_MQ.matches) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  var CONTACT_EMAIL = 'jeanniehan10@gmail.com';
+  function copyContactEmail() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(CONTACT_EMAIL);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = CONTACT_EMAIL;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        if (document.execCommand('copy')) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        reject(err);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var contactLink = e.target.closest && e.target.closest('a[href="#contact"], a[href$="#contact"]');
+    if (!contactLink) return;
+    e.preventDefault();
+    copyContactEmail().catch(function () {});
+  });
 
   function fullSrc(img) {
     // Use the asset currently intended for this viewport so lightbox
