@@ -1,0 +1,73 @@
+/* Project pages — modelled on neundex.com/project/stella-petkovas-portfolio (layout only) */
+html { text-transform: none; }
+.p-main { padding: 118px var(--gutter) 0; text-transform: lowercase; }
+
+.p-layout {
+  display: grid; grid-template-columns: 1fr;
+  gap: 44px;
+  align-items: start;
+}
+.p-title {
+  font-size: clamp(52px, 7.2vw, 104px);
+  line-height: .86;
+  letter-spacing: -.045em;
+  margin-bottom: 54px;
+  overflow-wrap: anywhere;
+}
+
+/* left: gallery */
+.p-gallery figure { margin-bottom: 22px; }
+.p-gallery img { width: 100%; height: auto; }
+.p-next {
+  display: block;
+  margin-top: 70px;
+  font-size: clamp(52px, 7.2vw, 104px);
+  line-height: .86;
+  letter-spacing: -.045em;
+}
+.p-next:hover { opacity: .55; }
+
+/* right: sticky info */
+.p-info { position: relative; }
+.p-meta {
+  display: grid; grid-template-columns: 92px 1fr;
+  column-gap: 18px;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+.p-meta .k {
+  text-align: right;
+  font-size: 14px; line-height: 1;
+  padding-top: 8px;
+}
+.p-meta .v {
+  font-size: clamp(20px, 1.9vw, 28px);
+  line-height: 1.05;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+.p-meta .v p + p { margin-top: 18px; }
+.p-meta .v a { text-decoration: underline; text-underline-offset: 3px; }
+.p-meta .v a:hover { opacity: .55; }
+.p-extra { margin-top: 34px; }
+.p-extra h3 {
+  font-size: clamp(20px, 1.9vw, 28px);
+  line-height: 1.05; letter-spacing: -.025em;
+  margin-bottom: 12px;
+}
+.p-extra p { font-size: 16px; line-height: 1.3; letter-spacing: -.01em; }
+.p-extra p + p { margin-top: 14px; }
+.p-extra strong { font-weight: 700; }
+
+@media (min-width: 769px) {
+  .p-layout { grid-template-columns: 7fr 5fr; column-gap: 22px; }
+  .p-info { position: sticky; top: 84px; }
+}
+@media (max-width: 768px) {
+  .p-layout { display: flex; flex-direction: column; }
+  .p-left { display: contents; }
+  .p-title { order: 1; margin-bottom: 10px; }
+  .p-right { order: 2; }
+  .p-gallery { order: 3; }
+  .p-next { order: 4; }
+}

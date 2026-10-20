@@ -6,16 +6,6 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://jeanniehan.com/archive.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jeanniehan.com/projects/about.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://jeanniehan.com/projects/CLUTTER/clutter.html</loc>
     <priority>0.7</priority>
   </url>
@@ -34,5 +24,9 @@
   <url>
     <loc>https://jeanniehan.com/projects/FORCE!/force.html</loc>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jeanniehan.com/information.html</loc>
+    <priority>0.6</priority>
   </url>
 </urlset>

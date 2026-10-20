@@ -1,0 +1,82 @@
+/* Information page — modelled on neundex.com/about-2 (layout only) */
+.info-main { padding: 118px var(--gutter) 0; text-transform: lowercase; }
+
+.info-hero h1 {
+  font-size: clamp(56px, 8.3vw, 120px);
+  line-height: .84;
+  letter-spacing: -.045em;
+}
+.info-hero h1 sup {
+  font-size: clamp(16px, 2vw, 30px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  vertical-align: baseline;
+  margin-left: 18px;
+  white-space: nowrap;
+}
+.info-tagline {
+  display: grid; grid-template-columns: 1fr; gap: 26px;
+  margin-top: 42px;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1;
+  letter-spacing: -.025em;
+}
+@media (min-width: 769px) {
+  .info-tagline { grid-template-columns: 240px 360px 1fr; }
+}
+
+/* lead block: offset from the left, like the reference */
+.info-lead {
+  margin: 110px 0 0;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1;
+  letter-spacing: -.025em;
+  max-width: 560px;
+}
+.info-lead p + p { margin-top: 30px; }
+@media (min-width: 769px) {
+  .info-lead { margin-left: 16.6%; }
+}
+
+/* accolades / publications style lists */
+.info-lists { margin-top: 150px; }
+.info-row {
+  display: grid; grid-template-columns: 1fr; gap: 10px;
+  margin-bottom: 90px;
+  align-items: start;
+}
+.info-row h3 {
+  font-size: 14px; line-height: 1;
+  padding-top: 8px;
+}
+.info-row ul {
+  font-size: clamp(20px, 1.9vw, 28px);
+  line-height: 1.08;
+  letter-spacing: -.025em;
+}
+.info-row li { margin-bottom: 2px; }
+.info-row .date { opacity: .55; }
+@media (min-width: 769px) {
+  .info-row { grid-template-columns: 16.6% 1fr; }
+  .info-row h3 { text-align: right; padding-right: 24px; }
+}
+
+/* footer rows like the reference */
+.info-footer { margin-top: 90px; text-transform: lowercase; }
+.info-frow {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  font-size: 14px; line-height: 1.45;
+  padding: 2px 0;
+}
+.info-frow .k { text-align: right; padding-right: 24px; }
+.info-frow a:hover { opacity: .55; }
+@media (min-width: 769px) {
+  .info-frow { grid-template-columns: 58.3% 8.3% 1fr; }
+  .info-frow .k { grid-column: 2; }
+  .info-frow .v { grid-column: 3; }
+}
+.info-copyright {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding: 70px 0 16px;
+  font-size: 14px;
+}

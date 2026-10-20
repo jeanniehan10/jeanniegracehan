@@ -4,11 +4,13 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  font-family:"Monument Grotesk Mono", ui-monospace, monospace;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500; /* Neue Haas Unica Medium */
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
   font-kerning:normal;
-  --text-sm:11px; /* match Information page body */
+  --text-sm:14px;
+  --text-leading:calc(17 / 14); /* body leading — slightly open */
   --img-gap:6px;
   --triptych-h:clamp(280px, 50vh, 4400px);
   --mobile-slideshow-h:clamp(520px, 42vh, 400px);
@@ -29,19 +31,14 @@ a { color:inherit; text-decoration:none; }
 */
 body[data-scroll-reveal] .reveal {
   opacity:0;
-  transform:translate3d(0, 34px, 0);
-  transition:
-    opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
-    transform 2s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+  transition:opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
 }
 body[data-scroll-reveal] .reveal.is-revealed {
   opacity:1;
-  transform:none;
 }
 @media (prefers-reduced-motion: reduce) {
   body[data-scroll-reveal] .reveal {
     opacity:1;
-    transform:none;
     transition:none;
   }
 }
@@ -56,15 +53,23 @@ body[data-scroll-reveal] .reveal.is-revealed {
   background:var(--bg);
 }
 .landing:has(.project-masthead) {
-  /* Align first masthead rule with Information / Index (topbar-h + 8px) */
+  /* Clear fixed homepage-style menu bar */
   padding-top:calc(var(--topbar-h) + 8px);
+}
+@media (max-width: 820px) {
+  .landing:has(.project-masthead) {
+    padding-top:calc(var(--pad) + 8px);
+    padding-bottom:calc(var(--topbar-h) + var(--pad));
+  }
 }
 
 .copy {
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size:var(--text-sm);
+  font-weight:500;
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
-  line-height:1.45;
+  line-height:var(--text-leading);
   font-variant-ligatures:none;
   font-feature-settings:"liga" 0, "calt" 0;
 }
@@ -72,31 +77,36 @@ body[data-scroll-reveal] .reveal.is-revealed {
 
 /* Landing copy: Mono for all text including title */
 .landing {
-  font-family:"Monument Grotesk Mono", ui-monospace, monospace;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /*
   Detail-page masthead:
-  rule → title → rule → (equal pad) meta|copy (equal pad) → rule → images (8px).
-  Meta | copy share the same 2-col grid as the topbar (name | nav).
+  title (left) aligns with copy (right) on the same line;
+  meta sits under the title on the left.
 */
 .project-masthead {
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  column-gap:clamp(24px, 4vw, 48px);
+  /* Half-line gap: title → meta (not a full blank line) */
+  row-gap:calc(var(--text-sm) * var(--text-leading) * 0.45);
+  align-items:start;
   width:100%;
+  padding-bottom:14px;
 }
 .project-masthead__rule {
-  flex:0 0 auto;
-  height:0.5px;
-  background:var(--hairline);
-  pointer-events:none;
+  display:none;
 }
 .project-masthead__title {
-  margin:6px 0;
-  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+  grid-column:1;
+  grid-row:1;
+  margin:0;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size:var(--text-sm);
-  font-weight:400;
-  line-height:1.45;
+  font-weight:900;
+  font-synthesis:none;
+  line-height:var(--text-leading);
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
 }
@@ -104,23 +114,30 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing b,
 .copy strong,
 .copy b {
-  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
-  font-weight:normal;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .project-masthead__body {
-  /* Same air above and below the text, matching the reference frame */
-  padding:8px 0;
+  display:contents;
+  padding:0;
 }
 .project-masthead__grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  column-gap:var(--col-gap);
-  row-gap:24px;
-  align-items:start;
+  display:contents;
 }
 .project-masthead__meta {
+  grid-column:1;
+  grid-row:2;
+}
+.project-masthead__copy.copy {
+  grid-column:2;
+  grid-row:1 / span 2;
+  min-width:0;
+}
+.project-masthead__meta {
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size:var(--text-sm);
-  line-height:1.45;
+  font-weight:500;
+  line-height:var(--text-leading);
   letter-spacing:var(--tracking);
   word-spacing:var(--word-gap);
 }
@@ -128,15 +145,13 @@ body[data-scroll-reveal] .reveal.is-revealed {
   margin:0;
 }
 .project-masthead__meta-block + .project-masthead__meta-block {
-  /* ~two lines of body leading, as in the reference */
-  margin-top:calc(var(--text-sm) * 1.45 * 2);
+  margin-top:calc(var(--text-sm) * var(--text-leading) * 2);
 }
 .project-masthead__copy.copy p + p {
   margin-top:var(--copy-para-gap);
 }
 .project-masthead__copy.copy > p:last-child {
-  /* Extra blank line below the final paragraph */
-  margin-bottom:calc(var(--text-sm) * 1.45);
+  margin-bottom:calc(var(--text-sm) * var(--text-leading));
 }
 
 .landing-hero {
@@ -178,7 +193,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .landing-copy__label {
   grid-column:1;
   margin:0;
-  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .landing-copy__body {
   grid-column:2;
@@ -207,7 +223,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
     grid-column:1;
   }
   .landing-copy__label {
-    margin-bottom:calc(var(--text-sm) * 1.45);
+    margin-bottom:calc(var(--text-sm) * var(--text-leading));
   }
   .landing-copy__row + .landing-copy__row {
     margin-top:calc(var(--copy-para-gap) * 2.5);
@@ -253,7 +269,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
 }
 .nsnb-impact__heading {
   margin:0 0 var(--copy-para-gap);
-  font-family:"Monument Grotesk Mono Bold", "Monument Grotesk Mono", ui-monospace, monospace;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight:500;
 }
 .nsnb-impact > p + p {
   margin-top:var(--copy-para-gap);
@@ -470,15 +487,36 @@ body:has(.nsnb-media-stack) {
 
 @media (max-width: 768px) {
   :root {
-    --text-sm:10px;
+    --text-sm:13px;
     --img-gap:10px;
     --hero-offset:90px;
     --copy-para-gap:14px;
     --hero-width:min(78%, 400px);
     --below-width:min(94%, 680px);
   }
+  .project-masthead {
+    display:flex;
+    flex-direction:column;
+    row-gap:0;
+    column-gap:0;
+    padding-bottom:14px;
+  }
   .project-masthead__body {
-    padding:12px 0;
+    display:block;
+    padding:0;
+  }
+  .project-masthead__grid {
+    display:grid;
+    grid-template-columns:1fr;
+    row-gap:calc(var(--text-sm) * var(--text-leading) * 3);
+  }
+  .project-masthead__title {
+    margin:0 0 calc(var(--text-sm) * var(--text-leading) * 0.45);
+  }
+  .project-masthead__meta,
+  .project-masthead__copy.copy {
+    grid-column:auto;
+    grid-row:auto;
   }
   .landing-hero--sequence,
   .landing-hero--sequence.landing-hero--narrow {
@@ -532,12 +570,6 @@ body:has(.nsnb-media-stack) {
   .landing-hero-group--mobile-tight {
     gap:var(--img-gap);
   }
-  .project-masthead__grid {
-    grid-template-columns:1fr;
-    /* Two blank lines between meta and description when stacked */
-    row-gap:calc(var(--text-sm) * 1.45 * 3);
-  }
-
   .triptych {
     display:block;
     position:relative;
@@ -638,6 +670,38 @@ body:has(.nsnb-media-stack) {
   object-fit:contain;
   background:var(--bg);
   cursor:zoom-in;
+}
+
+/* Back to top — bottom right */
+.to-top {
+  position:fixed;
+  right:var(--pad-x);
+  bottom:22px;
+  z-index:95;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size:13px;
+  font-weight:500;
+  line-height:1;
+  color:var(--text);
+  text-decoration:none;
+  pointer-events:auto;
+  mix-blend-mode:difference;
+  color:var(--blend-ink);
+}
+.to-top__arrow {
+  display:block;
+  flex:0 0 auto;
+}
+.to-top:hover {
+  opacity:.55;
+}
+@media (max-width: 820px) {
+  .to-top {
+    bottom:calc(var(--topbar-h) + 10px);
+  }
 }
 
 .project-adjacent {

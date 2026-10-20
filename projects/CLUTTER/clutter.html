@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
 <style>@media (hover:hover) and (pointer:fine){html:not(.site-cursor-touch):not(.site-cursor-play),html:not(.site-cursor-touch):not(.site-cursor-play) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23C8C8C8'/%3E%3C/svg%3E") 8 8, none !important}html.site-cursor-play,html.site-cursor-play *{cursor:none !important}}</style>
-<link rel="stylesheet" href="../../fonts.css?v=20261002">
+<link rel="stylesheet" href="https://use.typekit.net/lum5ogq.css">
+<link rel="stylesheet" href="../../fonts.css?v=20261019a">
+<script>(function(d){try{var t=localStorage.getItem("theme");if(t)d.dataset.theme=t}catch(e){}})(document.documentElement)</script>
 <script src="../../site-cursor.js"></script>
-<link rel="stylesheet" href="../project-layout.css?v=20261002b">
+<link rel="stylesheet" href="../project-layout.css?v=20261018r">
 <meta charset="UTF-8">
 <link rel="icon" href="../../favicon-32.png?v=3" type="image/png" sizes="32x32">
 <link rel="icon" href="../../favicon.png?v=3" type="image/png" sizes="194x194">
@@ -16,15 +18,27 @@
 </head>
 <body data-scroll-reveal data-trail-colors="#d0618c, #6d5638, #963c5a, #efa6c9, #0079b6, #f4c017, #8d76b6, #67bd50">
 
-  <header class="topbar">
-    <a class="name" href="../../index.html">Jeannie Han</a>
-    <nav class="topbar-nav">
-      <a href="../../archive.html">Index</a>
-      <a href="../about.html">Information</a>
+  <header class="bar" id="bar">
+    <nav class="bar-nav" aria-label="Sections">
+      <a href="../../index.html">HOME,</a>
+      <a href="../../index.html#index">WORK,</a>
+      <a href="../../index.html#information">INFORMATION,</a>
+      <a href="../../index.html#contact">CONTACT</a>
     </nav>
+    <div class="themes" role="group" aria-label="Color modes">
+      <button type="button" class="theme-btn" data-theme="light" aria-label="Light Mode" aria-pressed="true">
+        <span class="theme-dot theme-dot--light"><img src="../../assets/BUTTON.svg?v=2" alt=""></span>
+      </button>
+      <button type="button" class="theme-btn" data-theme="dark" aria-label="Dark Mode" aria-pressed="false">
+        <span class="theme-dot theme-dot--dark"><img src="../../assets/BUTTON2.svg?v=2" alt=""></span>
+      </button>
+      <button type="button" class="theme-btn" data-theme="bsod" aria-label="Blue Screen of Death Mode" aria-pressed="false">
+        <span class="theme-dot theme-dot--bsod"><img src="../../assets/BUTTON3.svg?v=2" alt=""></span>
+      </button>
+    </div>
   </header>
 
-  <section class="landing">
+  <section class="landing" id="top">
     <div class="project-masthead">
       <div class="project-masthead__rule" aria-hidden="true"></div>
       <h1 class="project-masthead__title">CLUTTER as a T(  )L: [An Index for Messy Pedagogy]</h1>
@@ -227,11 +241,13 @@
     </div>
   </section>
 
+    <a class="to-top" href="#top" aria-label="Back to top">Top <svg class="to-top__arrow" width="11" height="12" viewBox="0 0 11 12" aria-hidden="true" focusable="false"><path d="M5.5 11V1.5M5.5 1.5L1.5 5.5M5.5 1.5L9.5 5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <img class="lightbox__img" id="lightboxImg" alt="">
   </div>
 
-<script src="../../text-trail.js"></script>
-<script src="../project-layout.js"></script>
+<script src="../../text-trail.js?v=2"></script>
+<script src="../project-layout.js?v=20261019b"></script>
 </body>
 </html>
