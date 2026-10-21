@@ -851,6 +851,34 @@ html.home-reveal .info-status.is-revealed,
   }
 }
 
+.email-copied {
+  position: fixed;
+  z-index: 130;
+  transform: translate(-50%, -100%);
+  margin-top: -6px;
+  padding: 5px 8px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--diatype-bold);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: var(--nav-kerning);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.email-copied.is-on { opacity: 1; }
+.email-copied.is-below {
+  transform: translate(-50%, 0);
+  margin-top: 6px;
+}
+.email-copied.is-beside {
+  transform: translate(0, -50%);
+  margin-top: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rail-track { transform: none !important; }
   .skills-marquee__track {
@@ -863,4 +891,5 @@ html.home-reveal .info-status.is-revealed,
   .skills-marquee__chunk + .skills-marquee__chunk {
     display: none;
   }
+  .email-copied { transition: none; }
 }

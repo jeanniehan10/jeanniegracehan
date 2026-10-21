@@ -17,6 +17,8 @@ html, body {
   --slide-duration:0.9s;
   --triptych-push:0px;
   --hero-offset:75px;
+  /* Same space between the masthead text and the first image on every project */
+  --text-media-gap:24px;
   --hero-width:min(58%, 520px);
   --below-width:min(88%, 960px);
   --copy-para-gap:12px;
@@ -74,6 +76,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-feature-settings:"liga" 0, "calt" 0;
 }
 .copy p + p { margin-top:var(--copy-para-gap); }
+.copy em,
+.copy i {
+  font-style:italic;
+  font-synthesis:style;
+}
 
 /* Landing copy: Mono for all text including title */
 .landing {
@@ -82,25 +89,28 @@ body[data-scroll-reveal] .reveal.is-revealed {
 
 /*
   Detail-page masthead:
-  title (left) aligns with copy (right) on the same line;
-  meta sits under the title on the left.
+  title and specs stack on the left with a fixed gap;
+  copy sits on the right, aligned to the title.
+  The gap does not grow with the length of the copy.
 */
 .project-masthead {
   display:grid;
   grid-template-columns:1fr 1fr;
   column-gap:clamp(24px, 4vw, 48px);
-  /* Half-line gap: title → meta (not a full blank line) */
-  row-gap:calc(var(--text-sm) * var(--text-leading) * 0.45);
   align-items:start;
   width:100%;
-  padding-bottom:14px;
+  padding-bottom:0;
+}
+.project-masthead__lead {
+  display:flex;
+  flex-direction:column;
+  gap:calc(var(--text-sm) * var(--text-leading) * 1.3);
+  min-width:0;
 }
 .project-masthead__rule {
   display:none;
 }
 .project-masthead__title {
-  grid-column:1;
-  grid-row:1;
   margin:0;
   font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size:var(--text-sm);
@@ -117,20 +127,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   font-family:"Neue Haas Unica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight:500;
 }
-.project-masthead__body {
-  display:contents;
-  padding:0;
-}
-.project-masthead__grid {
-  display:contents;
-}
-.project-masthead__meta {
-  grid-column:1;
-  grid-row:2;
-}
 .project-masthead__copy.copy {
-  grid-column:2;
-  grid-row:1 / span 2;
   min-width:0;
 }
 .project-masthead__meta {
@@ -151,7 +148,7 @@ body[data-scroll-reveal] .reveal.is-revealed {
   margin-top:var(--copy-para-gap);
 }
 .project-masthead__copy.copy > p:last-child {
-  margin-bottom:calc(var(--text-sm) * var(--text-leading));
+  margin-bottom:0;
 }
 
 .landing-hero {
@@ -170,7 +167,11 @@ body[data-scroll-reveal] .reveal.is-revealed {
 .project-masthead + .landing-hero-stack,
 .project-masthead + .triptych,
 .project-masthead + .nsnb-media-stack {
-  margin-top:10px;
+  margin-top:var(--text-media-gap);
+}
+/* First image → the text under it uses that same gap (stack gap is already between them) */
+.landing-hero-stack > .landing-hero:first-child + .landing-copy {
+  margin-top:calc(var(--text-media-gap) - var(--img-gap));
 }
 .landing-copy {
   width:100%;
@@ -247,8 +248,8 @@ body[data-scroll-reveal] .reveal.is-revealed {
   column-gap:0;
   align-items:start;
   width:100%;
-  /* Same air as above/below GIFs / frame sequences */
-  margin-top:var(--hero-offset);
+  /* Same air as the masthead → first image gap; bottom air stays the larger offset */
+  margin-top:var(--text-media-gap);
   margin-bottom:var(--hero-offset);
 }
 .nsnb-media-stack__lead {
@@ -499,24 +500,13 @@ body:has(.nsnb-media-stack) {
     flex-direction:column;
     row-gap:0;
     column-gap:0;
-    padding-bottom:14px;
+    padding-bottom:0;
   }
-  .project-masthead__body {
-    display:block;
-    padding:0;
+  .project-masthead__lead {
+    gap:calc(var(--text-sm) * var(--text-leading) * 0.45);
   }
-  .project-masthead__grid {
-    display:grid;
-    grid-template-columns:1fr;
-    row-gap:calc(var(--text-sm) * var(--text-leading) * 3);
-  }
-  .project-masthead__title {
-    margin:0 0 calc(var(--text-sm) * var(--text-leading) * 0.45);
-  }
-  .project-masthead__meta,
   .project-masthead__copy.copy {
-    grid-column:auto;
-    grid-row:auto;
+    margin-top:calc(var(--text-sm) * var(--text-leading) * 3);
   }
   .landing-hero--sequence,
   .landing-hero--sequence.landing-hero--narrow {
@@ -534,13 +524,13 @@ body:has(.nsnb-media-stack) {
     display:flex;
     flex-direction:column;
     width:100%;
-    margin-top:10px;
+    margin-top:var(--text-media-gap);
   }
   .nsnb-lead-row {
     order:2;
     grid-template-columns:1fr;
-    row-gap:calc(var(--copy-para-gap) * 2);
-    margin-top:var(--hero-offset);
+    row-gap:var(--text-media-gap);
+    margin-top:var(--text-media-gap);
     margin-bottom:var(--hero-offset);
   }
   .nsnb-media-stack__lead {
@@ -576,6 +566,11 @@ body:has(.nsnb-media-stack) {
     height:var(--mobile-slideshow-h);
     overflow:hidden;
     width:100%;
+    touch-action:pan-y;
+    cursor:grab;
+  }
+  .triptych.is-dragging {
+    cursor:grabbing;
   }
   .triptych__track {
     display:flex;
@@ -775,4 +770,35 @@ body:has(.nsnb-media-stack) {
   cursor:ew-resize;
   user-select:none;
   -webkit-user-select:none;
+}
+
+.email-copied {
+  position:fixed;
+  z-index:130;
+  transform:translate(-50%, -100%);
+  margin-top:-6px;
+  padding:5px 8px;
+  background:var(--ink);
+  color:var(--bg);
+  font-family:var(--diatype-bold);
+  font-weight:700;
+  font-size:12px;
+  line-height:1;
+  letter-spacing:var(--nav-kerning);
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 160ms ease;
+}
+.email-copied.is-on { opacity:1; }
+.email-copied.is-below {
+  transform:translate(-50%, 0);
+  margin-top:6px;
+}
+.email-copied.is-beside {
+  transform:translate(0, -50%);
+  margin-top:0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .email-copied { transition:none; }
 }

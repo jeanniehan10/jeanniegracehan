@@ -218,32 +218,70 @@
 
   var CONTACT_EMAIL = 'jeanniehan10@gmail.com';
   function copyContactEmail() {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(CONTACT_EMAIL);
+    function fallback() {
+      return new Promise(function (resolve, reject) {
+        var ta = document.createElement('textarea');
+        ta.value = CONTACT_EMAIL;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          if (document.execCommand('copy')) resolve();
+          else reject(new Error('copy failed'));
+        } catch (err) {
+          reject(err);
+        } finally {
+          document.body.removeChild(ta);
+        }
+      });
     }
-    return new Promise(function (resolve, reject) {
-      var ta = document.createElement('textarea');
-      ta.value = CONTACT_EMAIL;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        if (document.execCommand('copy')) resolve();
-        else reject(new Error('copy failed'));
-      } catch (err) {
-        reject(err);
-      } finally {
-        document.body.removeChild(ta);
-      }
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(CONTACT_EMAIL).catch(fallback);
+    }
+    return fallback();
   }
+  function showEmailCopied(anchor) {
+    var old = document.querySelector('.email-copied');
+    if (old) old.remove();
+    var tip = document.createElement('span');
+    tip.className = 'email-copied';
+    tip.setAttribute('role', 'status');
+    tip.textContent = 'Email Copied!';
+    document.body.appendChild(tip);
+    var rect = anchor.getBoundingClientRect();
+    var tipW = tip.offsetWidth;
+    var bar = anchor.closest('.bar');
+    var barRect = bar ? bar.getBoundingClientRect() : rect;
+    var center = rect.left + rect.width / 2;
+    var left = Math.max(8 + tipW / 2, Math.min(center, window.innerWidth - 8 - tipW / 2));
+    if (barRect.top > window.innerHeight * 0.5) {
+      tip.style.left = left + 'px';
+      tip.style.top = barRect.top + 'px';
+    } else if (window.innerWidth - rect.right >= tipW + 16) {
+      tip.classList.add('is-beside');
+      tip.style.left = (rect.right + 10) + 'px';
+      tip.style.top = (rect.top + rect.height / 2) + 'px';
+    } else {
+      tip.classList.add('is-below');
+      tip.style.left = left + 'px';
+      tip.style.top = (barRect.bottom + 8) + 'px';
+    }
+    requestAnimationFrame(function () { tip.classList.add('is-on'); });
+    window.setTimeout(function () {
+      tip.classList.remove('is-on');
+      window.setTimeout(function () { if (tip.parentNode) tip.remove(); }, 180);
+    }, 1400);
+  }
+
   document.addEventListener('click', function (e) {
     var contactLink = e.target.closest && e.target.closest('a[href="#contact"], a[href$="#contact"]');
     if (!contactLink) return;
     e.preventDefault();
-    copyContactEmail().catch(function () {});
+    copyContactEmail().then(function () {
+      showEmailCopied(contactLink);
+    }).catch(function () {});
   });
 
   function fullSrc(img) {
@@ -338,7 +376,15 @@
     }
 
     document.querySelectorAll('[data-zoomable]').forEach((img) => {
-      img.addEventListener('click', () => openLightbox(img));
+      img.addEventListener('click', (e) => {
+        const slide = img.closest('.triptych');
+        if (slide && slide.dataset.dragged === '1') {
+          slide.dataset.dragged = '';
+          e.preventDefault();
+          return;
+        }
+        openLightbox(img);
+      });
     });
 
     // Backdrop click closes; left/right half of the lightbox steps the gallery
@@ -441,6 +487,15 @@
       }
     }
 
+    function armTimer() {
+      clearSlideshow();
+      if (!MOBILE_MQ.matches || slides.length < 2) return;
+      slideTimer = setInterval(() => {
+        slideIndex += 1;
+        goToSlide(slideIndex, true);
+      }, SLIDE_MS);
+    }
+
     function startSlideshow() {
       clearSlideshow();
       teardownInfiniteTrack();
@@ -449,11 +504,76 @@
       setupInfiniteTrack();
       slideIndex = 0;
       goToSlide(0, false);
-      slideTimer = setInterval(() => {
-        slideIndex += 1;
-        goToSlide(slideIndex, true);
-      }, SLIDE_MS);
+      armTimer();
     }
+
+    /* Horizontal drag on mobile. Vertical movement stays a page scroll. */
+    (function bindDrag() {
+      const viewport = track.parentElement;
+      if (!viewport || viewport.closest('.triptych-rows')) return;
+      let active = false;
+      let axis = null;
+      let startX = 0;
+      let startY = 0;
+      let startIndex = 0;
+      let dx = 0;
+
+      viewport.addEventListener('pointerdown', (e) => {
+        if (!MOBILE_MQ.matches || slides.length < 2) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        active = true;
+        axis = null;
+        dx = 0;
+        startX = e.clientX;
+        startY = e.clientY;
+        startIndex = slideIndex;
+        clearSlideshow();
+        track.style.transition = 'none';
+      });
+
+      viewport.addEventListener('pointermove', (e) => {
+        if (!active) return;
+        const mx = e.clientX - startX;
+        const my = e.clientY - startY;
+        if (!axis) {
+          if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+          axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+          if (axis === 'y') {
+            active = false;
+            armTimer();
+            return;
+          }
+          viewport.classList.add('is-dragging');
+          try { viewport.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+        if (axis !== 'x') return;
+        dx = mx;
+        track.style.transition = 'none';
+        track.style.transform = `translate3d(calc(-${startIndex * 100}% + ${dx}px), 0, 0)`;
+      });
+
+      function endDrag() {
+        if (!active && axis !== 'x') return;
+        const wasX = axis === 'x';
+        active = false;
+        viewport.classList.remove('is-dragging');
+        if (!wasX) {
+          armTimer();
+          return;
+        }
+        if (Math.abs(dx) > 8) viewport.dataset.dragged = '1';
+        const w = viewport.clientWidth || 1;
+        if (dx < -w * 0.18) slideIndex = startIndex + 1;
+        else if (dx > w * 0.18 && startIndex > 0) slideIndex = startIndex - 1;
+        else slideIndex = startIndex;
+        goToSlide(slideIndex, true);
+        armTimer();
+        axis = null;
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+    })();
 
     return { startSlideshow };
   }

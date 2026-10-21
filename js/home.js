@@ -145,19 +145,42 @@
     }
     requestAnimationFrame(tick);
 
-    /* Mobile: no rail drag — touch-action:none + capture was blocking page scroll */
+    /* Drag on desktop and mobile. A vertical gesture stays a page scroll. */
+    var pending = false;
+    var dragAxis = null;
+    var startX = 0;
+    var startY = 0;
     rail.addEventListener("pointerdown", function (e) {
-      if (mqRail.matches) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      dragging = true;
+      pending = true;
+      dragAxis = null;
+      dragging = false;
       vx = 0;
-      lastX = e.clientX;
+      startX = lastX = e.clientX;
+      startY = e.clientY;
       lastT = performance.now();
-      rail.classList.add("is-dragging");
-      try { rail.setPointerCapture(e.pointerId); } catch (err) {}
     });
     rail.addEventListener("pointermove", function (e) {
-      if (!dragging || mqRail.matches) return;
+      if (!pending && !dragging) return;
+      var mx = e.clientX - startX;
+      var my = e.clientY - startY;
+      if (!dragAxis) {
+        if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+        dragAxis = Math.abs(mx) > Math.abs(my) ? "x" : "y";
+        if (dragAxis === "y") {
+          pending = false;
+          return;
+        }
+        pending = false;
+        dragging = true;
+        vx = 0;
+        lastX = e.clientX;
+        lastT = performance.now();
+        rail.classList.add("is-dragging");
+        try { rail.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+      if (!dragging) return;
       var now = performance.now();
       var dx = e.clientX - lastX;
       var dt = Math.max(8, now - lastT);
@@ -168,6 +191,8 @@
       lastT = now;
     });
     function endDrag() {
+      pending = false;
+      dragAxis = null;
       if (!dragging) return;
       dragging = false;
       rail.classList.remove("is-dragging");
@@ -399,26 +424,62 @@
   var CONTACT_EMAIL = "jeanniehan10@gmail.com";
 
   function copyContactEmail() {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(CONTACT_EMAIL);
+    function fallback() {
+      return new Promise(function (resolve, reject) {
+        var ta = document.createElement("textarea");
+        ta.value = CONTACT_EMAIL;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          if (document.execCommand("copy")) resolve();
+          else reject(new Error("copy failed"));
+        } catch (err) {
+          reject(err);
+        } finally {
+          document.body.removeChild(ta);
+        }
+      });
     }
-    return new Promise(function (resolve, reject) {
-      var ta = document.createElement("textarea");
-      ta.value = CONTACT_EMAIL;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.left = "-9999px";
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        if (document.execCommand("copy")) resolve();
-        else reject(new Error("copy failed"));
-      } catch (err) {
-        reject(err);
-      } finally {
-        document.body.removeChild(ta);
-      }
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(CONTACT_EMAIL).catch(fallback);
+    }
+    return fallback();
+  }
+
+  function showEmailCopied(anchor) {
+    var old = document.querySelector(".email-copied");
+    if (old) old.remove();
+    var tip = document.createElement("span");
+    tip.className = "email-copied";
+    tip.setAttribute("role", "status");
+    tip.textContent = "Email Copied!";
+    document.body.appendChild(tip);
+    var rect = anchor.getBoundingClientRect();
+    var tipW = tip.offsetWidth;
+    var bar = anchor.closest(".bar");
+    var barRect = bar ? bar.getBoundingClientRect() : rect;
+    var center = rect.left + rect.width / 2;
+    var left = Math.max(8 + tipW / 2, Math.min(center, window.innerWidth - 8 - tipW / 2));
+    if (barRect.top > window.innerHeight * 0.5) {
+      tip.style.left = left + "px";
+      tip.style.top = barRect.top + "px";
+    } else if (window.innerWidth - rect.right >= tipW + 16) {
+      tip.classList.add("is-beside");
+      tip.style.left = (rect.right + 10) + "px";
+      tip.style.top = (rect.top + rect.height / 2) + "px";
+    } else {
+      tip.classList.add("is-below");
+      tip.style.left = left + "px";
+      tip.style.top = (barRect.bottom + 8) + "px";
+    }
+    requestAnimationFrame(function () { tip.classList.add("is-on"); });
+    window.setTimeout(function () {
+      tip.classList.remove("is-on");
+      window.setTimeout(function () { if (tip.parentNode) tip.remove(); }, 180);
+    }, 1400);
   }
 
   document.addEventListener("click", function (e) {
@@ -427,7 +488,9 @@
     var id = a.getAttribute("href").slice(1);
     if (id === "contact") {
       e.preventDefault();
-      copyContactEmail().catch(function () {});
+      copyContactEmail().then(function () {
+        showEmailCopied(a);
+      }).catch(function () {});
       return;
     }
     var el = id && document.getElementById(id);
