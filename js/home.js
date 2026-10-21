@@ -337,38 +337,10 @@
     }
   });
 
-  /* ---- skills marquee: duplicate until the loop has no empty gap --------- */
-  (function initSkillsMarquee() {
-    var viewport = document.querySelector(".skills-marquee__viewport");
-    var track = document.querySelector(".skills-marquee__track");
-    if (!viewport || !track) return;
-    var seed = track.querySelector(".skills-marquee__chunk");
-    if (!seed) return;
-    var unit = seed.cloneNode(true);
-
-    function fill() {
-      track.textContent = "";
-      track.appendChild(unit.cloneNode(true));
-      var vw = viewport.clientWidth || window.innerWidth;
-      var guard = 0;
-      while (track.scrollWidth < vw + 2 && guard < 24) {
-        track.appendChild(unit.cloneNode(true));
-        guard++;
-      }
-      Array.prototype.slice.call(track.children).forEach(function (node) {
-        track.appendChild(node.cloneNode(true));
-      });
-    }
-
-    fill();
-    window.addEventListener("resize", fill);
-  })();
-
   /* ---- scroll reveal (same as project detail pages) ---------------------- */
   (function initHomeReveal() {
     var REVEAL_SELECTOR = [
       ".masthead",
-      ".skills-marquee",
       ".rail",
       ".manifesto",
       ".index-title",
