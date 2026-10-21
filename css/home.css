@@ -90,28 +90,10 @@ html[data-theme="bsod"] {
   /* WORK / INFORMATION / CONTACT — adjust these */
   --nav-kerning: -0.05em;   /* letter-spacing inside each word */
   --nav-gap: 0.4em;         /* space between nav words */
-  --nav-font-size: 18px;    /* bar + skills marquee */
+  --nav-font-size: 18px;    /* menu bar */
 
   /* Desktop only: blank space between logo and nav row */
   --nav-margin-top: 12vh;
-
-  /*
-    Soft edge on the logo and the skills marquee.
-    Solid page color for the outer 10px, then a dissolve inward
-    so type doesn’t run off the screen.
-  */
-  --edge-solid: 10px;
-  --edge-fade: 52px;
-
-  /*
-    Desktop marquee ↔ masthead spacing (in home.css .skills-marquee):
-    • Pull marquee up: more negative --marquee-pull-up (e.g. -8px, -12px)
-    • Tighten gap under logo: lower --marquee-after-masthead-gap (e.g. 0)
-    • Space before nav row: --marquee-gap-below
-  */
-  --marquee-after-masthead-gap: 2px;
-  --marquee-pull-up: -4px;
-  --marquee-gap-below: 10px;
 
   /*
     Information column lengths — desktop only.
@@ -178,7 +160,6 @@ html, body {
 .index,
 .info,
 .masthead,
-.skills-marquee,
 .info-foot {
   background-color: var(--bg);
   color: var(--ink);
@@ -229,77 +210,6 @@ mark {
   line-height: 1;
   letter-spacing: var(--nav-kerning);
   padding-left: 10px;
-}
-
-/* TEMP: marquee off for layout preview — delete this rule to restore */
-.skills-marquee {
-  display: none !important;
-}
-
-/* ---- skills marquee (under masthead) ------------------------------------- */
-.skills-marquee {
-  position: relative;
-  margin: 0;
-  margin-top: var(--marquee-pull-up);
-  padding: 0 0 var(--marquee-gap-below);
-  overflow: hidden;
-  font-family: var(--diatype-bold);
-  font-weight: 700;
-  font-style: italic;
-  font-synthesis: style;
-  font-size: var(--nav-font-size);
-  line-height: 1;
-  letter-spacing: var(--nav-kerning);
-  white-space: nowrap;
-  color: #8a8a8a;
-}
-.skills-marquee::before,
-.skills-marquee::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--edge-fade);
-  z-index: 2;
-  pointer-events: none;
-}
-.skills-marquee::before {
-  left: 0;
-  background: linear-gradient(90deg, var(--bg) var(--edge-solid), transparent var(--edge-fade));
-}
-.skills-marquee::after {
-  right: 0;
-  background: linear-gradient(270deg, var(--bg) var(--edge-solid), transparent var(--edge-fade));
-}
-.skills-marquee__viewport {
-  display: block;
-  overflow: hidden;
-  width: 100%;
-}
-.skills-marquee__track {
-  display: flex;
-  flex-wrap: nowrap;
-  width: max-content;
-  animation: skills-marquee 52s linear infinite;
-  will-change: transform;
-}
-.skills-marquee__chunk {
-  display: flex;
-  align-items: center;
-  flex: 0 0 auto;
-}
-.skills-marquee__star {
-  display: block;
-  flex: 0 0 auto;
-  width: 0.62em;
-  height: 0.62em;
-  max-width: none;
-  margin: 0 0.55em;
-  object-fit: contain;
-}
-@keyframes skills-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
 }
 
 /* sensitive.work-style cubic / roller hover */
@@ -385,7 +295,7 @@ mark {
   padding:
     var(--logo-margin-top)
     var(--logo-margin-x)
-    var(--marquee-after-masthead-gap);
+    var(--logo-margin-bottom);
 }
 .masthead a {
   display: block;
@@ -440,7 +350,6 @@ html[data-theme="bsod"] .info-logo img {
 
 /* ---- scroll reveal (opacity only — no Y translate, so the page doesn't jump) */
 html.home-reveal .masthead,
-html.home-reveal .skills-marquee,
 html.home-reveal .rail,
 html.home-reveal .manifesto,
 html.home-reveal .index-title,
@@ -454,7 +363,6 @@ html.home-reveal .info-status,
   transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
 }
 html.home-reveal .masthead.is-revealed,
-html.home-reveal .skills-marquee.is-revealed,
 html.home-reveal .rail.is-revealed,
 html.home-reveal .manifesto.is-revealed,
 html.home-reveal .index-title.is-revealed,
@@ -468,7 +376,6 @@ html.home-reveal .info-status.is-revealed,
 }
 @media (prefers-reduced-motion: reduce) {
   html.home-reveal .masthead,
-  html.home-reveal .skills-marquee,
   html.home-reveal .rail,
   html.home-reveal .manifesto,
   html.home-reveal .index-title,
@@ -712,11 +619,11 @@ html.home-reveal .info-status.is-revealed,
 
   .masthead {
     flex-shrink: 0;
-    /* Bottom gap lives on the marquee so top and bottom match */
+    /* Same inset on all sides of the logo */
     padding:
       var(--logo-margin-top)
       var(--logo-margin-x)
-      0;
+      var(--logo-margin-bottom);
   }
 
   /* Floating bottom menu — matches screenshot, slightly rounded */
@@ -737,21 +644,6 @@ html.home-reveal .info-status.is-revealed,
   }
   .bar-nav {
     padding-left: 0;
-  }
-  .skills-marquee {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    /* Same space under the logo and above the slideshow */
-    padding: 8px 0;
-    font-size: 11px;
-    padding-top: 3px;
-  }
-  .skills-marquee__viewport {
-    flex-shrink: 0;
-    width: 100%;
   }
   .themes {
     padding-right: 0;
@@ -886,15 +778,5 @@ html.home-reveal .info-status.is-revealed,
 
 @media (prefers-reduced-motion: reduce) {
   .rail-track { transform: none !important; }
-  .skills-marquee__track {
-    animation: none;
-    flex-wrap: wrap;
-    white-space: normal;
-    width: auto;
-    padding-top: 10px;
-  }
-  .skills-marquee__chunk + .skills-marquee__chunk {
-    display: none;
-  }
   .email-copied { transition: none; }
 }
