@@ -231,6 +231,11 @@ mark {
   padding-left: 10px;
 }
 
+/* TEMP: marquee off for layout preview — delete this rule to restore */
+.skills-marquee {
+  display: none !important;
+}
+
 /* ---- skills marquee (under masthead) ------------------------------------- */
 .skills-marquee {
   position: relative;

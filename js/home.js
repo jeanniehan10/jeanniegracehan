@@ -270,7 +270,8 @@
   var scrollRaf = null;
   var scrollActive = true;
   var SCROLL_EASE = 0.095;
-  var NAV_SCROLL_EASE = 0.028;
+  /* Bar jumps (WORK / INFORMATION): faster than before, still eased */
+  var NAV_SCROLL_EASE = 0.072;
   var scrollEase = SCROLL_EASE;
   var WHEEL_SCALE = 0.92;
 
