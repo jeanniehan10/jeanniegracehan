@@ -334,7 +334,13 @@
   var TOUCH_SCALE = 0.93;
 
   function maxScroll() {
-    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    var root = document.documentElement;
+    var body = document.body;
+    var sh = Math.max(root.scrollHeight, body ? body.scrollHeight : 0);
+    return Math.max(0, sh - window.innerHeight);
+  }
+  function mastStretchDist() {
+    return Math.max(1, mastNaturalH() * (mastScaleMax() - 1));
   }
   function clampScroll(v) {
     return Math.max(0, Math.min(maxScroll(), v));
@@ -391,6 +397,7 @@
     var touchAxis = null;
     var touchOnRail = false;
     var touchActive = false;
+    var touchCustom = false;
     document.addEventListener("touchstart", function (e) {
       if (!e.touches || !e.touches[0]) return;
       touchActive = true;
@@ -398,11 +405,13 @@
       touchStartX = e.touches[0].clientX;
       touchStartY = touchY = e.touches[0].clientY;
       touchOnRail = !!(e.target && e.target.closest && e.target.closest("#rail"));
+      /* Ease only while the masthead is still contracting; after that, native scroll. */
+      touchCustom = mqHomeMobile.matches && (window.scrollY || 0) < mastStretchDist();
       scrollCurrent = window.scrollY || 0;
       scrollTarget = scrollCurrent;
     }, { passive: true });
     document.addEventListener("touchmove", function (e) {
-      if (!touchActive || !e.touches || !e.touches[0]) return;
+      if (!touchActive || !touchCustom || !e.touches || !e.touches[0]) return;
       var t = e.touches[0];
       if (touchOnRail && !touchAxis) {
         var adx = Math.abs(t.clientX - touchStartX);
@@ -416,8 +425,8 @@
       touchY = t.clientY;
       setScrollTarget(scrollTarget + dy * TOUCH_SCALE);
     }, { passive: false });
-    document.addEventListener("touchend", function () { touchActive = false; touchAxis = null; }, { passive: true });
-    document.addEventListener("touchcancel", function () { touchActive = false; touchAxis = null; }, { passive: true });
+    document.addEventListener("touchend", function () { touchActive = false; touchAxis = null; touchCustom = false; }, { passive: true });
+    document.addEventListener("touchcancel", function () { touchActive = false; touchAxis = null; touchCustom = false; }, { passive: true });
   }
 
   /* ---- scroll reveal (same as project detail pages) ---------------------- */
