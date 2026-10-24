@@ -201,6 +201,31 @@
     rail.addEventListener("pointercancel", endDrag);
   }
 
+  /* ---- masthead: start stretched, unstretch on scroll -------------------- */
+  var mastMark = document.querySelector(".masthead__mark");
+  var mastBand = document.querySelector(".masthead__band");
+  var mastRoot = document.documentElement;
+  function mastScaleMax() {
+    var v = parseFloat(getComputedStyle(mastRoot).getPropertyValue("--mast-scale-max"));
+    return v > 1 ? v : 2.55;
+  }
+  function mastNaturalH() {
+    if (!mastBand) return 0;
+    var w = mastBand.clientWidth || window.innerWidth;
+    return w * (264.48 / 2720.87);
+  }
+  function syncMastheadStretch() {
+    if (reduce || !mastMark || !mastRoot.classList.contains("mast-stretch")) return;
+    var max = mastScaleMax();
+    var dist = Math.max(1, mastNaturalH() * (max - 1));
+    var p = Math.min(1, Math.max(0, (window.scrollY || 0) / dist));
+    var s = max - (max - 1) * p;
+    mastMark.style.transform = "scaleY(" + s.toFixed(4) + ")";
+  }
+  syncMastheadStretch();
+  window.addEventListener("scroll", syncMastheadStretch, { passive: true });
+  window.addEventListener("resize", syncMastheadStretch);
+
   /* ---- keep menu bar pinned once it reaches the top ---------------------- */
   var bar = document.getElementById("bar");
   var barSpacer = null;
@@ -236,7 +261,7 @@
     if (shouldPin) {
       barSpacer.style.display = "block";
       barSpacer.style.marginTop = getComputedStyle(document.documentElement)
-        .getPropertyValue("--nav-margin-top").trim() || "26vh";
+        .getPropertyValue("--mast-gap").trim() || "45px";
       barSpacer.style.height = Math.max(bar.offsetHeight, 28) + "px";
       bar.classList.add("is-pinned");
     } else {
