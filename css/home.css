@@ -146,7 +146,7 @@ html[data-theme="bsod"] {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
   transition:
     --bg .7s var(--ease),
     --ink .7s var(--ease),
@@ -629,7 +629,8 @@ html.home-reveal .info-status.is-revealed,
     --logo-margin-x: 10px;
     --logo-margin-bottom: 10px;
     --nav-font-size: 15px;
-    --mast-pad: 2px;
+    /* Same top gap when stretched and when shrunk */
+    --mast-pad: var(--logo-margin-top);
     --mast-scale-max: 6.2;
     --mast-gap: 45px;
     --menu-masthead-gap: 20px;
@@ -644,11 +645,11 @@ html.home-reveal .info-status.is-revealed,
 
   .masthead {
     flex-shrink: 0;
-    padding: var(--mast-pad) var(--mast-pad) 0;
-    padding:
-      var(--logo-margin-top)
-      var(--logo-margin-x)
-      var(--logo-margin-bottom);
+    padding: var(--mast-pad) var(--logo-margin-x) var(--logo-margin-bottom);
+  }
+  html.mast-stretch .masthead__shell {
+    position: sticky;
+    top: var(--mast-pad);
   }
 
   /* Floating bottom menu — matches screenshot, slightly rounded */
