@@ -331,7 +331,7 @@
   var NAV_SCROLL_EASE = 0.072;
   var scrollEase = SCROLL_EASE;
   var WHEEL_SCALE = 0.92;
-  var TOUCH_SCALE = 0.88;
+  var TOUCH_SCALE = 0.93;
 
   function maxScroll() {
     return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
