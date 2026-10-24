@@ -42,18 +42,23 @@
   try {
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       d.documentElement.classList.add("home-reveal");
+      d.documentElement.classList.add("mast-stretch");
     }
   } catch (e) {}
 })(document);
 </script>
-<link rel="stylesheet" href="css/home.css?v=77">
+<link rel="stylesheet" href="css/home.css?v=87">
 </head>
 <body>
 
   <main>
     <section class="viewport" id="top" aria-label="Introduction">
-      <h1 class="masthead">
-        <a href="#top"><img src="assets/logo.svg" alt="Jeannie Han"></a>
+      <h1 class="masthead" data-logo>
+        <span class="masthead__band">
+          <span class="masthead__shell">
+            <a href="#top"><img class="masthead__mark" src="MASTHEAD.svg?v=5" alt="Jeannie Han"></a>
+          </span>
+        </span>
       </h1>
 
       <header class="bar" id="bar">
@@ -169,21 +174,19 @@
         </div>
       </div>
       <div class="info-wordmark">
-        <div class="info-logo" aria-hidden="true">
-          <img src="assets/logo.svg" alt="">
-        </div>
+        <div class="info-logo" aria-hidden="true"></div>
         <div class="info-status">
           <div class="info-status__left">
             <p class="info-status__tz">NYT</p>
             <p id="infoTime">12:00:00 AM</p>
           </div>
           <p class="info-status__listen">Currently Listening to: <a href="https://open.spotify.com/track/02l8T7IJ5UQE19m8cjY20f" target="_blank" rel="noopener">Tokyo Tea Room – If You Love Her</a></p>
-          <p class="info-status__copy">©2026 Jeannie Han all rights reserved</p>
+          <p class="info-status__copy">©2026 All Rights Reserved</p>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="js/home.js?v=56"></script>
+  <script src="js/home.js?v=62"></script>
 </body>
 </html>
