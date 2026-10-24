@@ -331,6 +331,7 @@
   var NAV_SCROLL_EASE = 0.072;
   var scrollEase = SCROLL_EASE;
   var WHEEL_SCALE = 0.92;
+  var TOUCH_SCALE = 0.88;
 
   function maxScroll() {
     return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
@@ -338,15 +339,18 @@
   function clampScroll(v) {
     return Math.max(0, Math.min(maxScroll(), v));
   }
-  function setScrollTarget(y, ease) {
-    scrollEase = ease || SCROLL_EASE;
-    scrollTarget = clampScroll(y);
-    if (scrollRaf == null && scrollActive && !reduce && !mqHomeMobile.matches) {
+  function startSmoothTick() {
+    if (scrollRaf == null && scrollActive && !reduce) {
       scrollRaf = requestAnimationFrame(tickScroll);
     }
   }
+  function setScrollTarget(y, ease) {
+    scrollEase = ease || SCROLL_EASE;
+    scrollTarget = clampScroll(y);
+    startSmoothTick();
+  }
   function tickScroll() {
-    if (!scrollActive || reduce || mqHomeMobile.matches) {
+    if (!scrollActive || reduce) {
       scrollRaf = null;
       return;
     }
@@ -357,15 +361,17 @@
       scrollEase = SCROLL_EASE;
       scrollRaf = null;
       syncBarPin(false);
+      syncMastheadStretch();
       return;
     }
     scrollCurrent += delta * scrollEase;
     window.scrollTo(0, scrollCurrent);
     syncBarPin(false);
+    syncMastheadStretch();
     scrollRaf = requestAnimationFrame(tickScroll);
   }
 
-  if (!reduce && !mqHomeMobile.matches) {
+  if (!reduce) {
     window.addEventListener("wheel", function (e) {
       if (e.ctrlKey) return;
       if (e.target && e.target.closest && e.target.closest(".rail.is-dragging")) return;
@@ -378,21 +384,41 @@
       scrollCurrent = window.scrollY || 0;
       scrollTarget = scrollCurrent;
     }, { passive: true });
-  }
 
-  mqHomeMobile.addEventListener("change", function (e) {
-    if (e.matches) {
-      scrollActive = false;
-      if (scrollRaf != null) {
-        cancelAnimationFrame(scrollRaf);
-        scrollRaf = null;
-      }
-    } else if (!reduce) {
-      scrollActive = true;
+    var touchY = 0;
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchAxis = null;
+    var touchOnRail = false;
+    var touchActive = false;
+    document.addEventListener("touchstart", function (e) {
+      if (!e.touches || !e.touches[0]) return;
+      touchActive = true;
+      touchAxis = null;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = touchY = e.touches[0].clientY;
+      touchOnRail = !!(e.target && e.target.closest && e.target.closest("#rail"));
       scrollCurrent = window.scrollY || 0;
       scrollTarget = scrollCurrent;
-    }
-  });
+    }, { passive: true });
+    document.addEventListener("touchmove", function (e) {
+      if (!touchActive || !e.touches || !e.touches[0]) return;
+      var t = e.touches[0];
+      if (touchOnRail && !touchAxis) {
+        var adx = Math.abs(t.clientX - touchStartX);
+        var ady = Math.abs(t.clientY - touchStartY);
+        if (adx < 8 && ady < 8) return;
+        touchAxis = adx > ady ? "x" : "y";
+      }
+      if (touchOnRail && (touchAxis === "x" || (rail && rail.classList.contains("is-dragging")))) return;
+      e.preventDefault();
+      var dy = touchY - t.clientY;
+      touchY = t.clientY;
+      setScrollTarget(scrollTarget + dy * TOUCH_SCALE);
+    }, { passive: false });
+    document.addEventListener("touchend", function () { touchActive = false; touchAxis = null; }, { passive: true });
+    document.addEventListener("touchcancel", function () { touchActive = false; touchAxis = null; }, { passive: true });
+  }
 
   /* ---- scroll reveal (same as project detail pages) ---------------------- */
   (function initHomeReveal() {
@@ -528,7 +554,7 @@
     e.preventDefault();
     var y = el.getBoundingClientRect().top + window.scrollY;
     var ease = a.closest(".bar-nav") ? NAV_SCROLL_EASE : SCROLL_EASE;
-    if (reduce || mqHomeMobile.matches) window.scrollTo(0, y);
+    if (reduce) window.scrollTo(0, y);
     else setScrollTarget(y, ease);
   });
 
