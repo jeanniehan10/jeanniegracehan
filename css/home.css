@@ -62,16 +62,16 @@ html[data-theme="dark"] {
 
 html[data-theme="bsod"] {
   --bg: #150df7;
-  --ink: #e0e1dd;
-  --muted: rgba(224, 225, 221, 0.62);
-  --plus: #e0e1dd;
-  --rule: rgba(224, 225, 221, 0.28);
-  --mark-bg: #e0e1dd;
+  --ink: #DAD2D8;
+  --muted: rgba(240, 235, 216, 0.62);
+  --plus: #DAD2D8;
+  --rule: rgba(240, 235, 216, 0.28);
+  --mark-bg: #DAD2D8;
   --mark-ink: #150df7;
-  --theme-fill: #e0e1dd;
+  --theme-fill: #DAD2D8;
   --theme-empty: transparent;
-  --theme-ring: #e0e1dd;
-  --live: #e0e1dd;
+  --theme-ring: #DAD2D8;
+  --live: #DAD2D8;
 }
 
 :root {
@@ -331,10 +331,13 @@ html.mast-stretch .masthead__mark {
   transform: scaleY(var(--mast-scale-max));
 }
 html[data-theme="dark"] .masthead img,
-html[data-theme="bsod"] .masthead img,
-html[data-theme="dark"] .info-logo img,
-html[data-theme="bsod"] .info-logo img {
+html[data-theme="dark"] .info-logo img {
   filter: invert(1);
+}
+/* Black wordmark → #DAD2D8 */
+html[data-theme="bsod"] .masthead img,
+html[data-theme="bsod"] .info-logo img {
+  filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mastBsod' color-interpolation-filters='sRGB'%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.8549 0 0 0 0 0.8235 0 0 0 0 0.8471 0 0 0 1 0'/%3E%3C/filter%3E%3C/svg%3E#mastBsod");
 }
 
 .bar {
