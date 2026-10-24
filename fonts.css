@@ -74,10 +74,10 @@ html[data-theme="dark"] {
 }
 html[data-theme="bsod"] {
   --bg: #150df7;
-  --text: #e0e1dd;
-  --ink: #e0e1dd;
-  --hairline: rgba(224, 225, 221, 0.28);
-  --blend-ink: #e0e1dd;
+  --text: #F0EBD8;
+  --ink: #F0EBD8;
+  --hairline: rgba(240, 235, 216, 0.28);
+  --blend-ink: #F0EBD8;
 }
 html {
   background: var(--bg);
