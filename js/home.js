@@ -204,7 +204,10 @@
   /* ---- masthead: start stretched, unstretch on scroll -------------------- */
   var mastMark = document.querySelector(".masthead__mark");
   var mastBand = document.querySelector(".masthead__band");
+  var mastShell = document.querySelector(".masthead__shell");
+  var mastEl = document.querySelector(".masthead");
   var mastRoot = document.documentElement;
+  var mqMastMobile = window.matchMedia("(max-width: 820px)");
   function mastScaleMax() {
     var v = parseFloat(getComputedStyle(mastRoot).getPropertyValue("--mast-scale-max"));
     return v > 1 ? v : 2.55;
@@ -214,17 +217,46 @@
     var w = mastBand.clientWidth || window.innerWidth;
     return w * (264.48 / 2720.87);
   }
+  function mastTopPad() {
+    return mastEl ? (parseFloat(getComputedStyle(mastEl).paddingTop) || 0) : 0;
+  }
   function syncMastheadStretch() {
     if (reduce || !mastMark || !mastRoot.classList.contains("mast-stretch")) return;
     var max = mastScaleMax();
     var dist = Math.max(1, mastNaturalH() * (max - 1));
-    var p = Math.min(1, Math.max(0, (window.scrollY || 0) / dist));
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    var p = Math.min(1, Math.max(0, y / dist));
     var s = max - (max - 1) * p;
+    /* Mobile: keep the stretched top inset the whole time it shrinks. */
+    if (mqMastMobile.matches && mastShell && mastBand) {
+      var restTop = mastTopPad();
+      var target = restTop;
+      if (y > dist) {
+        target = Math.min(restTop, mastBand.getBoundingClientRect().bottom - mastShell.offsetHeight);
+      }
+      var pin = target - mastShell.getBoundingClientRect().top;
+      mastMark.style.transform = "translateY(" + pin.toFixed(2) + "px) scaleY(" + s.toFixed(4) + ")";
+      return;
+    }
     mastMark.style.transform = "scaleY(" + s.toFixed(4) + ")";
   }
   syncMastheadStretch();
   window.addEventListener("scroll", syncMastheadStretch, { passive: true });
+  window.addEventListener("touchmove", syncMastheadStretch, { passive: true });
   window.addEventListener("resize", syncMastheadStretch);
+  mqMastMobile.addEventListener("change", function () {
+    if (mastMark) mastMark.style.transform = "";
+    syncMastheadStretch();
+  });
+  var lastMastY = -1;
+  (function mastRaf() {
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    if (y !== lastMastY) {
+      lastMastY = y;
+      syncMastheadStretch();
+    }
+    requestAnimationFrame(mastRaf);
+  })();
 
   /* ---- keep menu bar pinned once it reaches the top ---------------------- */
   var bar = document.getElementById("bar");
