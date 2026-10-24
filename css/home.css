@@ -72,6 +72,7 @@ html[data-theme="bsod"] {
   --theme-empty: transparent;
   --theme-ring: #DAD2D8;
   --live: #DAD2D8;
+  --mast-ink: #DAD2D8;
 }
 
 :root {
@@ -300,6 +301,10 @@ mark {
 .masthead {
   margin: 0;
   padding: var(--mast-pad) var(--mast-pad-x) 0;
+  color: var(--ink);
+}
+html[data-theme="bsod"] .masthead {
+  color: var(--mast-ink, #DAD2D8);
 }
 .masthead__band,
 .masthead__shell,
@@ -315,8 +320,10 @@ mark {
   display: block;
   width: 100%;
   height: auto;
+  fill: currentColor;
+  overflow: visible;
   transform-origin: 50% 0;
-  transition: filter .7s var(--ease);
+  transition: filter .7s var(--ease), fill .7s var(--ease), color .7s var(--ease);
 }
 html.mast-stretch .masthead__band {
   aspect-ratio: var(--mast-w) / calc(var(--mast-h) * var(--mast-scale-max));
@@ -333,11 +340,6 @@ html.mast-stretch .masthead__mark {
 html[data-theme="dark"] .masthead img,
 html[data-theme="dark"] .info-logo img {
   filter: invert(1);
-}
-/* Black wordmark → #DAD2D8 */
-html[data-theme="bsod"] .masthead img,
-html[data-theme="bsod"] .info-logo img {
-  filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mastBsod' color-interpolation-filters='sRGB'%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.8549 0 0 0 0 0.8235 0 0 0 0 0.8471 0 0 0 1 0'/%3E%3C/filter%3E%3C/svg%3E#mastBsod");
 }
 
 .bar {
