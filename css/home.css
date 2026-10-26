@@ -113,8 +113,8 @@ html[data-theme="bsod"] {
   --exp-col-width: 100%;
   /* Space between About and Experience; Experience still starts on the I (51.274%). */
   --info-col-gap: 28px;
-  /* Nudge copyright right edge if the SVG has extra side bearing (px) */
-  --info-copy-right-adjust: 2px;
+  /* Inset © from the right edge — matches theme buttons (bar 5px + 10px) */
+  --info-copy-right-adjust: 10px;
 
   --diatype: "ABC Diatype Ultra", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --diatype-bold: "ABC Diatype Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -434,7 +434,8 @@ html.home-reveal .info-status.is-revealed,
 }
 @media (min-width: 821px) {
   .manifesto p {
-    max-width: 60%;
+    /* Wide enough that “world.” stays on the second line of paragraph 2 */
+    max-width: 25em;
   }
 }
 .manifesto p + p {
@@ -574,6 +575,14 @@ html.home-reveal .info-status.is-revealed,
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.info-exp .info-credit {
+  margin-top: 1.28em;
+  padding-left: 0;
+  color: var(--muted);
+  font-size: inherit;
+  line-height: 1.28;
+  letter-spacing: inherit;
+}
 .jobs {
   width: max-content;
   max-width: 100%;
@@ -639,6 +648,8 @@ html.home-reveal .info-status.is-revealed,
     --mast-scale-max: 6.2;
     --mast-gap: 45px;
     --menu-masthead-gap: 20px;
+    /* Keep © lined up with the floating bar’s 12px side inset */
+    --info-copy-right-adjust: 2px;
   }
 
   .viewport {
@@ -696,7 +707,7 @@ html.home-reveal .info-status.is-revealed,
   }
 
   .manifesto { padding: 36px var(--gutter) 56px; }
-  .manifesto p { font-size: 20px; }
+  .manifesto p { font-size: clamp(17.5px, 5.2vw, 20px); }
   .index {
     padding: 28px 12px 64px;
   }
